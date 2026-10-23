@@ -1,0 +1,76 @@
+name: iOS CI
+
+# Compiles the app and runs tests on macOS for every push (any branch).
+# Signing is disabled: CI only checks that everything builds and tests pass.
+
+on:
+  push:
+  workflow_dispatch:
+
+concurrency:
+  group: ios-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: |
+          xcodebuild -version
+          mkdir -p build
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Upload regenerated project
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcodeproj
+          path: Suppl.xcodeproj
+          retention-days: 7
+
+      - name: Test SupplCore package
+        if: hashFiles('SupplCore/Package.swift') != ''
+        run: swift test --package-path SupplCore
+
+      - name: Build app for iOS Simulator
+        run: |
+          set -o pipefail
+          xcodebuild -project Suppl.xcodeproj -scheme Suppl \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            build | tee build/xcodebuild.log | grep -E "error:|warning:|BUILD (SUCCEEDED|FAILED)" || true
+          grep -q "BUILD SUCCEEDED" build/xcodebuild.log
+
+      - name: Run app unit tests
+        if: hashFiles('SupplTests/**') != ''
+        run: |
+          set -o pipefail
+          UDID=$(xcrun simctl list devices available -j | python3 -c "
+          import json, sys
+          d = json.load(sys.stdin)['devices']
+          print(next(x['udid'] for k, v in d.items() if 'iOS' in k for x in v if x['name'].startswith('iPhone')))
+          ")
+          echo "Using simulator $UDID"
+          xcodebuild -project Suppl.xcodeproj -scheme Suppl \
+            -destination "id=$UDID" \
+            -derivedDataPath build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            test | tee build/xcodebuild-test.log | grep -E "error:|Test Case.*failed|TEST (SUCCEEDED|FAILED)|Executed" || true
+          grep -q "TEST SUCCEEDED" build/xcodebuild-test.log
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcodebuild-logs
+          path: build/*.log
+          retention-days: 7
