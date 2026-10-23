@@ -197,7 +197,9 @@ struct HomeView: View {
     private func whyNowItem(_ groupID: String?) -> Binding<WhyNowItem?> {
         Binding(
             get: { groupID.map { WhyNowItem(id: $0) } },
-            set: { if $0 == nil { AppRouter.shared.whyNowGroupID = nil } }
+            set: { item in
+                if item == nil { Task { @MainActor in AppRouter.shared.whyNowGroupID = nil } }
+            }
         )
     }
 }

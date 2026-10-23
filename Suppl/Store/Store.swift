@@ -8,9 +8,10 @@ import StoreKit
 @Observable
 final class Store {
     static let shared = Store()
-    static let yearlyID = "com.zgalbs.suppl.pro.yearly"
-    static let monthlyID = "com.zgalbs.suppl.pro.monthly"
-    static let productIDs = [yearlyID, monthlyID]
+    // nonisolated so plain value types like `Membership` can read them.
+    nonisolated static let yearlyID = "com.zgalbs.suppl.pro.yearly"
+    nonisolated static let monthlyID = "com.zgalbs.suppl.pro.monthly"
+    nonisolated static let productIDs = [yearlyID, monthlyID]
 
     enum LoadState: Equatable { case idle, loading, loaded, failed }
 
@@ -41,8 +42,8 @@ final class Store {
             }
         }
         Task {
-            await loadProducts()
-            await refresh()
+            await self.loadProducts()
+            await self.refresh()
         }
     }
 
@@ -79,7 +80,7 @@ final class Store {
         case .success(let verification):
             guard case .verified(let transaction) = verification else { throw StoreError.unverified }
             await transaction.finish()
-            await refresh()
+            await self.refresh()
             return true
         case .pending:
             purchasePending = true

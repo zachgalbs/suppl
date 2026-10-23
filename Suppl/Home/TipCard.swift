@@ -17,7 +17,6 @@ struct TipCard: View {
                     Link("Learn more", destination: url)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(Color.forest)
-                        .underline()
                         .frame(minHeight: 44)
                         .accessibilityHint("Opens the source in Safari")
                 }

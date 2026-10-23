@@ -40,7 +40,7 @@ struct PaywallView: View {
         .overlay(alignment: .topTrailing) { closeButton }
         .task {
             store.start()
-            if store.products.isEmpty && store.loadState != .loading {
+            if store.loadState == .failed {
                 await store.loadProducts()
             }
         }

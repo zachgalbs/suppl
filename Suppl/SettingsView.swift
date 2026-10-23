@@ -89,10 +89,12 @@ struct SettingsView: View {
     }
 
     private var intensity: Binding<Intensity> {
-        Binding(
+        // Read here, on the main actor, so the binding's closures don't touch Store.
+        let pro = isPro
+        return Binding(
             get: { Intensity(rawValue: intensityRaw) ?? .balanced },
             set: { new in
-                if new.needsPro && !Store.shared.isPro {
+                if new.needsPro && !pro {
                     showingPaywall = true
                 } else {
                     intensityRaw = new.rawValue
