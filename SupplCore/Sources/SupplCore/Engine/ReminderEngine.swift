@@ -22,8 +22,9 @@ public enum ReminderEngine {
         public static let quietHours = "timing.quietHours.v1"
     }
 
-    /// Reminders that should be pending right now, for today and tomorrow (relative to `now` in `calendar`),
-    /// soonest first, at most 48. `history` holds decisions already delivered, so nothing fires twice.
+    /// Reminders that should be pending right now, soonest first, at most 48. Initial reminders cover
+    /// `prefs.planningDays` days from today (in `calendar`); follow-ups and snoozes cover today and tomorrow.
+    /// `history` holds decisions already delivered, so nothing fires twice.
     public static func plan(plans: [DosePlan], statuses: [DoseStatus], signals: [ContextSignal],
                             history: [ReminderDecision], prefs: Preferences,
                             now: Date, calendar: Calendar) -> [ReminderDecision] {
@@ -42,7 +43,8 @@ public enum ReminderEngine {
 
         let today = Day(now, calendar: calendar)
         var decisions: [ReminderDecision] = []
-        for day in [today, today.adding(days: 1, calendar: calendar)] {
+        for offset in 0..<max(2, prefs.planningDays) {
+            let day = today.adding(days: offset, calendar: calendar)
             for moment in Moment.allCases {
                 let open = unique.filter { plan in
                     guard plan.moment == moment, isDue(plan, on: day, calendar: calendar) else { return false }
@@ -56,14 +58,15 @@ public enum ReminderEngine {
                     if case let .snoozed(until) = states[plan.id]?[day] { return until }
                     return nil
                 }
-                decisions += planner.decisions(day: day, moment: moment, plans: open, snoozedUntil: snoozes.max())
+                // Past tomorrow only the initial is kept, so far-off days don't crowd out today's follow-ups.
+                let planned = planner.decisions(day: day, moment: moment, plans: open, snoozedUntil: snoozes.max())
+                decisions += offset < 2 ? planned : planned.filter { $0.stage == .initial }
             }
         }
         return capped(decisions)
     }
 
-    /// Soonest first, ties by id, then the cap. Six moments over two days can't reach 48 today,
-    /// but the cap guards against future moments or more follow-ups blowing the iOS limit.
+    /// Soonest first, ties by id, then the cap, so it's the farthest-off initials that give way.
     static func capped(_ decisions: [ReminderDecision]) -> [ReminderDecision] {
         Array(decisions.sorted { ($0.fireDate, $0.id) < ($1.fireDate, $1.id) }.prefix(maxDecisions))
     }
@@ -125,13 +128,15 @@ private struct Planner {
         } else {
             guard let first = initial(day: day, moment: moment, plans: plans, usual: usual, window: window)
             else { return [] }
+            // A past initial that isn't in history was never sent (added late, or a time moved earlier),
+            // so there's nothing to follow up on.
+            guard first.fire > now else { return [] }
             anchor = decision(.initial, first.fire, first.reason)
             followUpEnd = first.windowEnd
-            if first.fire > now { result.append(anchor) }
+            result.append(anchor)
         }
 
-        // Follow-ups hang off the initial's actual fire time. If the initial is in the past but wasn't
-        // reported delivered, it was still scheduled, so its follow-ups stay.
+        // Follow-ups hang off the initial's actual fire time.
         let delay = TimeInterval(prefs.followUpDelayMinutes * 60)
         let count = delay > 0 ? prefs.intensity.maxFollowUps : 0
         for n in stride(from: 1, through: count, by: 1) {

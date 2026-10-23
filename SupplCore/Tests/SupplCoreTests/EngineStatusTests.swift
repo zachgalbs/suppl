@@ -123,10 +123,10 @@ final class EngineStatusTests: XCTestCase {
         XCTAssertEqual(out.filter { $0.day == F.today }.reminderIDs, ["suppl.2026-10-23.breakfast.f2"])
     }
 
-    func testFollowUpsSurviveWithoutHistoryWhenTheInitialIsPast() {
-        // The 8:00 reminder was scheduled earlier; the app restarting at 8:10 must not lose its follow-up.
+    func testNoFollowUpForAnInitialThatWasNeverSent() {
+        // Added at 8:10, after the 8:00 usual time: nothing went out, so "Still open" would be a lie.
         let out = F.run([d], now: F.at(8, 10))
-        XCTAssertEqual(out.filter { $0.day == F.today }.reminderIDs, ["suppl.2026-10-23.breakfast.f1"])
+        XCTAssertEqual(out.filter { $0.day == F.today }.reminderIDs, [])
     }
 
     func testZeroDelayMeansNoFollowUps() {

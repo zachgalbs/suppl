@@ -40,7 +40,9 @@ enum EngineFixtures {
                       sources: Set<SignalSource> = [], quiet: QuietHours? = nil,
                       edit: (inout Preferences) -> Void = { _ in }) -> Preferences {
         var p = Preferences(intensity: intensity, quietHours: quiet, contextAware: contextAware,
-                            connectedSources: sources)
+                            connectedSources: sources,
+                            // Most tests reason about today and tomorrow; EngineHorizonTests covers the full week.
+                            planningDays: 2)
         edit(&p)
         return p
     }

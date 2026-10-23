@@ -59,7 +59,7 @@ final class CopyTests: XCTestCase {
     func testWorkoutFallbackIsHonest() {
         let r = Reason(trigger: .workoutFallback, usualDate: F.at(19, 30), ruleID: "timing.workoutFallback.v1")
         XCTAssertEqual(text(decision(.postWorkout, ["c"], fire: F.at(19, 30), r)).body,
-                       "No workout recorded today, so here's your usual reminder for Creatine (5 g).")
+                       "Here's your usual after-workout reminder for Creatine (5 g).")
     }
 
     func testStaleWorkoutNeverProducesJustFinishedWording() {
@@ -121,7 +121,7 @@ final class CopyTests: XCTestCase {
             (Reason(trigger: .usualTime, usualDate: F.at(8, 0), ruleID: "u"), .breakfast, ["8:00 AM", "usual breakfast time"]),
             (Reason(trigger: .workoutEnded, source: .appleHealth, dataTimestamp: F.at(17, 42), ruleID: "w"), .postWorkout,
              ["Apple Health", "5:42 PM"]),
-            (Reason(trigger: .workoutFallback, usualDate: F.at(19, 30), ruleID: "f"), .postWorkout, ["No workout", "7:30 PM"]),
+            (Reason(trigger: .workoutFallback, usualDate: F.at(19, 30), ruleID: "f"), .postWorkout, ["hadn't recorded a workout", "7:30 PM"]),
             (Reason(trigger: .lateWake, source: .whoop, dataTimestamp: F.at(8, 40), usualDate: F.at(7, 0), ruleID: "l"), .wake,
              ["WHOOP", "8:40 AM", "7:00 AM"]),
             (Reason(trigger: .calendarGap, source: .calendar, usualDate: F.at(8, 0), ruleID: "c"), .breakfast,

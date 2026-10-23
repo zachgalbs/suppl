@@ -40,7 +40,8 @@ public enum ReminderCopy {
                 let when = reason.dataTimestamp.map { " ending at \(time($0))" } ?? ""
                 sentence = "\(sourceName(reason.source)) recorded a workout\(when). Time for \(list)."
             case .workoutFallback:
-                sentence = "No workout recorded today, so here's your usual reminder for \(list)."
+                // Planned hours earlier, so it makes no claim about today: a workout may have happened since.
+                sentence = "Here's your usual after-workout reminder for \(list)."
             case .lateWake:
                 let woke = reason.dataTimestamp.map { " at \(time($0))" } ?? " later than usual"
                 sentence = "\(sourceName(reason.source)) shows you woke\(woke), so this moved to \(time(decision.fireDate)). Time for \(list)."
@@ -75,8 +76,8 @@ public enum ReminderCopy {
                 + "so this reminder was timed from that."
         case .workoutFallback:
             let at = reason.usualDate.map { " (\(time($0)))" } ?? ""
-            return "No workout was recorded today in your connected apps, so this came at your usual "
-                + "after-workout time\(at)."
+            return "This came at your usual after-workout time\(at). When it was planned, your connected "
+                + "apps hadn't recorded a workout today."
         case .lateWake:
             let woke = reason.dataTimestamp.map { " at \(time($0))" } ?? ""
             let from = reason.usualDate.map { " from \(time($0))" } ?? ""

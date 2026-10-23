@@ -224,6 +224,9 @@ public struct Preferences: Codable, Sendable, Hashable {
     public var freshness: FreshnessPolicy
     /// Shortest calendar gap worth moving a reminder into.
     public var minimumGapMinutes: Int
+    /// Days of initial reminders kept pending. Every trigger is one-shot, so this is how long reminders
+    /// keep coming if the app is never opened and background refresh never runs. Follow-ups cover two days.
+    public var planningDays: Int
 
     public init(usualTimes: [Moment: Int] = Preferences.defaultUsualTimes,
                 windows: [Moment: MomentWindow] = [:],
@@ -234,7 +237,8 @@ public struct Preferences: Codable, Sendable, Hashable {
                 contextAware: Bool = false,
                 connectedSources: Set<SignalSource> = [],
                 freshness: FreshnessPolicy = FreshnessPolicy(),
-                minimumGapMinutes: Int = 10) {
+                minimumGapMinutes: Int = 10,
+                planningDays: Int = 7) {
         self.usualTimes = usualTimes
         self.windows = windows
         self.intensity = intensity
@@ -245,6 +249,7 @@ public struct Preferences: Codable, Sendable, Hashable {
         self.connectedSources = connectedSources
         self.freshness = freshness
         self.minimumGapMinutes = minimumGapMinutes
+        self.planningDays = planningDays
     }
 
     /// Same defaults as the app's `Slot.defaultMinutes`.
