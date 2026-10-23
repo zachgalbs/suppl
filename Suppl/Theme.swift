@@ -5,6 +5,9 @@ extension Color {
     static let sage = Color(hex: 0x789575)
     static let forest = Color(hex: 0x344536)
     static let lavender = Color(hex: 0x987E9F)
+    // Secondary tokens from the design blueprint, for selected states and badges.
+    static let softSage = Color(hex: 0xE8EDE2)
+    static let softLavender = Color(hex: 0xF0EAF1)
 
     init(hex: UInt32) {
         self.init(
