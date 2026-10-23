@@ -81,7 +81,7 @@ struct PaywallView: View {
             feature("figure.run", "Reminders after your workouts",
                     "When Apple Health\(whoopAvailable ? " or WHOOP" : "") records one.")
             feature("sunrise", "Mornings that wait for you",
-                    "Slept in? Wake-up reminders shift with you.")
+                    "Slept in? If Apple Health shows you're up late, morning reminders that haven't gone out yet can wait.")
             feature("calendar", "Around your calendar",
                     "A reminder can move to a free moment instead of mid-meeting.")
             if whoopAvailable {
@@ -163,7 +163,7 @@ struct PaywallView: View {
                 .disabled(purchasing)
                 .padding(.top, 4)
             }
-            Text("Renews automatically until you cancel in Settings. Cancel anytime.")
+            Text("Payment is charged to your Apple ID when you confirm. It renews automatically unless you cancel at least 24 hours before the end of the current period. Manage or cancel anytime in Settings.")
                 .font(.footnote)
                 .foregroundStyle(Color.forest.opacity(0.8))
             if store.purchasePending {

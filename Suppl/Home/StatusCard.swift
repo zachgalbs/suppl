@@ -9,8 +9,14 @@ struct StatusCard: View {
     var turnOn: () -> Void
     @Environment(\.openURL) private var openURL
 
+    /// Without Pro, connected apps aren't read at all, so "hasn't updated" would blame the wrong thing.
+    private var connectedWithoutPro: Bool {
+        !Store.shared.isPro && !ConnectorHub.shared.connectedSources.isEmpty
+    }
+
     /// A connected app whose data is too old to use. The engine falls back to usual times on its own.
     private var staleConnector: String? {
+        guard Store.shared.isPro else { return nil }
         let hub = ConnectorHub.shared
         let now = Date.now
         return hub.connectors.first { connector in
@@ -50,6 +56,9 @@ struct StatusCard: View {
         default:
             if let name = staleConnector {
                 return "\(name) hasn't updated recently, so we're using your usual times."
+            }
+            if connectedWithoutPro {
+                return "Your routine is ready. Timing around your connected apps is part of suppl. Pro, so we're using your usual times."
             }
             return "Your routine is ready. We'll let you know when it's a good time."
         }

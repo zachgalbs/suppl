@@ -58,7 +58,8 @@ struct ConnectorRow: View {
         case .available: break
         }
         switch connector.authorization {
-        case .connected: return "Connected"
+        // iOS never tells apps whether Health read access was granted, so don't claim more than the prompt.
+        case .connected: return connector.id == .appleHealth ? "Set up" : "Connected"
         case .denied: return "Access off"
         case .notConnected: return "Not connected"
         }

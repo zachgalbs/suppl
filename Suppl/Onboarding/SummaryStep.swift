@@ -40,7 +40,7 @@ struct SummaryStep: View {
         result.append("Reminder style: \(style.title). \(style.detail)")
         let connected = hub.connectors.filter { $0.authorization == .connected }.map { $0.displayName }
         if !connected.isEmpty {
-            result.append("Connected: \(ListFormatter.localizedString(byJoining: connected)).")
+            result.append("Apps you set up: \(ListFormatter.localizedString(byJoining: connected)).")
         }
         if notificationStatus == .denied || notificationStatus == .notDetermined {
             result.append("Reminders are off for now. You can turn them on from Home.")
