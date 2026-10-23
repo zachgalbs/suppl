@@ -22,6 +22,14 @@ final class ContractsTests: XCTestCase {
         XCTAssertLessThan(day, day.adding(days: 1, calendar: calendar))
     }
 
+    func testDayKeyRoundTrips() {
+        let day = Day(year: 2026, month: 3, day: 8)
+        XCTAssertEqual(Day(key: day.key), day)
+        XCTAssertNil(Day(key: "2026-13-01"))
+        XCTAssertNil(Day(key: "followup"))
+        XCTAssertNil(Day(key: "2026-3-8"))
+    }
+
     func testReminderIdentifiers() {
         let day = Day(year: 2026, month: 3, day: 8)
         XCTAssertEqual(ReminderID.make(day: day, moment: .breakfast, stage: .initial), "suppl.2026-03-08.breakfast")

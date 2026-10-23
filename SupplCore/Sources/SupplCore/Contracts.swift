@@ -49,6 +49,14 @@ public struct Day: Hashable, Codable, Comparable, Sendable, CustomStringConverti
         self.init(year: c.year ?? 0, month: c.month ?? 0, day: c.day ?? 0)
     }
 
+    /// Parses `key` back. `nil` for anything that isn't a real `yyyy-MM-dd` date.
+    public init?(key: String) {
+        let parts = key.split(separator: "-").compactMap { Int($0) }
+        guard parts.count == 3, key.count == 10, (1...12).contains(parts[1]), (1...31).contains(parts[2])
+        else { return nil }
+        self.init(year: parts[0], month: parts[1], day: parts[2])
+    }
+
     /// `yyyy-MM-dd`, used in notification identifiers.
     public var key: String {
         String(format: "%04d-%02d-%02d", year, month, day)
