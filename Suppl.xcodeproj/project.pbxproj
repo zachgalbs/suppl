@@ -24,7 +24,9 @@
 		95A48A2AFCCF55A811DCF980 /* Logs.swift in Sources */ = {isa = PBXBuildFile; fileRef = F833EBA9E5E141E7FE487711 /* Logs.swift */; };
 		B9358C3F4152567273FDFFAD /* WebAuthSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B13E24B06E0B80D4E2FD24A /* WebAuthSession.swift */; };
 		BD2A495D8A20439B3BD15307 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 222E0D48A7789AB1DB50356F /* OnboardingView.swift */; };
+		C201C66B4415F63DAD2A8A6C /* tips.json in Resources */ = {isa = PBXBuildFile; fileRef = 74D27C26EE8E5FDB6685CD62 /* tips.json */; };
 		DB03C82547B2B31A50F8B74F /* MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9312C363341B35FA9ABF95 /* MigrationTests.swift */; };
+		DFEEAF75C6CFDBF4A2317E51 /* catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = 4633333E34CCD19EC8AC1F99 /* catalog.json */; };
 		E228AFA3444D580F1E0FD4F4 /* CalendarConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D40948AD8854D6D17126B14 /* CalendarConnector.swift */; };
 		FA64AD4D69034C8929BC3EC0 /* WhoopAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = E483C9B3A830B21AB2207599 /* WhoopAPI.swift */; };
 		FC21A99AF5F97AB091075129 /* PrefKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 768E94186A55E08F335A0B88 /* PrefKey.swift */; };
@@ -44,14 +46,15 @@
 		0B4A64E1392438BFFC7B955E /* SupplementForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupplementForm.swift; sourceTree = "<group>"; };
 		0E1F1EB98DEEE4A04475327A /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
 		0F80ACAEF50C632EFAB0045E /* SupplApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupplApp.swift; sourceTree = "<group>"; };
-		1D0AE3157476C7C0E77B991B /* Products.storekit */ = {isa = PBXFileReference; path = Products.storekit; sourceTree = "<group>"; };
 		222E0D48A7789AB1DB50356F /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		22A9C92CE0341F102C9D17D8 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		255DFE1A9A5509FC90FB9812 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3C4F611C77D8720115B4E305 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		3D40948AD8854D6D17126B14 /* CalendarConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarConnector.swift; sourceTree = "<group>"; };
 		3EEBE0AC7126E0E2DB40B451 /* SupplTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SupplTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4633333E34CCD19EC8AC1F99 /* catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = catalog.json; sourceTree = "<group>"; };
 		6E9A55A34C5D4FC2ED89DD83 /* Suppl.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Suppl.xcconfig; sourceTree = "<group>"; };
+		74D27C26EE8E5FDB6685CD62 /* tips.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = tips.json; sourceTree = "<group>"; };
 		768E94186A55E08F335A0B88 /* PrefKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefKey.swift; sourceTree = "<group>"; };
 		7B13E24B06E0B80D4E2FD24A /* WebAuthSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebAuthSession.swift; sourceTree = "<group>"; };
 		7BF6DF274A3E9396909628FF /* WhoopConnector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhoopConnector.swift; sourceTree = "<group>"; };
@@ -59,6 +62,7 @@
 		91783C31F281B54291E4F93D /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		9B1992C00DA35B2F713E6402 /* Suppl.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Suppl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D9312C363341B35FA9ABF95 /* MigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationTests.swift; sourceTree = "<group>"; };
+		DBFBA1D969B401FD0FED12F9 /* Products.storekit */ = {isa = PBXFileReference; path = Products.storekit; sourceTree = "<group>"; };
 		E0435018DA72F8CD403DD543 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		E483C9B3A830B21AB2207599 /* WhoopAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhoopAPI.swift; sourceTree = "<group>"; };
 		E9D7943D519B8C47A66328FB /* SupplCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SupplCore; path = SupplCore; sourceTree = SOURCE_ROOT; };
@@ -94,6 +98,7 @@
 				91783C31F281B54291E4F93D /* Theme.swift */,
 				4E5A95B39B55A16BE4F94924 /* Connectors */,
 				A3BD539688CF55EF8062D805 /* Engine */,
+				7A004E111F3BA55254958E33 /* Resources */,
 			);
 			path = Suppl;
 			sourceTree = "<group>";
@@ -130,13 +135,14 @@
 			path = Config;
 			sourceTree = "<group>";
 		};
-		8D1623B74AE4F2D4D1EB17E4 /* Resources */ = {
+		7A004E111F3BA55254958E33 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				1D0AE3157476C7C0E77B991B /* Products.storekit */,
+				4633333E34CCD19EC8AC1F99 /* catalog.json */,
+				DBFBA1D969B401FD0FED12F9 /* Products.storekit */,
+				74D27C26EE8E5FDB6685CD62 /* tips.json */,
 			);
-			name = Resources;
-			path = Suppl/Resources;
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		907E2E53EB6F48F301BEB5B4 = {
@@ -144,7 +150,6 @@
 			children = (
 				764886BA78CA99627872CFF7 /* Config */,
 				ECF77767E92BD8B19AD2C38F /* Packages */,
-				8D1623B74AE4F2D4D1EB17E4 /* Resources */,
 				113C3E51CF6608638293B901 /* Suppl */,
 				A631A5E23EB0AF997253A21F /* SupplTests */,
 				4ABBD83D1D7A707A475EC687 /* Products */,
@@ -265,6 +270,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				71141CA66939E49C74C311AD /* Assets.xcassets in Resources */,
+				DFEEAF75C6CFDBF4A2317E51 /* catalog.json in Resources */,
+				C201C66B4415F63DAD2A8A6C /* tips.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
