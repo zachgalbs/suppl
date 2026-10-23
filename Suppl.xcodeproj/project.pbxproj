@@ -12,24 +12,56 @@
 		2EE1B027E51360FCFA80FA62 /* SupplementForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B4A64E1392438BFFC7B955E /* SupplementForm.swift */; };
 		3765CDF1F89F3954197BBED6 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C4F611C77D8720115B4E305 /* SettingsView.swift */; };
 		459747EDF4D6944688CAC358 /* Reminders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F8EFCCAE2BF3FC41FA01A8B /* Reminders.swift */; };
+		56199A84F90476A525457ED9 /* SupplCore in Frameworks */ = {isa = PBXBuildFile; productRef = 79EA6FD3AEBD46B7999E91A0 /* SupplCore */; };
 		71141CA66939E49C74C311AD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 255DFE1A9A5509FC90FB9812 /* Assets.xcassets */; };
 		8B7D0537628B7A149393C9A4 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A9C92CE0341F102C9D17D8 /* HomeView.swift */; };
 		904296C1158A750D291A4892 /* SupplApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F80ACAEF50C632EFAB0045E /* SupplApp.swift */; };
+		95A48A2AFCCF55A811DCF980 /* Logs.swift in Sources */ = {isa = PBXBuildFile; fileRef = F833EBA9E5E141E7FE487711 /* Logs.swift */; };
 		BD2A495D8A20439B3BD15307 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 222E0D48A7789AB1DB50356F /* OnboardingView.swift */; };
+		DB03C82547B2B31A50F8B74F /* MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9312C363341B35FA9ABF95 /* MigrationTests.swift */; };
+		FC21A99AF5F97AB091075129 /* PrefKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 768E94186A55E08F335A0B88 /* PrefKey.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		ABB57801D81EFB108C73918C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 18530EEB1B16D8F1835459CD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E76EE741C5828BDE51B65ECB;
+			remoteInfo = Suppl;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		0B4A64E1392438BFFC7B955E /* SupplementForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupplementForm.swift; sourceTree = "<group>"; };
 		0F80ACAEF50C632EFAB0045E /* SupplApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupplApp.swift; sourceTree = "<group>"; };
+		1D0AE3157476C7C0E77B991B /* Products.storekit */ = {isa = PBXFileReference; path = Products.storekit; sourceTree = "<group>"; };
 		222E0D48A7789AB1DB50356F /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		22A9C92CE0341F102C9D17D8 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		255DFE1A9A5509FC90FB9812 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3C4F611C77D8720115B4E305 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		3EEBE0AC7126E0E2DB40B451 /* SupplTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SupplTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6E9A55A34C5D4FC2ED89DD83 /* Suppl.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Suppl.xcconfig; sourceTree = "<group>"; };
+		768E94186A55E08F335A0B88 /* PrefKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefKey.swift; sourceTree = "<group>"; };
 		7F8EFCCAE2BF3FC41FA01A8B /* Reminders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reminders.swift; sourceTree = "<group>"; };
 		91783C31F281B54291E4F93D /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		9B1992C00DA35B2F713E6402 /* Suppl.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Suppl.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9D9312C363341B35FA9ABF95 /* MigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationTests.swift; sourceTree = "<group>"; };
 		E0435018DA72F8CD403DD543 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		E9D7943D519B8C47A66328FB /* SupplCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SupplCore; path = SupplCore; sourceTree = SOURCE_ROOT; };
+		F833EBA9E5E141E7FE487711 /* Logs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logs.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7333B0BE63C48B9BAAFEEFD4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				56199A84F90476A525457ED9 /* SupplCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		113C3E51CF6608638293B901 /* Suppl */ = {
@@ -44,6 +76,7 @@
 				0F80ACAEF50C632EFAB0045E /* SupplApp.swift */,
 				0B4A64E1392438BFFC7B955E /* SupplementForm.swift */,
 				91783C31F281B54291E4F93D /* Theme.swift */,
+				A3BD539688CF55EF8062D805 /* Engine */,
 			);
 			path = Suppl;
 			sourceTree = "<group>";
@@ -52,27 +85,93 @@
 			isa = PBXGroup;
 			children = (
 				9B1992C00DA35B2F713E6402 /* Suppl.app */,
+				3EEBE0AC7126E0E2DB40B451 /* SupplTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		764886BA78CA99627872CFF7 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				6E9A55A34C5D4FC2ED89DD83 /* Suppl.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		8D1623B74AE4F2D4D1EB17E4 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				1D0AE3157476C7C0E77B991B /* Products.storekit */,
+			);
+			name = Resources;
+			path = Suppl/Resources;
 			sourceTree = "<group>";
 		};
 		907E2E53EB6F48F301BEB5B4 = {
 			isa = PBXGroup;
 			children = (
+				764886BA78CA99627872CFF7 /* Config */,
+				ECF77767E92BD8B19AD2C38F /* Packages */,
+				8D1623B74AE4F2D4D1EB17E4 /* Resources */,
 				113C3E51CF6608638293B901 /* Suppl */,
+				A631A5E23EB0AF997253A21F /* SupplTests */,
 				4ABBD83D1D7A707A475EC687 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		A3BD539688CF55EF8062D805 /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				F833EBA9E5E141E7FE487711 /* Logs.swift */,
+				768E94186A55E08F335A0B88 /* PrefKey.swift */,
+			);
+			path = Engine;
+			sourceTree = "<group>";
+		};
+		A631A5E23EB0AF997253A21F /* SupplTests */ = {
+			isa = PBXGroup;
+			children = (
+				9D9312C363341B35FA9ABF95 /* MigrationTests.swift */,
+			);
+			path = SupplTests;
+			sourceTree = "<group>";
+		};
+		ECF77767E92BD8B19AD2C38F /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				E9D7943D519B8C47A66328FB /* SupplCore */,
+			);
+			name = Packages;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		B25F8C231320AB3616056252 /* SupplTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 36948F37B955167475E46F92 /* Build configuration list for PBXNativeTarget "SupplTests" */;
+			buildPhases = (
+				1F6D44BAACA108852E68F8FB /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				68DC8C9D9F53EB259A1FCBB9 /* PBXTargetDependency */,
+			);
+			name = SupplTests;
+			packageProductDependencies = (
+			);
+			productName = SupplTests;
+			productReference = 3EEBE0AC7126E0E2DB40B451 /* SupplTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		E76EE741C5828BDE51B65ECB /* Suppl */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3B6A13338818D63B2108D611 /* Build configuration list for PBXNativeTarget "Suppl" */;
 			buildPhases = (
 				F5C6FD2D46B033CF6C7896FF /* Sources */,
 				3AE4AAFD2A1BB4A62E8736AE /* Resources */,
+				7333B0BE63C48B9BAAFEEFD4 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -80,6 +179,7 @@
 			);
 			name = Suppl;
 			packageProductDependencies = (
+				79EA6FD3AEBD46B7999E91A0 /* SupplCore */,
 			);
 			productName = Suppl;
 			productReference = 9B1992C00DA35B2F713E6402 /* Suppl.app */;
@@ -92,8 +192,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 1600;
 				TargetAttributes = {
+					B25F8C231320AB3616056252 = {
+						DevelopmentTeam = 8DGT7FKTPZ;
+						ProvisioningStyle = Automatic;
+					};
 					E76EE741C5828BDE51B65ECB = {
 						DevelopmentTeam = 8DGT7FKTPZ;
 						ProvisioningStyle = Automatic;
@@ -109,12 +213,16 @@
 			);
 			mainGroup = 907E2E53EB6F48F301BEB5B4;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				82C908E8F659F6539D82877B /* XCLocalSwiftPackageReference "SupplCore" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4ABBD83D1D7A707A475EC687 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				E76EE741C5828BDE51B65ECB /* Suppl */,
+				B25F8C231320AB3616056252 /* SupplTests */,
 			);
 		};
 /* End PBXProject section */
@@ -131,13 +239,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		1F6D44BAACA108852E68F8FB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB03C82547B2B31A50F8B74F /* MigrationTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F5C6FD2D46B033CF6C7896FF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				8B7D0537628B7A149393C9A4 /* HomeView.swift in Sources */,
+				95A48A2AFCCF55A811DCF980 /* Logs.swift in Sources */,
 				1C8117A12A51C19A81082267 /* Models.swift in Sources */,
 				BD2A495D8A20439B3BD15307 /* OnboardingView.swift in Sources */,
+				FC21A99AF5F97AB091075129 /* PrefKey.swift in Sources */,
 				459747EDF4D6944688CAC358 /* Reminders.swift in Sources */,
 				3765CDF1F89F3954197BBED6 /* SettingsView.swift in Sources */,
 				904296C1158A750D291A4892 /* SupplApp.swift in Sources */,
@@ -147,6 +265,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		68DC8C9D9F53EB259A1FCBB9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E76EE741C5828BDE51B65ECB /* Suppl */;
+			targetProxy = ABB57801D81EFB108C73918C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		25F330515826F9A09CEC20D4 /* Release */ = {
@@ -209,15 +335,37 @@
 			};
 			name = Release;
 		};
+		35F7E33CA68FA84743EFA5B7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.zgalbs.suppl.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Suppl.app/Suppl";
+			};
+			name = Release;
+		};
 		8C0F2B7631AABC1889E5BD49 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6E9A55A34C5D4FC2ED89DD83 /* Suppl.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Suppl/Suppl.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Suppl/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = suppl.;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "suppl. checks when you're busy so it can move a flexible reminder into a free moment. It never reads event titles, notes, or attendees.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "suppl. reads your workouts and sleep so it can remind you after a workout and shift morning reminders when you wake up late. Nothing leaves your phone.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -300,13 +448,18 @@
 		};
 		A0C4F94D2FF599C0260C3CCC /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6E9A55A34C5D4FC2ED89DD83 /* Suppl.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Suppl/Suppl.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Suppl/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = suppl.;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "suppl. checks when you're busy so it can move a flexible reminder into a free moment. It never reads event titles, notes, or attendees.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "suppl. reads your workouts and sleep so it can remind you after a workout and shift morning reminders when you wake up late. Nothing leaves your phone.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -320,9 +473,35 @@
 			};
 			name = Release;
 		};
+		D77BF928BFD9B8735EFE2CD0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.zgalbs.suppl.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Suppl.app/Suppl";
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		36948F37B955167475E46F92 /* Build configuration list for PBXNativeTarget "SupplTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D77BF928BFD9B8735EFE2CD0 /* Debug */,
+				35F7E33CA68FA84743EFA5B7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		3B6A13338818D63B2108D611 /* Build configuration list for PBXNativeTarget "Suppl" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -342,6 +521,20 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		82C908E8F659F6539D82877B /* XCLocalSwiftPackageReference "SupplCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = SupplCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		79EA6FD3AEBD46B7999E91A0 /* SupplCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SupplCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 18530EEB1B16D8F1835459CD /* Project object */;
 }
