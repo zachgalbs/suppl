@@ -1,118 +1,92 @@
 import SwiftUI
 
+/// The onboarding flow. Each step lives in Onboarding/; this file only handles order, Back, and progress.
+@MainActor
 struct OnboardingView: View {
     @AppStorage("onboarded") private var onboarded = false
-    @AppStorage("name") private var name = ""
-    @AppStorage(Slot.wake.storageKey) private var wake = Slot.wake.defaultMinutes
-    @AppStorage(Slot.breakfast.storageKey) private var breakfast = Slot.breakfast.defaultMinutes
-    @AppStorage(Slot.lunch.storageKey) private var lunch = Slot.lunch.defaultMinutes
-    @AppStorage(Slot.dinner.storageKey) private var dinner = Slot.dinner.defaultMinutes
-    @AppStorage(Slot.bedtime.storageKey) private var bedtime = Slot.bedtime.defaultMinutes
+    @AppStorage(PrefKey.takesSupplements) private var habitRaw = ""
 
-    @State private var step = 0
-    @State private var isAdult = false
+    /// Visited steps, so Back retraces the path the user actually took (e.g. "Not yet" skips ahead).
+    @State private var path: [OnboardingStep] = [.welcome]
+
+    private var step: OnboardingStep { path.last ?? .welcome }
 
     var body: some View {
         ZStack {
             Color.cream.ignoresSafeArea()
-            VStack(alignment: .leading, spacing: 24) {
-                switch step {
-                case 0: welcome
-                case 1: about
-                case 2: times
-                default: notifications
+            if step == .paywall {
+                PaywallView(onClose: { onboarded = true })
+            } else {
+                VStack(alignment: .leading, spacing: 24) {
+                    if step.showsProgress {
+                        header
+                    }
+                    page
                 }
+                .padding(24)
+                .foregroundStyle(Color.forest)
             }
-            .padding(24)
-            .foregroundStyle(Color.forest)
-            .animation(.easeInOut, value: step)
         }
+        .animation(.easeInOut, value: step)
+        .task { Store.shared.start() }
     }
 
-    private var welcome: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Spacer()
-            Text("suppl.")
-                .font(.system(size: 56, weight: .semibold, design: .rounded))
-            Text("Gentle reminders for the supplements you already take, at moments that fit your day.")
-                .font(.title3)
-            Spacer()
-            Button("Get started") { step = 1 }
-                .buttonStyle(PrimaryButtonStyle())
-        }
-    }
-
-    private var about: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("What should we call you?")
-                .font(.largeTitle.bold())
-            TextField("Your name", text: $name)
-                .font(.title3)
-                .textContentType(.givenName)
-                .padding()
-                .background(Color.white.opacity(0.7))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-            Toggle("I'm 18 or older", isOn: $isAdult)
-                .font(.body)
-            Spacer()
-            Button("Continue") { step = 2 }
-                .buttonStyle(PrimaryButtonStyle())
-                .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty || !isAdult)
-                .opacity(name.trimmingCharacters(in: .whitespaces).isEmpty || !isAdult ? 0.5 : 1)
-        }
-    }
-
-    private var times: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Your usual day")
-                .font(.largeTitle.bold())
-            Text("Roughly is fine. You can change these anytime.")
-                .foregroundStyle(Color.forest.opacity(0.7))
-            VStack(spacing: 4) {
-                timeRow(.wake, $wake)
-                timeRow(.breakfast, $breakfast)
-                timeRow(.lunch, $lunch)
-                timeRow(.dinner, $dinner)
-                timeRow(.bedtime, $bedtime)
+    private var header: some View {
+        HStack(spacing: 12) {
+            Button(action: back) {
+                Image(systemName: "chevron.left")
+                    .font(.body.weight(.semibold))
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
             }
-            .card()
-            Spacer()
-            Button("Continue") { step = 3 }
-                .buttonStyle(PrimaryButtonStyle())
+            .buttonStyle(.plain)
+            .accessibilityLabel("Back")
+            ProgressView(value: Double(step.position), total: Double(OnboardingStep.progressCount))
+                .tint(Color.sage)
+                .accessibilityLabel("Progress")
+                .accessibilityValue("Step \(step.position) of \(OnboardingStep.progressCount)")
+        }
+        .padding(.leading, -12)
+    }
+
+    @ViewBuilder private var page: some View {
+        switch step {
+        case .welcome: WelcomeStep { go(.name) }
+        case .name: NameStep { go(.age) }
+        case .age: AgeStep { go(.takes) }
+        // "Not yet" goes straight to the summary. We never suggest anyone needs supplements.
+        case .takes: TakesStep { habit in go(habit == .notYet ? .summary : .add) }
+        case .add: AddSupplementsStep { go(.times) }
+        case .times: TimesStep { go(.connect) }
+        case .connect: ConnectStep { go(.style) }
+        case .style: StyleStep { go(.notifications) }
+        case .notifications: NotificationsStep { go(.summary) }
+        case .summary: SummaryStep(finish: finishSummary)
+        case .paywall: EmptyView()
         }
     }
 
-    private var notifications: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Spacer()
-            Image(systemName: "bell.badge")
-                .font(.system(size: 48))
-                .foregroundStyle(Color.sage)
-            Text("One nudge, at the right time")
-                .font(.largeTitle.bold())
-            Text("We'll remind you around meals, with Taken, Snooze, and Skip right in the notification. Never more than one follow-up.")
-                .font(.title3)
-            Spacer()
-            Button("Turn on reminders") {
-                Task {
-                    _ = await Reminders.requestAuthorization()
-                    onboarded = true
-                }
-            }
-            .buttonStyle(PrimaryButtonStyle())
-            Button("Not now") { onboarded = true }
-                .frame(maxWidth: .infinity)
-                .foregroundStyle(Color.forest.opacity(0.7))
-        }
+    private func go(_ next: OnboardingStep) {
+        path.append(next)
     }
 
-    private func timeRow(_ slot: Slot, _ value: Binding<Int>) -> some View {
-        DatePicker(selection: value.asTime, displayedComponents: .hourAndMinute) {
-            Label(slot.title, systemImage: slot.symbol)
+    private func back() {
+        if path.count > 1 { path.removeLast() }
+    }
+
+    /// The paywall is offered once, dismissibly. Skipped for people who don't take anything yet or already have Pro.
+    private func finishSummary() {
+        if habitRaw == SupplementHabit.notYet.rawValue || Store.shared.isPro {
+            onboarded = true
+        } else {
+            go(.paywall)
         }
     }
 }
 
+#if DEBUG
 #Preview {
     OnboardingView()
+        .modelContainer(PreviewData.container(empty: true))
 }
+#endif
