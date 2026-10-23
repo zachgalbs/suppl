@@ -9,6 +9,7 @@ struct HomeView: View {
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage("name") private var name = ""
     @Query(sort: \Supplement.createdAt) private var supplements: [Supplement]
+    @Query private var doseLogs: [DoseLog]
 
     @State private var adding = false
     @State private var showingProfile = false
@@ -23,6 +24,12 @@ struct HomeView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     Text(greeting)
                         .font(.largeTitle.bold())
+
+                    if streak >= 2 {
+                        Label("\(streak) days in a row, every dose confirmed", systemImage: "leaf.fill")
+                            .font(.subheadline)
+                            .foregroundStyle(Color.sage)
+                    }
 
                     if let notificationStatus, !supplements.isEmpty {
                         StatusCard(notifications: notificationStatus, turnOn: turnOnReminders)
@@ -73,6 +80,17 @@ struct HomeView: View {
             Store.shared.start()
             await refreshNotificationStatus()
         }
+    }
+
+    /// Confirmed days only. Shown from two days up, and never as a broken streak.
+    private var streak: Int {
+        let calendar = Calendar.current
+        var confirmed: [String: Set<Day>] = [:]
+        for log in doseLogs where log.action == .taken {
+            if let day = Day(key: log.dayKey) { confirmed[log.supplementID, default: []].insert(day) }
+        }
+        let plans = supplements.map { Streak.Plan(plan: $0.dosePlan, since: Day($0.createdAt, calendar: calendar)) }
+        return Streak.confirmedDays(plans: plans, confirmed: confirmed, today: Day(.now, calendar: calendar), calendar: calendar)
     }
 
     private var greeting: String {
