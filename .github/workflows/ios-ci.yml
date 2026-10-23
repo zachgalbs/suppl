@@ -40,6 +40,11 @@ jobs:
         if: hashFiles('SupplCore/Package.swift') != ''
         run: swift test --package-path SupplCore
 
+      - name: Test WHOOP token broker
+        if: hashFiles('server/whoop-broker/package.json') != ''
+        working-directory: server/whoop-broker
+        run: node --test
+
       - name: Build app for iOS Simulator
         run: |
           set -o pipefail

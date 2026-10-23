@@ -37,6 +37,8 @@
 	<array>
 		<string>fetch</string>
 	</array>
+	<key>WHOOPAppKey</key>
+	<string>$(WHOOP_APP_KEY)</string>
 	<key>WHOOPBrokerURL</key>
 	<string>$(WHOOP_BROKER_URL)</string>
 	<key>WHOOPClientID</key>

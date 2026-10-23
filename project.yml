@@ -48,6 +48,7 @@ targets:
         UIBackgroundModes: [fetch]
         WHOOPClientID: $(WHOOP_CLIENT_ID)
         WHOOPBrokerURL: $(WHOOP_BROKER_URL)
+        WHOOPAppKey: $(WHOOP_APP_KEY)
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.zgalbs.suppl
