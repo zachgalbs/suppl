@@ -348,7 +348,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.zgalbs.suppl.tests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Suppl.app/Suppl";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/suppl.app/suppl";
 			};
 			name = Release;
 		};
@@ -486,7 +486,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.zgalbs.suppl.tests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Suppl.app/Suppl";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/suppl.app/suppl";
 			};
 			name = Debug;
 		};

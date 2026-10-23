@@ -76,3 +76,6 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.zgalbs.suppl.tests
         GENERATE_INFOPLIST_FILE: YES
+        # XcodeGen derives these from the target name (Suppl), but the product is named suppl.
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/suppl.app/suppl
+        BUNDLE_LOADER: $(TEST_HOST)
