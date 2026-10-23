@@ -164,11 +164,11 @@ struct HomeView: View {
         let dayKey = Day(.now, calendar: .current).key
         if item.isTakenToday {
             item.lastTakenAt = nil
+            // Clears a Taken from the notification too, so history matches what Home shows.
             let id = item.planID
-            let app = DoseLog.Source.app.rawValue
             let taken = DoseLog.Action.taken.rawValue
             let descriptor = FetchDescriptor<DoseLog>(predicate: #Predicate<DoseLog> { log in
-                log.supplementID == id && log.dayKey == dayKey && log.sourceRaw == app && log.actionRaw == taken
+                log.supplementID == id && log.dayKey == dayKey && log.actionRaw == taken
             })
             for log in (try? context.fetch(descriptor)) ?? [] {
                 context.delete(log)

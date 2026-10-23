@@ -1,13 +1,6 @@
 import SwiftUI
 import SupplCore
 
-/// Connectors that explain what disconnecting leaves behind (e.g. HealthKit permissions live in the Health app).
-/// Concrete connectors opt in with an empty extension; rows without it simply show no note.
-@MainActor
-protocol HasDisconnectNote {
-    var disconnectNote: String? { get }
-}
-
 /// One connected app. Permission is only requested when the user taps Connect.
 @MainActor
 struct ConnectorRow: View {
@@ -76,7 +69,7 @@ struct ConnectorRow: View {
             Text(syncText)
                 .font(.footnote)
                 .foregroundStyle(Color.forest.opacity(0.8))
-            if let note = (connector as? HasDisconnectNote)?.disconnectNote {
+            if let note = hub.disconnectNote(connector.id) {
                 Text(note)
                     .font(.footnote)
                     .foregroundStyle(Color.forest.opacity(0.8))
