@@ -59,8 +59,13 @@ public enum ReminderEngine {
                 decisions += planner.decisions(day: day, moment: moment, plans: open, snoozedUntil: snoozes.max())
             }
         }
-        decisions.sort { ($0.fireDate, $0.id) < ($1.fireDate, $1.id) }
-        return Array(decisions.prefix(maxDecisions))
+        return capped(decisions)
+    }
+
+    /// Soonest first, ties by id, then the cap. Six moments over two days can't reach 48 today,
+    /// but the cap guards against future moments or more follow-ups blowing the iOS limit.
+    static func capped(_ decisions: [ReminderDecision]) -> [ReminderDecision] {
+        Array(decisions.sorted { ($0.fireDate, $0.id) < ($1.fireDate, $1.id) }.prefix(maxDecisions))
     }
 
     static func isDue(_ plan: DosePlan, on day: Day, calendar: Calendar) -> Bool {
@@ -111,7 +116,8 @@ private struct Planner {
         if let past = delivered[initialID] {
             // Already delivered: never re-send it, even if a late signal would now pick a different time.
             anchor = past
-            if past.reason.trigger == .workoutEnded, let end = past.reason.dataTimestamp {
+            if moment == .postWorkout, past.reason.trigger == .workoutEnded || past.reason.trigger == .quietHours,
+               let end = past.reason.dataTimestamp {
                 followUpEnd = end.addingTimeInterval(TimeInterval(w.after * 60))
             } else {
                 followUpEnd = window.end
@@ -167,15 +173,22 @@ private struct Planner {
                 reason = Reason(trigger: .workoutFallback, usualDate: usual, ruleID: RuleID.workoutFallback)
             }
         } else if movable {
+            var searchWindow = window
             if moment == .wake || moment == .breakfast, let wake = context.wake(on: day) {
                 let usualWake = WallClock.date(day, minutes: prefs.usualMinutes(for: .wake), calendar: calendar)
                 if wake.at > usualWake {
-                    fire = min(usual.addingTimeInterval(wake.at.timeIntervalSince(usualWake)), window.end)
+                    let delta = wake.at.timeIntervalSince(usualWake)
+                    // The shifted "on waking" time is the wake time itself, which is already past once we
+                    // know about it, so it gets the same one-minute lead as a workout.
+                    let shifted = max(usual.addingTimeInterval(delta), now.addingTimeInterval(ReminderEngine.minimumLead))
+                    fire = min(shifted, window.end)
+                    // A calendar move afterwards must not pull it back to before the user was up.
+                    searchWindow = DateInterval(start: min(window.start.addingTimeInterval(delta), fire), end: window.end)
                     reason = Reason(trigger: .lateWake, source: wake.source, dataTimestamp: wake.at,
                                     usualDate: usual, ruleID: RuleID.lateWake)
                 }
             }
-            if let gap = context.freeGap(moving: fire, within: window,
+            if let gap = context.freeGap(moving: fire, within: searchWindow,
                                          minimumGap: TimeInterval(prefs.minimumGapMinutes * 60)) {
                 fire = gap
                 reason = Reason(trigger: .calendarGap, source: .calendar, usualDate: usual, ruleID: RuleID.calendarGap)
@@ -194,8 +207,10 @@ private struct Planner {
         guard !exempt, quiet.contains(fire, calendar: calendar) else { return (fire, reason) }
         let end = quiet.end(after: fire, calendar: calendar)
         guard end <= window.end else { return nil }
-        // usualDate keeps the time it would have fired, so copy can say what it was moved from.
-        return (end, Reason(trigger: .quietHours, usualDate: fire, ruleID: RuleID.quietHours))
+        // usualDate keeps the time it would have fired, so copy can say what it was moved from. Source and
+        // timestamp carry over so a delivered post-workout reminder still knows its workout's window.
+        return (end, Reason(trigger: .quietHours, source: reason.source, dataTimestamp: reason.dataTimestamp,
+                            usualDate: fire, ruleID: RuleID.quietHours))
     }
 
     /// The bedtime reminder is the one quiet hours must never swallow when they begin during the bedtime window.
