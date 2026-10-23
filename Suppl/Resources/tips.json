@@ -1,0 +1,368 @@
+{
+  "version": 1,
+  "tips": [
+    {
+      "id": "bottles-where-you-eat",
+      "text": "Keeping your bottles where you eat makes them easier to remember.",
+      "ingredients": [],
+      "sourceURL": "https://www.nia.nih.gov/health/medicines-and-medication-management/taking-medicines-safely-you-age",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "missed-dose",
+      "text": "Missed one? Follow your label or ask a pharmacist. Don't double up.",
+      "ingredients": [],
+      "sourceURL": "https://www.nia.nih.gov/health/medicines-and-medication-management/taking-medicines-safely-you-age",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "with-food",
+      "text": "Some supplements are better absorbed with food. Your label usually says.",
+      "ingredients": [],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/Calcium-Consumer/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "consistent-time",
+      "text": "A consistent time each day tends to stick better than a perfect time.",
+      "ingredients": [],
+      "sourceURL": "https://www.nia.nih.gov/health/medicines-and-medication-management/taking-medicines-safely-you-age",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "new-supplement",
+      "text": "Bringing a new supplement into the mix? It's worth a quick check with your pharmacist.",
+      "ingredients": [],
+      "sourceURL": "https://www.fda.gov/food/dietary-supplements/information-consumers-using-dietary-supplements",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "reminder-style",
+      "text": "You can pick how many nudges you get in Profile. Choose the reminder style that fits your day.",
+      "ingredients": [],
+      "sourceURL": "https://www.nia.nih.gov/health/medicines-and-medication-management/taking-medicines-safely-you-age",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "expiration-dates",
+      "text": "Check expiration dates now and then, especially for probiotics and oils.",
+      "ingredients": [],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/Probiotics-Consumer/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "keep-a-list",
+      "text": "Keep a list of everything you take, supplements included. Review it with your clinician or pharmacist now and then.",
+      "ingredients": [],
+      "sourceURL": "https://medlineplus.gov/ency/patientinstructions/000883.htm",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "pill-organizer",
+      "text": "A weekly pill organizer can make it easy to see what you've already taken today.",
+      "ingredients": [],
+      "sourceURL": "https://medlineplus.gov/ency/patientinstructions/000883.htm",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "natural-not-always-safe",
+      "text": "Natural doesn't always mean safe. Some herbal products can interact with medicines.",
+      "ingredients": [],
+      "sourceURL": "https://www.fda.gov/consumers/consumer-updates/mixing-medications-and-dietary-supplements-can-endanger-your-health",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "before-surgery",
+      "text": "Having surgery? Tell your care team about every supplement you take, since some can affect bleeding or anesthesia.",
+      "ingredients": [],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/WYNTK-Consumer/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "pregnancy",
+      "text": "Pregnant or breastfeeding? Check with your clinician before taking supplements beyond a standard prenatal.",
+      "ingredients": [],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/WYNTK-Consumer/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "not-fda-approved",
+      "text": "The FDA doesn't approve supplements before they're sold. Your pharmacist can help you compare products.",
+      "ingredients": [],
+      "sourceURL": "https://www.fda.gov/food/information-consumers-using-dietary-supplements/questions-and-answers-dietary-supplements",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "hidden-ingredients",
+      "text": "Be careful with products sold for weight loss, sexual enhancement, or bodybuilding. Some have been found to contain hidden drug ingredients.",
+      "ingredients": [],
+      "sourceURL": "https://www.nccih.nih.gov/health/using-dietary-supplements-wisely",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "supplement-facts",
+      "text": "The Supplement Facts label lists each ingredient and the amount per serving. It's the best place to check what's in your product.",
+      "ingredients": [],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/WYNTK-Consumer/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "watch-for-overlap",
+      "text": "The same nutrient can show up in more than one product, like a multivitamin and a single vitamin. Checking your labels helps you know your total.",
+      "ingredients": [],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/MVMS-Consumer/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "report-a-problem",
+      "text": "If you have a bad reaction to a supplement, talk with your clinician. You can also report it to the FDA.",
+      "ingredients": [],
+      "sourceURL": "https://www.fda.gov/food/dietary-supplements/how-report-problem-dietary-supplements",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "food-first",
+      "text": "Supplements can't take the place of a varied diet. Foods provide more than vitamins and minerals.",
+      "ingredients": [],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/MVMS-Consumer/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "kids-reach",
+      "text": "Store supplements out of children's reach, especially gummies that look like candy.",
+      "ingredients": [],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/Iron-Consumer/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "ask-about-interactions",
+      "text": "Taking prescription medicines? Your pharmacist can check your supplements for interactions.",
+      "ingredients": [],
+      "sourceURL": "https://www.nccih.nih.gov/health/know-science/how-medications-and-supplements-can-interact/introduction",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "switching-brands",
+      "text": "Switching brands? Amounts can differ between products, so give the new label a quick read.",
+      "ingredients": [],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/WYNTK-Consumer/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "tell-every-provider",
+      "text": "Tell each of your clinicians about the supplements you take, not only the one who suggested them.",
+      "ingredients": [],
+      "sourceURL": "https://www.nia.nih.gov/health/medicines-and-medication-management/taking-medicines-safely-you-age",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "vitamin-d-fat",
+      "text": "Vitamin D is fat-soluble, so a meal with some fat helps your body absorb it.",
+      "ingredients": [
+        "vitamin-d",
+        "vitamin-d3-k2"
+      ],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/VitaminD-HealthProfessional/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "iron-vitamin-c",
+      "text": "Vitamin C helps your body absorb iron from plant foods like beans and greens.",
+      "ingredients": [
+        "iron",
+        "vitamin-c"
+      ],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/Iron-Consumer/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "iron-kids",
+      "text": "Keep iron supplements, including multivitamins with iron, out of children's reach. Accidental iron overdose is dangerous for young kids.",
+      "ingredients": [
+        "iron",
+        "multivitamin",
+        "prenatal-vitamin"
+      ],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/Iron-Consumer/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "calcium-forms",
+      "text": "Calcium carbonate is absorbed best with food, while calcium citrate works with or without it. Your label says which one you have.",
+      "ingredients": [
+        "calcium"
+      ],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/Calcium-Consumer/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "vitamin-k-warfarin",
+      "text": "Taking warfarin? Check with your clinician before starting or stopping vitamin K, since it can change how the medicine works.",
+      "ingredients": [
+        "vitamin-k",
+        "vitamin-d3-k2"
+      ],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/VitaminK-Consumer/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "biotin-lab-tests",
+      "text": "Biotin can throw off some lab tests. Let your clinician know you take it before any blood work.",
+      "ingredients": [
+        "biotin",
+        "vitamin-b-complex",
+        "multivitamin"
+      ],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/Biotin-Consumer/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "magnesium-forms",
+      "text": "Magnesium supplements can cause loose stools for some people. Your label has the directions for your form.",
+      "ingredients": [
+        "magnesium"
+      ],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/Magnesium-Consumer/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "melatonin-labels",
+      "text": "Studies have found that many melatonin products contain a different amount than the label says. A pharmacist can help you pick a product.",
+      "ingredients": [
+        "melatonin"
+      ],
+      "sourceURL": "https://www.nccih.nih.gov/health/melatonin-what-you-need-to-know",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "st-johns-wort-interactions",
+      "text": "St. John's wort interacts with many medicines. If you take any prescription, check with your pharmacist first.",
+      "ingredients": [
+        "st-johns-wort"
+      ],
+      "sourceURL": "https://www.nccih.nih.gov/health/st-johns-wort",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "ginkgo-bleeding",
+      "text": "Ginkgo may raise bleeding risk for people on blood thinners. Check with your clinician if you take one.",
+      "ingredients": [
+        "ginkgo"
+      ],
+      "sourceURL": "https://www.nccih.nih.gov/health/ginkgo",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "garlic-surgery",
+      "text": "Garlic supplements may raise bleeding risk. Mention them to your care team before any surgery.",
+      "ingredients": [
+        "garlic"
+      ],
+      "sourceURL": "https://www.nccih.nih.gov/health/garlic",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "fiber-liquid",
+      "text": "Fiber supplements like psyllium need plenty of liquid. Your label says how much.",
+      "ingredients": [
+        "fiber"
+      ],
+      "sourceURL": "https://medlineplus.gov/druginfo/meds/a601104.html",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "caffeine-total",
+      "text": "Caffeine adds up across coffee, tea, energy drinks, and supplements. Checking labels helps you know your daily total.",
+      "ingredients": [
+        "caffeine"
+      ],
+      "sourceURL": "https://www.fda.gov/consumers/consumer-updates/spilling-beans-how-much-caffeine-too-much",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "creatine-water",
+      "text": "Creatine usually causes a little weight gain because your muscles hold more water.",
+      "ingredients": [
+        "creatine"
+      ],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-Consumer/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "probiotic-storage",
+      "text": "Some probiotics need the fridge and others don't. Your label says how to store yours.",
+      "ingredients": [
+        "probiotic"
+      ],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/Probiotics-Consumer/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "fish-oil-side-effects",
+      "text": "Fish oil side effects are usually mild, like an aftertaste or heartburn. Your label has the directions for your product.",
+      "ingredients": [
+        "omega-3"
+      ],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/Omega3FattyAcids-Consumer/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "vitamin-a-pregnancy",
+      "text": "Too much preformed vitamin A during pregnancy can harm a baby. If you're pregnant, review your labels with your clinician.",
+      "ingredients": [
+        "vitamin-a",
+        "multivitamin",
+        "prenatal-vitamin"
+      ],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/VitaminA-Consumer/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "vitamin-b6-total",
+      "text": "High amounts of vitamin B6 from supplements over a long time can cause nerve problems. Checking your labels helps you know your total.",
+      "ingredients": [
+        "vitamin-b6",
+        "vitamin-b-complex"
+      ],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/VitaminB6-Consumer/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "zinc-copper",
+      "text": "Taking a lot of zinc for a long time can lower copper levels. Your labels show how much zinc you get in total.",
+      "ingredients": [
+        "zinc",
+        "copper"
+      ],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/Zinc-Consumer/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "beta-alanine-tingle",
+      "text": "Beta-alanine can cause a tingling or prickling feeling in the skin. Your label has the directions for your product.",
+      "ingredients": [
+        "beta-alanine"
+      ],
+      "sourceURL": "https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-Consumer/",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "green-tea-liver",
+      "text": "Liver injury has been reported, though rarely, with green tea extract pills. Check with your clinician if you have liver concerns.",
+      "ingredients": [
+        "green-tea-extract"
+      ],
+      "sourceURL": "https://www.nccih.nih.gov/health/green-tea",
+      "reviewStatus": "unreviewed"
+    },
+    {
+      "id": "ashwagandha-pregnancy",
+      "text": "Ashwagandha should be avoided during pregnancy and breastfeeding. Your clinician can help if you have questions.",
+      "ingredients": [
+        "ashwagandha"
+      ],
+      "sourceURL": "https://www.nccih.nih.gov/health/ashwagandha",
+      "reviewStatus": "unreviewed"
+    }
+  ]
+}
