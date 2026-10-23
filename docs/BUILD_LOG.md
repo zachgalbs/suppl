@@ -8,14 +8,13 @@ Resume with: read `docs/PLAN.md` and this file, then continue from "Next".
 | 0 Plan | Done (`docs/PLAN.md`) | n/a |
 | 1 Foundation | Done | green (run 40035786203) |
 | 2 Parallel build | Done: A, B, C, D merged | A+B+C green (run 40037434584) |
-| 3 Integration | Code committed, CI pending | run 40038482867 |
-| 4 Review | Not started | |
+| 3 Integration | Done | green (run 40038482867): 159 core + 11 app tests, broker 18 |
+| 4 Review | In progress | |
 | 5 Stretch | Not started | |
 | 6 Handoff | Not started | |
 
 ## Next
-- Get run 40038482867 (UI + integration) green, fixing compile errors in batches.
-- Then Phase 4: independent review of `git diff origin/main...HEAD`.
+- Phase 4: independent review of `git diff origin/main...HEAD`, then fix real findings.
 
 ## PR
 Draft PR: https://github.com/zachgalbs/suppl/pull/1

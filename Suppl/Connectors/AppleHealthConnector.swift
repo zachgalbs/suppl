@@ -56,7 +56,7 @@ final class AppleHealthConnector: Connector {
         if let observer { store.stop(observer) }
         observer = nil
         if availability == .available {
-            store.disableBackgroundDelivery(for: workoutType) { _, _ in }
+            try? await store.disableBackgroundDelivery(for: workoutType)
         }
         defaults.removeObject(forKey: Self.connectedKey)
         defaults.removeObject(forKey: Self.lastSyncKey)
