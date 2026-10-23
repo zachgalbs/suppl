@@ -1,15 +1,21 @@
 import SwiftUI
 import SwiftData
+import UserNotifications
+import SupplCore
 
+@MainActor
 struct HomeView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage("name") private var name = ""
     @Query(sort: \Supplement.createdAt) private var supplements: [Supplement]
 
-    @State private var editing: Supplement?
     @State private var adding = false
-    @State private var showingSettings = false
+    @State private var showingProfile = false
+    /// Unknown until the first check, so the status card never guesses.
+    @State private var notificationStatus: UNAuthorizationStatus?
+
+    private var router: AppRouter { .shared }
 
     var body: some View {
         NavigationStack {
@@ -18,7 +24,13 @@ struct HomeView: View {
                     Text(greeting)
                         .font(.largeTitle.bold())
 
-                    tipCard
+                    if let notificationStatus, !supplements.isEmpty {
+                        StatusCard(notifications: notificationStatus, turnOn: turnOnReminders)
+                    }
+
+                    if let tip {
+                        TipCard(tip: tip)
+                    }
 
                     if supplements.isEmpty {
                         emptyState
@@ -37,18 +49,29 @@ struct HomeView: View {
             .foregroundStyle(Color.forest)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button { showingSettings = true } label: { Image(systemName: "gearshape") }
+                    Button { showingProfile = true } label: { Image(systemName: "person.crop.circle") }
+                        .accessibilityLabel("Profile")
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { adding = true } label: { Image(systemName: "plus") }
+                        .accessibilityLabel("Add supplement")
                 }
             }
-            .sheet(isPresented: $adding) { SupplementForm(supplement: nil) }
-            .sheet(item: $editing) { SupplementForm(supplement: $0) }
-            .sheet(isPresented: $showingSettings) { SettingsView() }
+            .sheet(isPresented: $adding) { SupplementSearchView() }
+            .sheet(isPresented: $showingProfile) { SettingsView() }
+            .sheet(item: whyNowItem(router.whyNowGroupID)) { item in
+                WhyNowView(groupID: item.id)
+            }
         }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active { Reminders.reschedule() }
+            if phase == .active {
+                Reminders.reschedule()
+                Task { await refreshNotificationStatus() }
+            }
+        }
+        .task {
+            Store.shared.start()
+            await refreshNotificationStatus()
         }
     }
 
@@ -58,14 +81,9 @@ struct HomeView: View {
         return name.isEmpty ? part : "\(part), \(name)"
     }
 
-    private var tipCard: some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: "leaf")
-                .foregroundStyle(Color.lavender)
-            Text(Tips.today)
-                .font(.callout)
-        }
-        .card()
+    /// Prefers tips about what the user actually takes.
+    private var tip: Tip? {
+        Content.tip(for: Day(.now, calendar: .current), preferring: Set(supplements.compactMap(\.catalogID)))
     }
 
     private var emptyState: some View {
@@ -73,7 +91,7 @@ struct HomeView: View {
             Text("Nothing here yet")
                 .font(.title2.bold())
             Text("Add the supplements you already take and we'll remind you at the right moments.")
-                .foregroundStyle(Color.forest.opacity(0.7))
+                .foregroundStyle(Color.forest.opacity(0.8))
             Button("Add a supplement") { adding = true }
                 .buttonStyle(PrimaryButtonStyle())
                 .padding(.top, 8)
@@ -99,51 +117,104 @@ struct HomeView: View {
     private func row(_ item: Supplement) -> some View {
         HStack(spacing: 12) {
             Button {
-                item.lastTakenAt = item.isTakenToday ? nil : .now
+                toggleTaken(item)
             } label: {
                 Image(systemName: item.isTakenToday ? "checkmark.circle.fill" : "circle")
                     .font(.title2)
-                    .foregroundStyle(item.isTakenToday ? Color.sage : Color.forest.opacity(0.3))
+                    .foregroundStyle(item.isTakenToday ? Color.sage : Color.forest.opacity(0.4))
+                    .frame(minWidth: 44, minHeight: 44)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .accessibilityLabel(item.isTakenToday ? "Mark \(item.name) not taken" : "Mark \(item.name) taken")
 
-            Button { editing = item } label: {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(item.name)
-                        .font(.body.weight(.semibold))
-                        .strikethrough(item.isTakenToday, color: Color.forest.opacity(0.4))
-                    Text("\(item.doseText) · \(item.timingNote)")
-                        .font(.subheadline)
-                        .foregroundStyle(Color.forest.opacity(0.6))
+            NavigationLink {
+                SupplementDetailView(supplement: item)
+            } label: {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(item.name)
+                            .font(.body.weight(.semibold))
+                            .strikethrough(item.isTakenToday, color: Color.forest.opacity(0.4))
+                        Text(subtitle(item))
+                            .font(.subheadline)
+                            .foregroundStyle(Color.forest.opacity(0.8))
+                    }
+                    Spacer(minLength: 8)
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(Color.forest.opacity(0.4))
+                        .accessibilityHidden(true)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
         }
-        .padding(.vertical, 10)
+        .padding(.vertical, 6)
+    }
+
+    private func subtitle(_ item: Supplement) -> String {
+        let base = "\(item.doseText) · \(item.timingNote)"
+        return item.takesEveryDay ? base : "\(base) · \(item.frequencyText)"
+    }
+
+    /// Taken in the app is logged like a notification Taken, so the scheduler stops reminding for today.
+    private func toggleTaken(_ item: Supplement) {
+        let dayKey = Day(.now, calendar: .current).key
+        if item.isTakenToday {
+            item.lastTakenAt = nil
+            let id = item.planID
+            let app = DoseLog.Source.app.rawValue
+            let taken = DoseLog.Action.taken.rawValue
+            let descriptor = FetchDescriptor<DoseLog>(predicate: #Predicate<DoseLog> { log in
+                log.supplementID == id && log.dayKey == dayKey && log.sourceRaw == app && log.actionRaw == taken
+            })
+            for log in (try? context.fetch(descriptor)) ?? [] {
+                context.delete(log)
+            }
+        } else {
+            item.lastTakenAt = .now
+            context.insert(DoseLog(supplementID: item.planID, dayKey: dayKey, action: .taken, source: .app))
+        }
+        try? context.save()
+        Reminders.reschedule()
+    }
+
+    private func refreshNotificationStatus() async {
+        let settings = await UNUserNotificationCenter.current().notificationSettings()
+        notificationStatus = settings.authorizationStatus
+    }
+
+    private func turnOnReminders() {
+        Task {
+            _ = await Reminders.requestAuthorization()
+            await refreshNotificationStatus()
+            Reminders.reschedule()
+        }
+    }
+
+    private func whyNowItem(_ groupID: String?) -> Binding<WhyNowItem?> {
+        Binding(
+            get: { groupID.map { WhyNowItem(id: $0) } },
+            set: { if $0 == nil { AppRouter.shared.whyNowGroupID = nil } }
+        )
     }
 }
 
-enum Tips {
-    static let all = [
-        "Keeping your bottles where you eat makes them easier to remember.",
-        "Missed one? Follow your label or ask a pharmacist. Don't double up.",
-        "Some supplements are better absorbed with food. Your label usually says.",
-        "A consistent time each day tends to stick better than a perfect time.",
-        "Bringing a new supplement into the mix? It's worth a quick check with your pharmacist.",
-        "Snooze is there for busy moments. One follow-up, then we'll leave you be.",
-        "Check expiration dates now and then, especially for probiotics and oils.",
-    ]
-
-    static var today: String {
-        let day = Calendar.current.ordinality(of: .day, in: .year, for: .now) ?? 0
-        return all[day % all.count]
-    }
+/// Wraps a group id so the sheet keeps it through the dismiss animation.
+struct WhyNowItem: Identifiable, Equatable {
+    let id: String
 }
 
+#if DEBUG
 #Preview {
     HomeView()
-        .modelContainer(for: Supplement.self, inMemory: true)
+        .modelContainer(PreviewData.container())
 }
+
+#Preview("Empty") {
+    HomeView()
+        .modelContainer(PreviewData.container(empty: true))
+}
+#endif
