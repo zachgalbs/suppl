@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import SupplCore
 import UserNotifications
 
 /// Notification categories, permission, and the entry point for re-planning reminders.
@@ -35,6 +36,7 @@ enum Reminders {
     }
 
     /// Fires a sample reminder a few seconds from now so testers can try the actions.
+    /// It respects lock-screen privacy, and its actions record nothing.
     @MainActor
     static func sendTest() {
         let supplements = (try? sharedContainer.mainContext.fetch(FetchDescriptor<Supplement>())) ?? []
@@ -50,11 +52,16 @@ enum Reminders {
 
     private static func content(for slot: Slot, names: [String], category: String) -> UNMutableNotificationContent {
         let content = UNMutableNotificationContent()
-        content.title = slot.isMeal ? "\(slot.title) time" : slot.title
-        content.body = ListFormatter.localizedString(byJoining: names)
+        if UserDefaults.standard.bool(forKey: PrefKey.privacyMode) {
+            content.title = ReminderCopy.privateTitle
+            content.body = ReminderCopy.privateBody
+        } else {
+            content.title = slot.isMeal ? "\(slot.title) time" : slot.title
+            content.body = ListFormatter.localizedString(byJoining: names)
+        }
         content.sound = .default
         content.categoryIdentifier = category
-        content.userInfo = ["slot": slot.rawValue]
+        content.userInfo = ["slot": slot.rawValue, "test": true]
         return content
     }
 }

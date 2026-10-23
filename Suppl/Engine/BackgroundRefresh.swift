@@ -11,8 +11,9 @@ enum BackgroundRefresh {
             schedule()
             let work = Task { @MainActor in
                 await NotificationScheduler.run(refreshSignals: true)
-                task.setTaskCompleted(success: true)
+                task.setTaskCompleted(success: !Task.isCancelled)
             }
+            // Cancelling ends the run's wait early; the task above still reports completion exactly once.
             task.expirationHandler = { work.cancel() }
         }
     }

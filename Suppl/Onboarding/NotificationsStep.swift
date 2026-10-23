@@ -30,6 +30,8 @@ struct NotificationsStep: View {
     private func turnOn() {
         Task {
             _ = await Reminders.requestAuthorization()
+            // Anything added earlier in onboarding couldn't be scheduled before permission existed.
+            Reminders.reschedule()
             next()
         }
     }

@@ -10,6 +10,8 @@ struct ReminderResponse: Sendable {
     var groupID: String?
     var dayKey: String?
     var planIDs: [String]?
+    /// The Profile test reminder. Its actions record nothing, so testing never marks a real dose.
+    var isTest: Bool
 
     init(action: String, userInfo: [AnyHashable: Any]) {
         self.action = action
@@ -17,6 +19,7 @@ struct ReminderResponse: Sendable {
         groupID = userInfo["group"] as? String
         dayKey = userInfo["day"] as? String
         planIDs = userInfo["plans"] as? [String]
+        isTest = userInfo["test"] as? Bool ?? false
     }
 }
 
@@ -25,8 +28,10 @@ struct ReminderResponse: Sendable {
 @MainActor
 enum ReminderActions {
     static func handle(_ response: ReminderResponse, now: Date = .now) async {
+        guard !response.isTest else { return }
         let calendar = Calendar.current
-        let dayKey = response.dayKey ?? Day(now, calendar: calendar).key
+        let todayKey = Day(now, calendar: calendar).key
+        let dayKey = response.dayKey ?? todayKey
         let context = sharedContainer.mainContext
         let all = (try? context.fetch(FetchDescriptor<Supplement>())) ?? []
 
@@ -43,7 +48,8 @@ enum ReminderActions {
         switch response.action {
         case Reminders.takenAction:
             for s in targets {
-                s.lastTakenAt = now
+                // A bedtime reminder tapped after midnight belongs to yesterday; it mustn't mark today taken.
+                if dayKey == todayKey { s.lastTakenAt = now }
                 context.insert(DoseLog(supplementID: s.planID, dayKey: dayKey, action: .taken, at: now, source: .notification))
             }
         case Reminders.snoozeAction:
@@ -66,6 +72,12 @@ enum ReminderActions {
             return // Dismissed: no response stays unconfirmed.
         }
         try? context.save()
+        // Pull this group's follow-ups now, before re-planning: if iOS suspends the app mid-run,
+        // a stale "Still open" must not fire after Taken or Skip. A snooze is re-added by the engine.
+        if let group = response.groupID {
+            UNUserNotificationCenter.current().removePendingNotificationRequests(
+                withIdentifiers: ["\(group).f1", "\(group).f2", "\(group).s"])
+        }
         await NotificationScheduler.run()
     }
 }

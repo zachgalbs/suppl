@@ -19,6 +19,9 @@ struct SupplApp: App {
             }
             .tint(.sage)
             .preferredColorScheme(.light)
+            .onChange(of: onboarded) { _, done in
+                if done { Reminders.reschedule() }
+            }
         }
         .modelContainer(sharedContainer)
         .onChange(of: scenePhase) { _, phase in

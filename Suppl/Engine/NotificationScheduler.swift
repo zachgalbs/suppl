@@ -7,25 +7,36 @@ import UserNotifications
 /// Only changed requests are added or removed, so re-running is cheap and never double-schedules.
 @MainActor
 enum NotificationScheduler {
-    private static var running = false
-    private static var rerunRequested = false
+    /// Bumped by every request; a run covers every request made before it started.
+    private static var requested = 0
+    private static var completed = 0
+    private static var worker: Task<Void, Never>?
+    /// Set when HealthKit, the calendar, or background refresh says connector data changed.
+    /// Consumed at the start of a run, so a change that lands mid-run is picked up by the next one.
+    private static var signalsInvalidated = false
     private static var cachedSignals: [ContextSignal] = []
     private static var signalsFetchedAt: Date?
 
-    /// Coalesces bursts of calls (several edits, foreground + observer) into at most one extra run.
-    /// `refreshSignals` forces a connector fetch, e.g. when HealthKit or the calendar says something changed.
+    /// Re-plans and returns only once a run that started after this call has finished, so callers that
+    /// must hand control back to iOS (notification actions, HealthKit, background tasks) know the
+    /// pending requests are up to date. Bursts of calls share one run.
     static func run(refreshSignals: Bool = false) async {
-        if refreshSignals { signalsFetchedAt = nil }
-        guard !running else {
-            rerunRequested = true
-            return
+        if refreshSignals { signalsInvalidated = true }
+        requested += 1
+        let target = requested
+        if worker == nil {
+            worker = Task { @MainActor in
+                while completed < requested {
+                    let generation = requested
+                    await runOnce(now: .now, calendar: .current)
+                    completed = generation
+                }
+                worker = nil
+            }
         }
-        running = true
-        defer { running = false }
-        repeat {
-            rerunRequested = false
-            await runOnce(now: .now, calendar: .current)
-        } while rerunRequested
+        while completed < target, let current = worker {
+            await current.value
+        }
     }
 
     private static func runOnce(now: Date, calendar: Calendar) async {
@@ -57,7 +68,9 @@ enum NotificationScheduler {
 
     /// Connector data is cached for a few minutes so routine edits don't hit WHOOP's rate limits.
     private static func signals(from hub: ConnectorHub, now: Date, calendar: Calendar) async -> [ContextSignal] {
-        if let fetched = signalsFetchedAt, now.timeIntervalSince(fetched) < 5 * 60 {
+        let invalidated = signalsInvalidated
+        signalsInvalidated = false
+        if !invalidated, let fetched = signalsFetchedAt, now.timeIntervalSince(fetched) < 5 * 60 {
             return cachedSignals
         }
         cachedSignals = await hub.signals(since: calendar.startOfDay(for: now))
@@ -94,6 +107,9 @@ enum NotificationScheduler {
             let names = decision.planIDs.compactMap { plansByID[$0]?.name }
 
             if let existing = pendingByID[decision.id], isSame(existing, text: text, fireDate: decision.fireDate) {
+                if logsByID[decision.id] == nil {
+                    context.insert(DecisionLog(decision: decision, title: text.title, reasonText: reasonText, supplementNames: names))
+                }
                 continue
             }
             let content = UNMutableNotificationContent()
@@ -108,11 +124,19 @@ enum NotificationScheduler {
                 "day": decision.day.key,
                 "plans": decision.planIDs,
             ]
-            let interval = max(1, decision.fireDate.timeIntervalSince(now))
+            // Wall-clock components with no time zone, like the old repeating triggers: if the user flies
+            // and doesn't open the app, breakfast still comes at breakfast time where they are.
+            let when = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: decision.fireDate)
             let request = UNNotificationRequest(
                 identifier: decision.id, content: content,
-                trigger: UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false))
-            try? await center.add(request)
+                trigger: UNCalendarNotificationTrigger(dateMatching: when, repeats: false))
+            do {
+                try await center.add(request)
+            } catch {
+                // Not scheduled (e.g. notifications not allowed yet), so it must not count as delivered later.
+                if let log = logsByID[decision.id] { context.delete(log) }
+                continue
+            }
 
             if let log = logsByID[decision.id] {
                 log.update(decision: decision, title: text.title, reasonText: reasonText, supplementNames: names)
@@ -125,7 +149,7 @@ enum NotificationScheduler {
     /// Same text and a fire date within a minute: leave it alone instead of churning the request.
     private static func isSame(_ request: UNNotificationRequest, text: NotificationText, fireDate: Date) -> Bool {
         guard request.content.title == text.title, request.content.body == text.body,
-              let next = (request.trigger as? UNTimeIntervalNotificationTrigger)?.nextTriggerDate()
+              let next = (request.trigger as? UNCalendarNotificationTrigger)?.nextTriggerDate()
         else { return false }
         return abs(next.timeIntervalSince(fireDate)) < 60
     }
