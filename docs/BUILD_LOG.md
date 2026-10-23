@@ -2,19 +2,21 @@
 
 Resume with: read `docs/PLAN.md` and this file, then continue from "Next".
 
-## Status
+## Status (final)
 | Phase | State | CI |
 |---|---|---|
 | 0 Plan | Done (`docs/PLAN.md`) | n/a |
-| 1 Foundation | Done | green (run 40035786203) |
-| 2 Parallel build | Done: A, B, C, D merged | A+B+C green (run 40037434584) |
-| 3 Integration | Done | green (run 40038482867): 159 core + 11 app tests, broker 18 |
-| 4 Review | Done: 2 blockers + 11 should-fix found; fixed or logged below | pending |
-| 5 Stretch | Not started | |
-| 6 Handoff | Not started | |
+| 1 Foundation | Done | green |
+| 2 Parallel build | Done: agents A (engine), B (catalog), C (connectors), D (UI) merged | green |
+| 3 Integration | Done | green |
+| 4 Review | Done: 2 blockers + 11 should-fix found; fixed or logged below | green |
+| 5 Stretch | Partial: streak done; mascot and Oura skipped | green (run 40041369087) |
+| 6 Handoff | Done: this log, `docs/IMPLEMENTATION_MAP.md`, PR description | see PR |
+
+Tests in CI: 173 SupplCore, 12 SupplTests (incl. on-disk upgrade), 18 broker.
 
 ## Next
-- Confirm CI green on the review fixes, then Phase 5 stretch (streak first), then Phase 6 handoff.
+Nothing in progress. Remaining work is on Zach's checklist in the PR and under "Needs a human" below. If a session resumes: re-run CI on the branch head, then pick from the PR's known limitations (sleep observer for late wake, Oura boundary, mascot).
 
 ## PR
 Draft PR: https://github.com/zachgalbs/suppl/pull/1
@@ -100,6 +102,14 @@ Accepted, not changed:
 - Typed names are linked to a catalog entry by `bestMatch` (cautious: nil on ambiguity). Only general notes and informational rules depend on it; spacing rules are disabled.
 - WHOOP broker has no PKCE or rate limit. Acceptable for a 10-member dev app; revisit before WHOOP approval.
 - Late-wake shifting only helps when the app learns the wake time before the reminder fires (no sleep observer yet).
+
+### Phase 5 stretch
+- Streak: built (`Streak.confirmedDays`), shown on Home from 2 days up, never shown as broken.
+- Mascot: skipped. It's design-heavy and subjective, SPEC.md lists it under Later, and a rushed one would fight Zach's visual style.
+- Oura: skipped. SPEC.md lists it under Later, and a second unconfigured OAuth connector plus broker endpoints adds review surface without adding anything a user can turn on.
+
+### Handoff
+- `Suppl.xcodeproj` replaced with the copy XcodeGen generated in CI (run 40041369087), which differs from the locally built XcodeGen only in version stamps.
 
 ## Needs a human
 - `PRIVACY.md` link in the paywall points at `main`, so it 404s until this PR merges. Replace with a hosted policy URL after legal review.

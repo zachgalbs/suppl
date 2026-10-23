@@ -48,11 +48,11 @@ Statuses: **Implemented** · **Partial** · **Not started** · **Blocked (extern
 | Verified saved supplement doses | Partial | The app stores and shows exactly what the user typed and never changes it. No label verification (needs scanning) |
 | Structured evidence-backed knowledge engine | Partial; Needs clinical review | Catalog + rule model with ids, versions, sources, `reviewStatus: "unreviewed"` |
 | Medication and supplement safety screening | Not started; Needs clinical review | No medication entry. Three supplement spacing rules exist but ship `enabled: false` |
-| Context-aware reminder architecture | Implemented | Pure engine in `SupplCore` with ~100 tests; app scheduler diffs pending requests |
-| Functional push notifications | Partial | Local notifications only. APNs out of scope |
+| Context-aware reminder architecture | Implemented | Pure engine in `SupplCore` with ~110 tests; app scheduler diffs pending requests |
+| Functional push notifications | Partial | Local notifications planned 7 days ahead. APNs out of scope |
 | Taken, Snooze, and Skip actions | Implemented | |
-| Gentle accountability | Partial | No shame copy, no-response stays unconfirmed. No streaks yet |
-| Optional mascot | Not started | Stretch |
+| Gentle accountability | Implemented | No shame copy; no response stays unconfirmed; confirmed-days streak on Home (`SupplCore/.../Accountability/Streak.swift`) |
+| Optional mascot | Not started | Stretch; skipped this session |
 | Extremely simple home screen | Implemented | Status card, list, one tip |
 | Daily educational insights | Implemented | 44 tips with sources; Needs clinical review |
 | Full contextual AI chat | Not started | Out of scope |
@@ -65,7 +65,7 @@ Statuses: **Implemented** · **Partial** · **Not started** · **Blocked (extern
 | Privacy controls | Implemented | Lock-screen privacy mode, per-connector disconnect, delete all data |
 | Account deletion | Partial | No accounts; "Delete all data" clears everything local and WHOOP tokens |
 | Accessibility support | Partial | Dynamic Type, VoiceOver labels, 44 pt targets in code; not audited on device |
-| Automated testing | Implemented | 159 core tests, 11 app tests, 18 broker tests, all in CI |
+| Automated testing | Implemented | 173 core tests, 12 app tests (incl. on-disk upgrade), 18 broker tests, all in CI |
 | Clinical safety review of actionable rules | Needs clinical review | Every catalog entry, tip, and rule is `unreviewed` |
 | Legal and privacy review | Needs legal or App Store review | `PRIVACY.md` is a draft; health claims and paywall copy need review |
 | App Store submission readiness | Needs legal or App Store review | Privacy policy URL, App Privacy answers, subscription metadata, review notes |
