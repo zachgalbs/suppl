@@ -6,15 +6,19 @@ Resume with: read `docs/PLAN.md` and this file, then continue from "Next".
 | Phase | State | CI |
 |---|---|---|
 | 0 Plan | Done (`docs/PLAN.md`) | n/a |
-| 1 Foundation | In progress | pending first run |
-| 2 Parallel build | Not started | |
+| 1 Foundation | Done | green (run 40035786203) |
+| 2 Parallel build | In progress: agents A-D running in worktrees | |
 | 3 Integration | Not started | |
 | 4 Review | Not started | |
 | 5 Stretch | Not started | |
 | 6 Handoff | Not started | |
 
 ## Next
-- Push Phase 1, watch CI, fix until green, open the draft PR.
+- Merge agent branches A → B → C → D, `swift test` / CI after each.
+- Phase 3 drafts (scheduler, actions, BG refresh) are written but not committed yet; they land after D merges.
+
+## PR
+Draft PR: https://github.com/zachgalbs/suppl/pull/1
 
 ## Tooling on the VPS
 - Swift 6.4.1 via swiftly (`. ~/.local/share/swiftly/env.sh`). `swift test` in `SupplCore/` runs in ~15 s.
