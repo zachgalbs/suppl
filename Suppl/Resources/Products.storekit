@@ -1,0 +1,77 @@
+{
+  "identifier" : "5A7E2C41",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_developerTeamID" : "8DGT7FKTPZ"
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "8F3C1A20",
+      "localizations" : [
+
+      ],
+      "name" : "suppl. Pro",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "39.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "8F3C1A21",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Context-aware reminders, billed yearly.",
+              "displayName" : "suppl. Pro Yearly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.zgalbs.suppl.pro.yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Pro Yearly",
+          "subscriptionGroupID" : "8F3C1A20",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "7.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "8F3C1A22",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Context-aware reminders, billed monthly.",
+              "displayName" : "suppl. Pro Monthly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.zgalbs.suppl.pro.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Pro Monthly",
+          "subscriptionGroupID" : "8F3C1A20",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

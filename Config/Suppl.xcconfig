@@ -1,0 +1,9 @@
+// Build settings shared by Debug and Release.
+//
+// WHOOP connector. Leave both empty and WHOOP shows as "Not available yet" with no Connect button.
+// To turn it on, put real values in Config/Secrets.xcconfig (gitignored), not here.
+// xcconfig treats // as a comment, so write URLs as https:/$()/broker.example.com
+WHOOP_CLIENT_ID =
+WHOOP_BROKER_URL =
+
+#include? "Secrets.xcconfig"

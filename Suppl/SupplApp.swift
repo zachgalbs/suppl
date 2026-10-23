@@ -28,6 +28,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         UNUserNotificationCenter.current().delegate = self
         Reminders.registerCategories()
+        Supplement.backfillIDs(in: sharedContainer.mainContext)
         return true
     }
 
