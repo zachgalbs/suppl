@@ -2,7 +2,8 @@ import Foundation
 import SwiftData
 import UserNotifications
 
-/// Schedules one repeating local notification per slot that has supplements in it.
+/// Notification categories, permission, and the entry point for re-planning reminders.
+/// Category and action identifiers must not change: notifications from older builds still route through them.
 enum Reminders {
     static let category = "SUPPL_REMINDER"
     static let followUpCategory = "SUPPL_FOLLOWUP"
@@ -26,35 +27,11 @@ enum Reminders {
         (try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge])) ?? false
     }
 
+    /// Re-plans every pending reminder. The engine decides what to send and when; see `NotificationScheduler`.
+    /// Kept as the one entry point so every existing call site (save, delete, foreground, settings) still works.
     @MainActor
     static func reschedule() {
-        let center = UNUserNotificationCenter.current()
-        center.removePendingNotificationRequests(withIdentifiers: Slot.allCases.map { "suppl.\($0.rawValue)" })
-
-        let supplements = (try? sharedContainer.mainContext.fetch(FetchDescriptor<Supplement>())) ?? []
-        for slot in Slot.allCases {
-            let names = supplements.filter { $0.slot == slot }.map(\.name)
-            guard !names.isEmpty else { continue }
-
-            var when = DateComponents()
-            when.hour = slot.minutes / 60
-            when.minute = slot.minutes % 60
-            let request = UNNotificationRequest(
-                identifier: "suppl.\(slot.rawValue)",
-                content: content(for: slot, names: names, category: category),
-                trigger: UNCalendarNotificationTrigger(dateMatching: when, repeats: true)
-            )
-            center.add(request)
-        }
-    }
-
-    static func scheduleFollowUp(for slot: Slot, names: [String]) {
-        let request = UNNotificationRequest(
-            identifier: "suppl.followup.\(slot.rawValue)",
-            content: content(for: slot, names: names, category: followUpCategory),
-            trigger: UNTimeIntervalNotificationTrigger(timeInterval: TimeInterval(snoozeMinutes * 60), repeats: false)
-        )
-        UNUserNotificationCenter.current().add(request)
+        Task { await NotificationScheduler.run() }
     }
 
     /// Fires a sample reminder a few seconds from now so testers can try the actions.
@@ -79,21 +56,5 @@ enum Reminders {
         content.categoryIdentifier = category
         content.userInfo = ["slot": slot.rawValue]
         return content
-    }
-
-    @MainActor
-    static func markTaken(slot: Slot) {
-        let context = sharedContainer.mainContext
-        let supplements = (try? context.fetch(FetchDescriptor<Supplement>())) ?? []
-        for s in supplements where s.slot == slot {
-            s.lastTakenAt = .now
-        }
-        try? context.save()
-    }
-
-    @MainActor
-    static func names(in slot: Slot) -> [String] {
-        let supplements = (try? sharedContainer.mainContext.fetch(FetchDescriptor<Supplement>())) ?? []
-        return supplements.filter { $0.slot == slot }.map(\.name)
     }
 }

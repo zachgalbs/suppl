@@ -59,4 +59,14 @@ final class DecisionLog {
     }
 
     var decision: ReminderDecision? { try? JSONDecoder().decode(ReminderDecision.self, from: payload) }
+
+    /// The engine re-timed a reminder that hasn't fired yet (same id, new time or text).
+    func update(decision: ReminderDecision, title: String, reasonText: String, supplementNames: [String]) {
+        fireDate = decision.fireDate
+        self.title = title
+        self.reasonText = reasonText
+        dataTimestamp = decision.reason.dataTimestamp
+        self.supplementNames = supplementNames.joined(separator: ", ")
+        payload = (try? JSONEncoder().encode(decision)) ?? Data()
+    }
 }
