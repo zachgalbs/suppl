@@ -1,0 +1,16 @@
+{
+  "name": "suppl-whoop-broker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Swaps WHOOP OAuth codes and refresh tokens for the suppl. iOS app, so the client secret never ships in the app.",
+  "type": "module",
+  "main": "index.js",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --env-file=.env index.js",
+    "test": "node --test"
+  }
+}
