@@ -9,12 +9,12 @@ Resume with: read `docs/PLAN.md` and this file, then continue from "Next".
 | 1 Foundation | Done | green (run 40035786203) |
 | 2 Parallel build | Done: A, B, C, D merged | A+B+C green (run 40037434584) |
 | 3 Integration | Done | green (run 40038482867): 159 core + 11 app tests, broker 18 |
-| 4 Review | In progress | |
+| 4 Review | Done: 2 blockers + 11 should-fix found; fixed or logged below | pending |
 | 5 Stretch | Not started | |
 | 6 Handoff | Not started | |
 
 ## Next
-- Phase 4: independent review of `git diff origin/main...HEAD`, then fix real findings.
+- Confirm CI green on the review fixes, then Phase 5 stretch (streak first), then Phase 6 handoff.
 
 ## PR
 Draft PR: https://github.com/zachgalbs/suppl/pull/1
@@ -78,5 +78,29 @@ Draft PR: https://github.com/zachgalbs/suppl/pull/1
 - Triggers use `UNTimeIntervalNotificationTrigger` (absolute time); time zone and clock changes re-plan.
 - `Reminders.scheduleFollowUp`, `markTaken(slot:)`, `names(in:)` removed: the engine and `ReminderActions` replace them. Category and action ids are unchanged.
 
+### Phase 4 review (fresh agent, did not write the code)
+Fixed:
+- **Blocker:** reminders stopped after two days if the app was never opened (one-shot triggers for today and tomorrow only; main repeated forever). Engine now plans initial reminders 7 days ahead (`Preferences.planningDays`), follow-ups for 2 days.
+- **Blocker:** overlapping scheduler runs returned early, so a Taken could leave a follow-up pending when iOS suspended the app, and a forced connector refresh could be lost. `run()` now waits for a run that started after the call; actions also remove the group's follow-ups immediately.
+- DecisionLog written only when `UNUserNotificationCenter.add` succeeds; onboarding re-plans after permission and on finish.
+- Taken tapped after midnight on yesterday's reminder no longer marks today.
+- Post-workout fallback copy no longer claims "No workout recorded today" hours after planning.
+- Calendar (wall-clock) triggers instead of time-interval triggers, so reminders follow local time while travelling.
+- Free users with connected apps get an accurate status line (smart timing is Pro) instead of "hasn't updated".
+- Apple Health shows "Set up" (iOS hides read authorization).
+- Paywall "slept in" claim softened to what can actually happen; full auto-renew disclosure added.
+- Billing retry (outside grace period) no longer grants Pro; Pro changes re-plan immediately.
+- Test reminder respects privacy mode and its actions record nothing.
+- No "Still open" follow-up for an initial that was never sent. BG task reports failure on expiry.
+- Added an on-disk upgrade test (pre-v1 store opened with the v1 schema).
+
+Accepted, not changed:
+- A snooze that lands in quiet hours is dropped if quiet hours end after the window (so a bedtime dose never moves to morning). Conservative; Zach may prefer moving it.
+- A clinician-directed post-workout plan is still timed from the workout: "after a workout" is the instruction itself.
+- Typed names are linked to a catalog entry by `bestMatch` (cautious: nil on ambiguity). Only general notes and informational rules depend on it; spacing rules are disabled.
+- WHOOP broker has no PKCE or rate limit. Acceptable for a 10-member dev app; revisit before WHOOP approval.
+- Late-wake shifting only helps when the app learns the wake time before the reminder fires (no sleep observer yet).
+
 ## Needs a human
-(none yet)
+- `PRIVACY.md` link in the paywall points at `main`, so it 404s until this PR merges. Replace with a hosted policy URL after legal review.
+- Run the branch on a device that has the current TestFlight build installed, to confirm the SwiftData upgrade on real data (also covered by `UpgradeTests` in CI).
