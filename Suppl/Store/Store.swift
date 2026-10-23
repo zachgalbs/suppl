@@ -69,7 +69,10 @@ final class Store {
         }
         let statuses = await subscriptionStatuses(entitled: entitled)
         status = Self.membership(from: statuses, entitled: entitled)
+        let wasPro = isPro
         isPro = status.includesPro
+        // Buying or losing Pro changes how reminders are timed, so re-plan right away.
+        if isPro != wasPro { Reminders.reschedule() }
     }
 
     /// True when a verified purchase went through. False when the user cancelled or it's pending approval.

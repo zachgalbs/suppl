@@ -6,7 +6,7 @@ enum Membership: Equatable {
     case active(productID: String, renewalDate: Date?, willRenew: Bool)
     /// Renewal failed but Apple is still giving access while the user fixes their payment.
     case gracePeriod
-    /// Renewal failed and Apple is retrying. We keep Pro on so a card hiccup doesn't change reminders.
+    /// Renewal failed and Apple is retrying, outside any grace period. Apple's guidance is no access here.
     case billingRetry
     case expired
     /// Refunded or removed from Family Sharing.
@@ -14,8 +14,8 @@ enum Membership: Equatable {
 
     var includesPro: Bool {
         switch self {
-        case .active, .gracePeriod, .billingRetry: true
-        case .notSubscribed, .expired, .revoked: false
+        case .active, .gracePeriod: true
+        case .notSubscribed, .billingRetry, .expired, .revoked: false
         }
     }
 
@@ -33,7 +33,7 @@ enum Membership: Equatable {
         case .gracePeriod:
             return "Your last payment didn't go through. Pro stays on while you update it in Settings."
         case .billingRetry:
-            return "Apple couldn't renew Pro. Update your payment method in Settings to keep it."
+            return "Apple couldn't renew Pro. Update your payment method in Settings to turn it back on."
         case .expired:
             return "Your Pro subscription has ended."
         case .revoked:
