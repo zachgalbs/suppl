@@ -5,9 +5,9 @@ import SupplCore
 // Maps what the app stores (SwiftData, UserDefaults) to the engine's plain value types.
 
 extension Preferences {
-    /// The user's saved preferences. Context-aware timing and Extra Help are Pro; without Pro the
-    /// engine gets usual times only, which is exactly how reminders worked before v1.
-    static func current(isPro: Bool, connectedSources: Set<SignalSource>,
+    /// The user's saved preferences. Without smart timing the engine gets usual times only, which is
+    /// exactly how reminders worked before v1. Extra Help is Pro.
+    static func current(_ features: Features, connectedSources: Set<SignalSource>,
                         defaults: UserDefaults = .standard) -> Preferences {
         var usual: [Moment: Int] = [:]
         for slot in Slot.allCases {
@@ -17,7 +17,7 @@ extension Preferences {
         }
 
         var intensity = Intensity(rawValue: defaults.string(forKey: PrefKey.intensity) ?? "") ?? .balanced
-        if intensity == .extraHelp && !isPro { intensity = .balanced }
+        if intensity == .extraHelp && !features.extraHelp { intensity = .balanced }
 
         let start = (defaults.object(forKey: PrefKey.quietStart) as? Int) ?? -1
         let end = (defaults.object(forKey: PrefKey.quietEnd) as? Int) ?? -1
@@ -29,8 +29,8 @@ extension Preferences {
             quietHours: quiet,
             privacyMode: defaults.bool(forKey: PrefKey.privacyMode),
             followUpDelayMinutes: Reminders.snoozeMinutes,
-            contextAware: isPro,
-            connectedSources: isPro ? connectedSources : []
+            contextAware: features.smartTiming,
+            connectedSources: features.timingSources(connectedSources)
         )
     }
 }

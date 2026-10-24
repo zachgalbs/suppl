@@ -58,7 +58,7 @@ struct SummaryStep: View {
         return "You're taking \(count). We'll remind you \(moments)."
     }
 
-    /// "After workouts" only when something can actually see a workout and Pro is on; otherwise the real fallback time.
+    /// "After workouts" only when a source whose data times reminders can see a workout; otherwise the real fallback time.
     private func phrase(_ slot: Slot) -> String {
         switch slot {
         case .wake: return "when you wake up"
@@ -67,9 +67,10 @@ struct SummaryStep: View {
         case .dinner: return "around dinner"
         case .bedtime: return "before bed"
         case .postWorkout:
-            let canSeeWorkouts = !hub.connectedSources.isDisjoint(with: [.appleHealth, .whoop])
+            let timing = Features.current.timingSources(hub.connectedSources)
+            let canSeeWorkouts = !timing.isDisjoint(with: [.appleHealth, .whoop])
             let fixedGroup = supplements.contains { $0.slot == .postWorkout && $0.clinicianDirected }
-            if canSeeWorkouts && Store.shared.isPro && !fixedGroup { return "after recorded workouts when data is available" }
+            if canSeeWorkouts && !fixedGroup { return "after recorded workouts when data is available" }
             return "at \(timeText(Slot.postWorkout.minutes)) for after-workout supplements"
         }
     }

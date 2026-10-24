@@ -51,22 +51,23 @@ enum NotificationScheduler {
         // Entitlements come from StoreKit on every run; a lapsed subscription falls back to usual times here.
         await Store.shared.refresh()
         guard isCurrent(pass) else { return }
-        let isPro = Store.shared.isPro
+        let features = Features.current
         let hub = ConnectorHub.shared
-        let signals = isPro ? await signals(from: hub, now: now, calendar: calendar) : []
+        let fetched = features.smartTiming ? await signals(from: hub, now: now, calendar: calendar) : []
         guard isCurrent(pass) else { return }
+        let usable = features.timingSignals(fetched, connected: hub.connectedSources)
         let context = sharedContainer.mainContext
         Supplement.backfillIDs(in: context)
         let supplements = (try? context.fetch(FetchDescriptor<Supplement>())) ?? []
         let doseLogs = (try? context.fetch(FetchDescriptor<DoseLog>())) ?? []
         let decisionLogs = (try? context.fetch(FetchDescriptor<DecisionLog>())) ?? []
-        let prefs = Preferences.current(isPro: isPro, connectedSources: hub.connectedSources)
+        let prefs = Preferences.current(features, connectedSources: hub.connectedSources)
 
         let plans = supplements.map(\.dosePlan)
         let decisions = ReminderEngine.plan(
             plans: plans,
             statuses: EngineInputs.statuses(for: supplements, logs: doseLogs, now: now, calendar: calendar),
-            signals: signals,
+            signals: usable,
             history: EngineInputs.history(from: decisionLogs, now: now),
             prefs: prefs, now: now, calendar: calendar)
 

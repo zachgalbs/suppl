@@ -8,6 +8,10 @@ struct ConnectStep: View {
 
     private var hub: ConnectorHub { .shared }
 
+    private var whoopNote: String {
+        hub.connector(.whoop)?.availability == .available ? " Using WHOOP for timing is part of suppl. Pro." : ""
+    }
+
     private var anyConnected: Bool {
         hub.connectors.contains { $0.authorization == .connected }
     }
@@ -21,7 +25,9 @@ struct ConnectStep: View {
                         .card()
                 }
             }
-            Text("Smart timing with these apps is part of suppl. Pro. Without it, reminders come at your usual times. You can connect or disconnect anytime in Profile.")
+            Text(Features.current.smartTimingFree
+                 ? "Timing around your workouts, sleep, and calendar is free while suppl. is in testing.\(whoopNote) You can connect or disconnect anytime in Profile."
+                 : "Smart timing with these apps is part of suppl. Pro. Without it, reminders come at your usual times. You can connect or disconnect anytime in Profile.")
                 .font(.footnote)
                 .foregroundStyle(Color.forest.opacity(0.8))
         }

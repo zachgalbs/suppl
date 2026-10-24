@@ -9,19 +9,21 @@ struct StatusCard: View {
     var turnOn: () -> Void
     @Environment(\.openURL) private var openURL
 
-    /// Without Pro, connected apps aren't read at all, so "hasn't updated" would blame the wrong thing.
-    private var connectedWithoutPro: Bool {
-        !Store.shared.isPro && !ConnectorHub.shared.connectedSources.isEmpty
+    /// Connected apps whose data isn't used for timing aren't read at all, so "hasn't updated" would blame the wrong thing.
+    private var connectedButUnused: Bool {
+        let connected = ConnectorHub.shared.connectedSources
+        return !connected.isEmpty && Features.current.timingSources(connected).isEmpty
     }
 
     /// A connected app whose data is too old to use. The engine falls back to usual times on its own.
     private var staleConnector: String? {
-        guard Store.shared.isPro else { return nil }
         let hub = ConnectorHub.shared
+        let used = Features.current.timingSources(hub.connectedSources)
         let now = Date.now
         return hub.connectors.first { connector in
             connector.availability == .available
                 && connector.authorization == .connected
+                && SignalSource(rawValue: connector.id.rawValue).map { used.contains($0) } == true
                 && hub.isStale(connector.id, now: now)
         }?.displayName
     }
@@ -57,8 +59,10 @@ struct StatusCard: View {
             if let name = staleConnector {
                 return "\(name) hasn't updated recently, so we're using your usual times."
             }
-            if connectedWithoutPro {
-                return "Your routine is ready. Timing around your connected apps is part of suppl. Pro, so we're using your usual times."
+            if connectedButUnused {
+                return Features.current.smartTiming
+                    ? "Your routine is ready. Timing with WHOOP is part of suppl. Pro, so we're using your usual times."
+                    : "Your routine is ready. Timing around your connected apps is part of suppl. Pro, so we're using your usual times."
             }
             return "Your routine is ready. We'll let you know when it's a good time."
         }

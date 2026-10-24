@@ -17,7 +17,7 @@ struct RecentRemindersView: View {
 
     var body: some View {
         Form {
-            if !Store.shared.isPro {
+            if !Features.current.reminderHistory {
                 Section {
                     Text("Recent reminders is part of Pro.")
                     Button("See Pro") { showingPaywall = true }

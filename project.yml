@@ -46,6 +46,8 @@ targets:
             CFBundleURLSchemes: [suppl]
         BGTaskSchedulerPermittedIdentifiers: [com.zgalbs.suppl.refresh]
         UIBackgroundModes: [fetch]
+        # Smart timing (workouts, late wake, calendar) free while testing. Set false to restore Pro gating.
+        SupplSmartTimingFree: true
         WHOOPClientID: $(WHOOP_CLIENT_ID)
         WHOOPBrokerURL: $(WHOOP_BROKER_URL)
         WHOOPAppKey: $(WHOOP_APP_KEY)

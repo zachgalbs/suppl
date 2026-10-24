@@ -20,6 +20,9 @@ struct PaywallView: View {
         ConnectorHub.shared.connector(.whoop)?.availability == .available
     }
 
+    /// While testing, workout, morning, and calendar timing are free, so they aren't sold here.
+    private var smartTimingFree: Bool { Features.current.smartTimingFree }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
@@ -78,12 +81,14 @@ struct PaywallView: View {
 
     private var proFeatures: some View {
         VStack(alignment: .leading, spacing: 14) {
-            feature("figure.run", "Reminders after your workouts",
-                    "When Apple Health\(whoopAvailable ? " or WHOOP" : "") records one.")
-            feature("sunrise", "Mornings that wait for you",
-                    "Slept in? If Apple Health shows you're up late, morning reminders that haven't gone out yet can wait.")
-            feature("calendar", "Around your calendar",
-                    "A reminder can move to a free moment instead of mid-meeting.")
+            if !smartTimingFree {
+                feature("figure.run", "Reminders after your workouts",
+                        "When Apple Health\(whoopAvailable ? " or WHOOP" : "") records one.")
+                feature("sunrise", "Mornings that wait for you",
+                        "Slept in? If Apple Health shows you're up late, morning reminders that haven't gone out yet can wait.")
+                feature("calendar", "Around your calendar",
+                        "A reminder can move to a free moment instead of mid-meeting.")
+            }
             if whoopAvailable {
                 feature("waveform.path.ecg", "WHOOP", "Use your WHOOP workouts and sleep for timing.")
             }
@@ -217,7 +222,8 @@ struct PaywallView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Always free")
                 .font(.headline)
-            Text("Your supplement list and search. Reminders at your usual times with Taken, Snooze, and Skip. All supplement and safety information.")
+            Text("Your supplement list and search. Reminders at your usual times with Taken, Snooze, and Skip. All supplement and safety information."
+                 + (smartTimingFree ? " While suppl. is in testing, timing around your workouts, sleep, and calendar is free too." : ""))
                 .font(.subheadline)
                 .foregroundStyle(Color.forest.opacity(0.8))
         }

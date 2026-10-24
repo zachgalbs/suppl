@@ -40,7 +40,7 @@ final class EngineMappingTests: XCTestCase {
     func testPreferencesUseSavedTimesAndDefaultToTodaysBehaviour() {
         let d = defaults()
         d.set(7 * 60 + 15, forKey: Slot.breakfast.storageKey)
-        let prefs = Preferences.current(isPro: false, connectedSources: [.appleHealth], defaults: d)
+        let prefs = Preferences.current(Features(isPro: false, smartTimingFree: false), connectedSources: [.appleHealth], defaults: d)
         XCTAssertEqual(prefs.usualMinutes(for: .breakfast), 7 * 60 + 15)
         XCTAssertEqual(prefs.usualMinutes(for: .lunch), Slot.lunch.defaultMinutes)
         XCTAssertEqual(prefs.intensity, .balanced)
@@ -52,8 +52,8 @@ final class EngineMappingTests: XCTestCase {
     func testExtraHelpAndContextNeedPro() {
         let d = defaults()
         d.set(Intensity.extraHelp.rawValue, forKey: PrefKey.intensity)
-        XCTAssertEqual(Preferences.current(isPro: false, connectedSources: [], defaults: d).intensity, .balanced)
-        let pro = Preferences.current(isPro: true, connectedSources: [.whoop], defaults: d)
+        XCTAssertEqual(Preferences.current(Features(isPro: false, smartTimingFree: false), connectedSources: [], defaults: d).intensity, .balanced)
+        let pro = Preferences.current(Features(isPro: true, smartTimingFree: false), connectedSources: [.whoop], defaults: d)
         XCTAssertEqual(pro.intensity, .extraHelp)
         XCTAssertTrue(pro.contextAware)
         XCTAssertEqual(pro.connectedSources, [.whoop])
@@ -64,7 +64,7 @@ final class EngineMappingTests: XCTestCase {
         d.set(23 * 60, forKey: PrefKey.quietStart)
         d.set(6 * 60, forKey: PrefKey.quietEnd)
         d.set(true, forKey: PrefKey.privacyMode)
-        let prefs = Preferences.current(isPro: false, connectedSources: [], defaults: d)
+        let prefs = Preferences.current(Features(isPro: false, smartTimingFree: false), connectedSources: [], defaults: d)
         XCTAssertEqual(prefs.quietHours, QuietHours(start: 23 * 60, end: 6 * 60))
         XCTAssertTrue(prefs.privacyMode)
     }
@@ -191,7 +191,7 @@ final class EngineMappingTests: XCTestCase {
         let d = defaults()
         d.set(22 * 60, forKey: PrefKey.quietStart)
         d.set(22 * 60, forKey: PrefKey.quietEnd)
-        XCTAssertEqual(Preferences.current(isPro: false, connectedSources: [], defaults: d).quietHours,
+        XCTAssertEqual(Preferences.current(Features(isPro: false, smartTimingFree: false), connectedSources: [], defaults: d).quietHours,
                        QuietHours(start: 22 * 60, end: 22 * 60))
     }
 
