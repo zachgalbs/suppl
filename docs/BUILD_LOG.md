@@ -2,11 +2,9 @@
 
 Resume with: read `docs/PLAN.md` and this file, then continue from "Next".
 
-## Current independent-review status (2026-10-24)
+## Current status (2026-10-24)
 
-The build handoff below is historical. Codex's review is still in progress and release acceptance is **blocked by R14**: reminders use a finite, non-repeating queue. A six-moment Extra Help routine with quiet hours off exhausts some groups after about four days because the 48-request cap truncates the seven-day horizon. This regresses pre-v1 indefinite reminders. A longer horizon does not solve it.
-
-Latest verified code: `c77d88f`, CI `40048761097` green (178 core, 26 app, 18 broker). This includes connector/session invalidation, cancellation/reset draining, equal-quiet-hours and conditional-detail corrections, plus transactional deletion/error reporting. The successful CI XcodeGen artifact matches the committed project byte-for-byte. Review coverage is complete across the watcher passes, but final disposition remains pending and release acceptance is blocked by R14.
+Everything below "Original build handoff" is the history of how v1 was built. The current state is in "Independent review and durable reminders" at the end. In short: the independent review's findings are all fixed, including the reminder-reliability blocker (R14), and the branch is ready to merge into `main` once CI is green.
 
 ## Original build handoff
 | Phase | State | CI |
@@ -22,7 +20,7 @@ Latest verified code: `c77d88f`, CI `40048761097` green (178 core, 26 app, 18 br
 Tests in CI: 173 SupplCore, 12 SupplTests (incl. on-disk upgrade), 18 broker.
 
 ## Next
-Check the latest branch-head CI, publish the one final independent-review disposition after reconciling all PR comments, and address the durable-reminder blocker before release. Do not start stretch features while R14 is open. Historical phase completion is not independent acceptance.
+Zach: TestFlight via `scripts/testflight.sh`, then the device checks and external setup in the PR's checklist. Nothing else is planned on this branch.
 
 ## PR
 Draft PR: https://github.com/zachgalbs/suppl/pull/1
@@ -104,7 +102,7 @@ Fixed:
 
 Accepted, not changed:
 - A snooze that lands in quiet hours is dropped if quiet hours end after the window (so a bedtime dose never moves to morning). Conservative; Zach may prefer moving it.
-- A clinician-directed post-workout plan is still timed from the workout: "after a workout" is the instruction itself.
+- A clinician-directed post-workout plan is still timed from the workout: "after a workout" is the instruction itself. (Superseded: the independent review fixed this, and such a group now keeps its usual time.)
 - Typed names are linked to a catalog entry by `bestMatch` (cautious: nil on ambiguity). Only general notes and informational rules depend on it; spacing rules are disabled.
 - WHOOP broker has no PKCE or rate limit. Acceptable for a 10-member dev app; revisit before WHOOP approval.
 - Late-wake shifting only helps when the app learns the wake time before the reminder fires (no sleep observer yet).
@@ -121,56 +119,26 @@ Accepted, not changed:
 - `PRIVACY.md` link in the paywall points at `main`, so it 404s until this PR merges. Replace with a hosted policy URL after legal review.
 - Run the branch on a device that has the current TestFlight build installed, to confirm the SwiftData upgrade on real data (also covered by `UpgradeTests` in CI).
 
-### 2026-10-24 — Codex Mode C verification, first repair
-- Claude’s Phase 6 handoff and idle final screen were verified; remote `d1f492f` was stable and CI `40041981496` passed. Work is in the separate watcher clone only.
-- Corrected clinician-directed post-workout timing: BUILD_PROMPT explicitly says these plans are never moved. The earlier accepted exception above is superseded; a group containing a clinician-directed plan keeps its usual time.
-- Retained eligible previous-day reminders across midnight, including snoozes and dose-day confirmation/skip state. Regression tests first reproduced the failures against the handoff snapshot.
-- Verification in progress: local core tests and macOS CI must pass before this repair is considered complete.
-- Independent verification remains incomplete. In particular, the seven-day queue still eventually expires without app execution; extending the horizon did not resolve the durable-fallback blocker. No final independent-review comment has been posted.
+## Independent review and durable reminders (2026-10-24)
 
-### 2026-10-24 — Codex carry-over eligibility follow-up
-- First repair `944fb2a` passed CI `40042993312` (simulator build and app tests), with 176 core tests locally; no completion claimed for the remaining independent-review queue.
-- Added the existing supplement creation timestamp to the core plan. Yesterday’s carry-over is now eligible only for routines already present that day; adding a supplement after midnight must not invent yesterday’s dose. No persistence schema or stored field changed. Two further core regression cases cover new versus existing routines.
-- Local core suite and follow-up CI are required; if CI outlasts this watcher run, its exact run ID and SHA are checkpointed in watcher STATE. Remaining open review areas: durable reminders after prolonged inactivity, notification payload identity, immediate preference replanning, connector/token races, reset/expiration lifecycle and accessibility.
+### What happened
+- After the build handoff, an independent reviewer (Codex) went through the whole branch and logged findings R1 to R22. Twenty-one were fixed on this branch: clinician-directed workout timing (such a group now never moves), reminders that cross midnight, routines added after midnight, notification action targets under lock-screen privacy, Profile changes re-planning straight away, WHOOP sign-in races, stale connector data after disconnecting, scheduler cancellation and reset, Delete all data rolling back cleanly on failure, accessible controls, and copy that overstated what the app knows.
+- One finding, **R14**, blocked release: reminders were a finite queue of one-shot notifications. With six moments, Extra Help and quiet hours off, the 48-request cap ran some reminders out after about four days if the app never ran again, and nothing warned the user. The old build's repeating reminders never stopped.
 
-### 2026-10-24 — Codex notification identity and preference repair
-- Prior creation-date repair `b64e731` passed CI `40044223008`; 178 core tests and 14 app tests passed, plus 18 broker tests.
-- Notification equality now includes action payload (plan ids, day, moment, group), category, thread and exact wall-clock trigger. Private text no longer hides changed dose targets. Reused requests refresh their stored explanation.
-- Profile changes to privacy, intensity, usual times and quiet hours request an immediate coalesced replan while Profile remains open.
-- Three app regression tests cover generic-text plan replacement, schedule/category/group identity and explanation updates. macOS CI is required; no local iOS or device pass is claimed. Independent review and other recorded findings remain incomplete.
+### How R14 was resolved
+The full comparison, with Apple documentation for every platform claim, is in `docs/DESIGN_R14.md`. Summary:
+- **Budget.** iOS keeps 64 pending notifications. Two slots are reserved (the heads-up and the Debug test reminder), and the rest go to reminders: snoozes and follow-ups due within a day, then initial reminders up to two weeks out, then later follow-ups. Requests left over from the old build count against the budget until they're gone. Before adding anything new, the scheduler re-reads what iOS actually holds, so the limit holds even while removals are still finishing.
+- **Heads-up.** One "Open suppl. to keep your reminders coming." notification, moved on every re-plan. It reuses the time of a planned reminder outside quiet hours, at least a day before the last one when possible. It names no supplement and has no actions, so it can't duplicate a reminder or fire for a dose already Taken or Skipped.
+- **Re-plan everywhere.** Every launch (foreground, background, HealthKit, background refresh, notification action) now re-plans and re-submits the refresh task, and tapping the heads-up re-plans.
+- **Result with zero launches.** A light routine keeps coming for two weeks. The busiest routine keeps every moment for eight full days (it used to be about four), and the heads-up arrives a day before the queue ends.
+- **Rejected.** Repeating triggers in any form, because iOS can't give them a start date or skip one occurrence, so they either duplicate smart reminders or fire after Taken or Skip. APNs is the long-term fix once a backend exists.
 
-### 2026-10-24 — Codex truthful reminder UI and accessibility repair
-- Notification identity/preference repair `575af42` passed macOS CI `40045457513`; independent review continues.
-- Recent reminders and Why now now describe scheduled times, not unverified delivery. Elapsed accepted schedules still suppress duplicates conservatively; no delivery proof or dose confirmation is inferred.
-- Test reminders and their Profile controls are Debug-only, clearly marked as tests and never invent a supplement. The Debug button reports scheduling errors rather than claiming a failed request was sent.
-- Primary button/text tint uses forest for contrast; weekday controls wrap in an adaptive grid with 44-point minimum targets. Brand sage/lavender tokens remain for decoration. Device Dynamic Type/VoiceOver auditing still belongs to Zach.
-- Detail/summary copy distinguishes fixed clinician-directed groups and conditional workout timing. Daily tips carry the same general-information/label caveat as catalog details.
-- Local core/broker tests and macOS CI are required for this batch. Durable reminder fallback, WHOOP session/persistence races, connector cache invalidation and reset/background lifecycle findings remain unresolved; no final independent-review acceptance or comment yet.
+### Also on this pass
+- **Smart timing is free during testing.** One switch, `SupplSmartTimingFree` in `project.yml` (on), makes workout, late-wake and calendar timing available to everyone. WHOOP, Extra Help and Recent reminders stay Pro. With the switch off, the previous Pro gating applies exactly. Paywall, onboarding and Profile copy follow the switch.
+- **CI.** Actions moved to `actions/checkout@v7` and `actions/upload-artifact@v7` (Node 24), clearing the Node 20 deprecation warning.
+- **Fresh review.** A new reviewer that hadn't written the code is checking the R14 changes; outcomes are added here when it finishes.
 
-### 2026-10-24 — Codex WHOOP rotated-session repair
-- UI repair `2a55fe6` passed CI `40046082134`. Claude remains idle; all work is in the separate watcher clone.
-- Offline fault injection reproduced a delayed 401 erasing a newer token pair and a failed Keychain write returning refresh success. WHOOP's official OAuth rotation documentation was rechecked.
-- Refresh now reuses the current stored pair after an obsolete 401. A failed rotated-token save explicitly signs out with a reconnect message. Session generations reject old sign-in/refresh/data completions after disconnect; local disconnect happens before network revocation. An obsolete 400 cannot delete a different stored pair.
-- Corrected broker APP_KEY setup instructions to use the existing ignored local config wiring.
-- Validation: rerun the same offline probes against the modified source, core/broker suites and macOS CI. Offline probes stub platform APIs and intercept HTTP; no real WHOOP account, credentials or network calls are used. ConnectorHub cache and scheduler reset/background findings remain separate unresolved work.
-
-### 2026-10-24 — Codex connector and scheduling lifecycle repair
-- Prior WHOOP repair `f080003` passed exact-head CI `40046639685`; 178 core, 18 broker and 17 app tests passed. Claude remains idle; separate watcher clone only.
-- Connection changes immediately invalidate cached signals and request replanning. Hub revisions and live authorization reject in-flight results after disconnect; Health/Calendar session guards prevent late permission/query completions restoring local state.
-- Scheduler callers are individually cancellable. Expired background callers return promptly; the worker is cancelled when nobody else needs it. Every scheduler suspension checks cancellation/revision before subsequent writes. A reset pauses and drains the worker, disconnects providers, then clears models/notifications/settings before resuming. Notification actions are ignored during deletion.
-- Added deterministic app tests for cancellation while a provider is suspended, concurrent foreground work, reset draining, disconnect during fetch/teardown and connect invalidation. Equal custom quiet endpoints preserve the engine's no-quiet-hours meaning. Flexible supplement detail copy no longer claims permanent fixed timing due to another plan's non-overlapping weekdays.
-- Core/broker suites and exact-head macOS CI required. The finite non-repeating queue remains an unresolved blocker; independent acceptance and the one final review comment are still pending. Device lifecycle/permission acceptance remains Zach's task.
-
-### 2026-10-24 — Codex deletion failure reporting and handoff correction
-- Lifecycle repair `c28ac1c` passed CI `40048146895`, including all 24 app tests and the seven new regression cases.
-- Delete-all now stages every persisted model deletion in one save, rolls back if it fails, shows a retryable error and preserves onboarding/settings on failure. The Done button also stays disabled while deletion drains. Two app tests cover complete deletion and an injected save failure followed by a later save.
-- Reset retains WHOOP's best-effort grant revocation by passing its captured token through disconnect before clearing other providers. Corrected the draft privacy policy's uninstall/Keychain wording; legal review remains external.
-- Actual-source finite-queue probe: at October 24 00:01 UTC, six moments + Extra Help + quiet hours off produce 48 requests; lunch/dinner/bedtime/workout end October 27, wake/breakfast October 28. The original PR's “over a week” limit was too optimistic.
-- Durable fallback remains BLOCKER R14. Apple calendar triggers automatically repeat at every matching date; adding a parallel recurring usual-time alarm can duplicate smart reminders or notify after Taken/Skip. No supported arbitrary future start bound for daily/weekly repeats was identified in Apple's trigger API. A safe durable strategy needs a separate design/contract decision and inactivity/duplicate/action tests; neither naive recurrence nor a longer finite horizon is accepted as a fix. APNs/backend expansion remains out of scope.
-- Local core/broker suites and exact-head macOS CI are required for this repair. Device upgrade, actual notification delivery, StoreKit transitions and accessibility remain Zach's verification checklist.
-
-### 2026-10-24 — Verified repair handoff
-- `c77d88f139857128fba8e79d2d0ae66a41276cf2` passed CI `40048761097`: simulator build, all 26 app tests (including deletion success/failure rollback), 178 core and 18 broker tests. Exact-head local core/broker suites also passed.
-- Successful CI artifact downloaded and compared recursively with committed `Suppl.xcodeproj`: byte-for-byte equal. No project files were hand-edited. Protected scripts, original identifiers and persistence keys/fields remain unchanged.
-- All recorded correctable findings R1–R13 and R15–R22 are repaired or reconciled across the commits described above. R14 remains a release blocker; no passing release acceptance is claimed. Device/clinical/legal/WHOOP setup requirements remain external.
-- The draft PR description now foregrounds R14, corrects the roughly four-day cap case and Debug-only test helper, and retains How to test and Zach's checklist. The final Independent review (Codex) comment is still unsent; the watcher must reconcile all comments before publishing exactly one final disposition. This documentation-only commit gets its own CI; use Actions for that head's current status.
+### Current status
+- All review findings, R1 to R22, are resolved.
+- What's still open is outside this repo: running it on a device, TestFlight, App Store Connect products, the WHOOP developer app and broker, and clinical and legal review. These are listed in the PR under Zach's checklist.
+- Local `swift test` couldn't run on this pass (the sandbox blocks download.swift.org), so SupplCore tests were verified by CI's SupplCore step.
