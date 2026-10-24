@@ -6,7 +6,7 @@ Resume with: read `docs/PLAN.md` and this file, then continue from "Next".
 
 The build handoff below is historical. Codex's review is still in progress and release acceptance is **blocked by R14**: reminders use a finite, non-repeating queue. A six-moment Extra Help routine with quiet hours off exhausts some groups after about four days because the 48-request cap truncates the seven-day horizon. This regresses pre-v1 indefinite reminders. A longer horizon does not solve it.
 
-Latest verified repair: `c28ac1c`, CI `40048146895` green (178 core, 24 app, 18 broker). This adds connector/session invalidation, cancellation and reset draining, plus equal-quiet-hours and conditional-detail corrections. The following transactional deletion/error-reporting repair still requires its own CI. No final independent-review acceptance yet.
+Latest verified code: `c77d88f`, CI `40048761097` green (178 core, 26 app, 18 broker). This includes connector/session invalidation, cancellation/reset draining, equal-quiet-hours and conditional-detail corrections, plus transactional deletion/error reporting. The successful CI XcodeGen artifact matches the committed project byte-for-byte. Review coverage is complete across the watcher passes, but final disposition remains pending and release acceptance is blocked by R14.
 
 ## Original build handoff
 | Phase | State | CI |
@@ -22,7 +22,7 @@ Latest verified repair: `c28ac1c`, CI `40048146895` green (178 core, 24 app, 18 
 Tests in CI: 173 SupplCore, 12 SupplTests (incl. on-disk upgrade), 18 broker.
 
 ## Next
-Finish exact-head verification of the deletion repair, reconcile the draft PR and implementation map, and address the durable-reminder blocker before release. Do not start stretch features while R14 is open. Historical phase completion is not independent acceptance.
+Check the latest branch-head CI, publish the one final independent-review disposition after reconciling all PR comments, and address the durable-reminder blocker before release. Do not start stretch features while R14 is open. Historical phase completion is not independent acceptance.
 
 ## PR
 Draft PR: https://github.com/zachgalbs/suppl/pull/1
@@ -168,3 +168,9 @@ Accepted, not changed:
 - Actual-source finite-queue probe: at October 24 00:01 UTC, six moments + Extra Help + quiet hours off produce 48 requests; lunch/dinner/bedtime/workout end October 27, wake/breakfast October 28. The original PR's “over a week” limit was too optimistic.
 - Durable fallback remains BLOCKER R14. Apple calendar triggers automatically repeat at every matching date; adding a parallel recurring usual-time alarm can duplicate smart reminders or notify after Taken/Skip. No supported arbitrary future start bound for daily/weekly repeats was identified in Apple's trigger API. A safe durable strategy needs a separate design/contract decision and inactivity/duplicate/action tests; neither naive recurrence nor a longer finite horizon is accepted as a fix. APNs/backend expansion remains out of scope.
 - Local core/broker suites and exact-head macOS CI are required for this repair. Device upgrade, actual notification delivery, StoreKit transitions and accessibility remain Zach's verification checklist.
+
+### 2026-10-24 — Verified repair handoff
+- `c77d88f139857128fba8e79d2d0ae66a41276cf2` passed CI `40048761097`: simulator build, all 26 app tests (including deletion success/failure rollback), 178 core and 18 broker tests. Exact-head local core/broker suites also passed.
+- Successful CI artifact downloaded and compared recursively with committed `Suppl.xcodeproj`: byte-for-byte equal. No project files were hand-edited. Protected scripts, original identifiers and persistence keys/fields remain unchanged.
+- All recorded correctable findings R1–R13 and R15–R22 are repaired or reconciled across the commits described above. R14 remains a release blocker; no passing release acceptance is claimed. Device/clinical/legal/WHOOP setup requirements remain external.
+- The draft PR description now foregrounds R14, corrects the roughly four-day cap case and Debug-only test helper, and retains How to test and Zach's checklist. The final Independent review (Codex) comment is still unsent; the watcher must reconcile all comments before publishing exactly one final disposition. This documentation-only commit gets its own CI; use Actions for that head's current status.

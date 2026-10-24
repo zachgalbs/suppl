@@ -62,10 +62,10 @@ Statuses: **Implemented** · **Partial** · **Not started** · **Blocked (extern
 | Monthly and yearly subscriptions | Implemented in code; Blocked (external) | App Store Connect products |
 | Working purchase restoration | Implemented in code | `AppStore.sync()`; needs a sandbox test on device |
 | Secure authentication | Not started | No accounts in v1; WHOOP OAuth uses WHOOP and the token broker |
-| Privacy controls | Partial | Lock-screen privacy works with immediate Profile replanning; connector disconnect/cache and reset barriers passed CI `40048146895`; deletion-failure repair and device acceptance pending |
-| Account deletion | Partial | No accounts; local deletion and WHOOP token clearing exist, but scheduler drain and stale-result rejection passed CI; transactional model deletion/error reporting added with two tests, awaiting CI; device acceptance pending |
+| Privacy controls | Partial | Lock-screen privacy works with immediate Profile replanning; connector/cache invalidation, reset drain and deletion rollback passed CI `40048761097`; device acceptance pending |
+| Account deletion | Partial | No accounts; local deletion and WHOOP token clearing exist, but scheduler drain, stale-result rejection and transactional deletion/error reporting passed CI `40048761097`; device acceptance pending |
 | Accessibility support | Partial | Dynamic Type, VoiceOver labels, 44 pt targets in code; not audited on device |
-| Automated testing | Implemented | 178 core tests, 24 app tests (incl. on-disk upgrade and lifecycle), 18 broker tests passed at `c28ac1c`; two added deletion tests await their own CI |
+| Automated testing | Implemented | 178 core, 26 app (including on-disk upgrade, lifecycle and deletion rollback), 18 broker tests passed at `c77d88f`, CI `40048761097` |
 | Clinical safety review of actionable rules | Needs clinical review | Every catalog entry, tip, and rule is `unreviewed` |
 | Legal and privacy review | Needs legal or App Store review | `PRIVACY.md` is a draft; health claims and paywall copy need review |
 | App Store submission readiness | Needs legal or App Store review | Privacy policy URL, App Privacy answers, subscription metadata, review notes |
@@ -77,3 +77,5 @@ The rows above describe the implementation, not final independent acceptance. Co
 2026-10-24 lifecycle follow-up: `f080003` WHOOP repair passed CI `40046639685`. Scheduler reset/cancellation, connection cache invalidation and Health/Calendar session guards now have a follow-up repair plus seven app regression cases (macOS CI required). An offline extraction of the actual queue and its three cancellation/reset tests passed on Linux; this is not device validation. The finite-queue fallback blocker remains open.
 
 2026-10-24 handoff correction: R14 is release-blocking. In the six-moment/Extra Help/no-quiet-hours probe, the cap truncates some reminders after roughly four days. No indefinite fallback is implemented. A separate durable strategy must preserve quiet hours, saved dose-day status and no duplicates; expanding the horizon alone is insufficient. Current lifecycle repair `c28ac1c` passed all 24 app tests. Final deletion repair, exact-head CI/artifact check and independent-review disposition remain pending.
+
+Final code-verification update, 2026-10-24: `c77d88f` passed CI `40048761097` with all 26 app tests, 178 core and 18 broker tests. Successful generated project is byte-for-byte equal to the committed project. Earlier “awaiting CI” entries above are historical checkpoints superseded by this result. Correctable independent findings are repaired; R14 remains a release-blocking design issue. No device, clinical, legal or production WHOOP acceptance is implied. The draft PR remains unmerged; the one final review comment is pending final branch-head/comment reconciliation.
