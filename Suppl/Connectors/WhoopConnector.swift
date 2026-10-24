@@ -28,6 +28,8 @@ final class WhoopConnector: Connector {
     @ObservationIgnored private let webAuth: WebAuthSession
     /// One refresh at a time: WHOOP accepts only the first of two concurrent refreshes.
     @ObservationIgnored private var refreshTask: Task<WhoopTokens, Error>?
+    /// Old requests must never restore credentials after disconnect or a new sign-in.
+    @ObservationIgnored private var sessionID = UUID()
     @ObservationIgnored private var backoffCount = 0
     @ObservationIgnored private let log = Logger(subsystem: "com.zgalbs.suppl", category: "whoop")
 
@@ -64,6 +66,10 @@ final class WhoopConnector: Connector {
 
     func connect() async throws {
         guard let config else { throw ConnectorError.notConfigured }
+        sessionID = UUID()
+        refreshTask?.cancel()
+        refreshTask = nil
+        let session = sessionID
         let state = Self.makeState()
         var components = URLComponents(url: WhoopAPI.authorizeURL, resolvingAgainstBaseURL: false)!
         components.queryItems = [
@@ -76,6 +82,7 @@ final class WhoopConnector: Connector {
         guard let url = components.url else { throw ConnectorError.failed("Couldn't start WHOOP sign-in.") }
 
         let callback = try await webAuth.start(url: url, callbackScheme: WhoopAPI.callbackScheme)
+        guard sessionID == session else { throw ConnectorError.cancelled }
         let items = URLComponents(url: callback, resolvingAgainstBaseURL: false)?.queryItems ?? []
         func item(_ name: String) -> String? { items.first { $0.name == name }?.value }
 
@@ -86,24 +93,27 @@ final class WhoopConnector: Connector {
             throw ConnectorError.failed("WHOOP sign-in didn't match. Try again.")
         }
         let tokens = try await brokerTokens("whoop/token", body: ["code": code], previous: nil, config: config)
+        guard sessionID == session else { throw ConnectorError.cancelled }
         guard save(tokens) else { throw ConnectorError.failed("Couldn't save the WHOOP sign-in on this phone. Try again.") }
         authorization = .connected
     }
 
     /// Revokes the grant at WHOOP (best effort) and deletes the tokens from this phone.
     func disconnect() async {
-        if let tokens = Self.loadTokens() {
+        let tokens = Self.loadTokens()
+        deleteAllData() // Stop local access before waiting for best-effort network revocation.
+        if let tokens {
             var request = URLRequest(url: WhoopAPI.baseURL.appendingPathComponent(WhoopAPI.revokePath))
             request.httpMethod = "DELETE"
             request.setValue("Bearer \(tokens.accessToken)", forHTTPHeaderField: "Authorization")
             request.timeoutInterval = 10
             _ = try? await urlSession.data(for: request)
         }
-        deleteAllData()
     }
 
     /// For "Delete all data": removes tokens and sync state without calling WHOOP.
     func deleteAllData() {
+        sessionID = UUID()
         refreshTask?.cancel()
         refreshTask = nil
         Keychain.delete(service: Self.keychainService, account: Self.keychainAccount)
@@ -119,6 +129,7 @@ final class WhoopConnector: Connector {
 
     func fetchSignals(since: Date) async throws -> [ContextSignal] {
         guard config != nil, authorization == .connected else { return [] }
+        let session = sessionID
         let at = now()
         if let nextAllowedFetch, at < nextAllowedFetch { return [] }
 
@@ -135,6 +146,7 @@ final class WhoopConnector: Connector {
             return []
         }
 
+        guard sessionID == session, authorization == .connected else { return [] }
         var signals: [ContextSignal] = []
         for w in workouts {
             guard let end = w.end, end >= since, end <= at, end > w.start else { continue }
@@ -182,12 +194,15 @@ final class WhoopConnector: Connector {
 
     /// GET with the access token. Refreshes first if it's expired, and once more on a 401.
     private func authorizedGet(_ url: URL) async throws -> Data {
+        let session = sessionID
         var tokens = try await validTokens()
         for attempt in 0..<2 {
+            guard sessionID == session, !Task.isCancelled else { throw ConnectorError.cancelled }
             var request = URLRequest(url: url)
             request.setValue("Bearer \(tokens.accessToken)", forHTTPHeaderField: "Authorization")
             request.timeoutInterval = 20
             let (data, response) = try await urlSession.data(for: request)
+            guard sessionID == session else { throw ConnectorError.cancelled }
             let status = (response as? HTTPURLResponse)?.statusCode ?? 0
             switch status {
             case 200..<300:
@@ -229,16 +244,27 @@ final class WhoopConnector: Connector {
 
     private func refresh(_ tokens: WhoopTokens) async throws -> WhoopTokens {
         if let refreshTask { return try await refreshTask.value }
+        guard authorization == .connected, let current = Self.loadTokens() else {
+            throw ConnectorError.failed("Couldn't read the WHOOP sign-in. Try connecting again.")
+        }
+        // A delayed 401 may refer to the pair another request has already rotated.
+        if current != tokens { return try await validTokens() }
         guard let config else { throw ConnectorError.notConfigured }
+        let session = sessionID
         let task = Task { @MainActor in
+            guard self.sessionID == session, !Task.isCancelled else { throw ConnectorError.cancelled }
             let fresh = try await self.brokerTokens("whoop/refresh", body: ["refresh_token": tokens.refreshToken],
                                                     previous: tokens, config: config)
-            // The old pair is dead now, so save the new one before anything uses it.
-            self.save(fresh)
+            guard self.sessionID == session else { throw ConnectorError.cancelled }
+            // Rotation invalidates the old pair. A failed write must not masquerade as a live sign-in.
+            guard self.save(fresh) else {
+                self.deleteAllData()
+                throw ConnectorError.signedOut("Couldn't save the renewed WHOOP sign-in. Connect again to keep using it.")
+            }
             return fresh
         }
         refreshTask = task
-        defer { refreshTask = nil }
+        defer { if sessionID == session { refreshTask = nil } }
         return try await task.value
     }
 
@@ -246,6 +272,7 @@ final class WhoopConnector: Connector {
     /// refresh token is dead (revoked, or already rotated), so the stored sign-in is removed.
     private func brokerTokens(_ path: String, body: [String: String], previous: WhoopTokens?,
                               config: WhoopConfig) async throws -> WhoopTokens {
+        let session = sessionID
         var request = URLRequest(url: config.brokerURL.appendingPathComponent(path))
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -260,12 +287,13 @@ final class WhoopConnector: Connector {
         } catch {
             throw ConnectorError.failed("Couldn't reach the WHOOP sign-in service. Check your connection and try again.")
         }
+        guard sessionID == session else { throw ConnectorError.cancelled }
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
         guard (200..<300).contains(status),
               let decoded = try? JSONDecoder().decode(WhoopTokenResponse.self, from: data) else {
             log.error("WHOOP broker \(path, privacy: .public) failed with status \(status, privacy: .public)")
-            if previous != nil, status == 400 {
-                deleteAllData()
+            if let previous, status == 400 {
+                if Self.loadTokens()?.refreshToken == previous.refreshToken { deleteAllData() }
                 throw ConnectorError.signedOut("WHOOP signed suppl. out. Connect again to keep using it.")
             }
             throw ConnectorError.failed("Couldn't connect to WHOOP. Try again in a bit.")

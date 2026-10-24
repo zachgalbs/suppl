@@ -72,7 +72,7 @@ The app only talks to an `https://` broker URL, so a phone can't use a laptop on
 
 If `APP_KEY` is set, `/whoop/token` and `/whoop/refresh` require the same value in an `x-suppl-key` header. The key ships inside the app, so anyone who unpacks the app can read it. It keeps drive-by traffic out. It is not a secret and does not protect the client secret: that protection comes from the secret never leaving this server.
 
-The app sends the header only if its Info.plist has a non-empty `WHOOPAppKey`. That key is not in `project.yml` yet. To use it, add `WHOOPAppKey: $(WHOOP_APP_KEY)` under the Suppl target's `info.properties` and `WHOOP_APP_KEY =` to `Config/Suppl.xcconfig`. Until then, leave `APP_KEY` unset on the broker.
+The app sends the header when `WHOOP_APP_KEY` is set in the ignored `Config/Secrets.xcconfig`. The Info.plist and project.yml wiring already exist. Set the same value as the broker's `APP_KEY`, or leave both empty. Never put the WHOOP client secret in app configuration.
 
 ## Register a WHOOP developer app
 

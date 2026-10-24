@@ -140,3 +140,10 @@ Accepted, not changed:
 - Primary button/text tint uses forest for contrast; weekday controls wrap in an adaptive grid with 44-point minimum targets. Brand sage/lavender tokens remain for decoration. Device Dynamic Type/VoiceOver auditing still belongs to Zach.
 - Detail/summary copy distinguishes fixed clinician-directed groups and conditional workout timing. Daily tips carry the same general-information/label caveat as catalog details.
 - Local core/broker tests and macOS CI are required for this batch. Durable reminder fallback, WHOOP session/persistence races, connector cache invalidation and reset/background lifecycle findings remain unresolved; no final independent-review acceptance or comment yet.
+
+### 2026-10-24 — Codex WHOOP rotated-session repair
+- UI repair `2a55fe6` passed CI `40046082134`. Claude remains idle; all work is in the separate watcher clone.
+- Offline fault injection reproduced a delayed 401 erasing a newer token pair and a failed Keychain write returning refresh success. WHOOP's official OAuth rotation documentation was rechecked.
+- Refresh now reuses the current stored pair after an obsolete 401. A failed rotated-token save explicitly signs out with a reconnect message. Session generations reject old sign-in/refresh/data completions after disconnect; local disconnect happens before network revocation. An obsolete 400 cannot delete a different stored pair.
+- Corrected broker APP_KEY setup instructions to use the existing ignored local config wiring.
+- Validation: rerun the same offline probes against the modified source, core/broker suites and macOS CI. Offline probes stub platform APIs and intercept HTTP; no real WHOOP account, credentials or network calls are used. ConnectorHub cache and scheduler reset/background findings remain separate unresolved work.
