@@ -28,7 +28,7 @@ struct ReminderResponse: Sendable {
 @MainActor
 enum ReminderActions {
     static func handle(_ response: ReminderResponse, now: Date = .now) async {
-        guard !response.isTest else { return }
+        guard !response.isTest, !NotificationScheduler.isResetting else { return }
         let calendar = Calendar.current
         let todayKey = Day(now, calendar: calendar).key
         let dayKey = response.dayKey ?? todayKey

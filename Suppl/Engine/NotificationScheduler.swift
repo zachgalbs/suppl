@@ -7,50 +7,59 @@ import UserNotifications
 /// Only changed requests are added or removed, so re-running is cheap and never double-schedules.
 @MainActor
 enum NotificationScheduler {
-    /// Bumped by every request; a run covers every request made before it started.
-    private static var requested = 0
-    private static var completed = 0
-    private static var worker: Task<Void, Never>?
-    /// Set when HealthKit, the calendar, or background refresh says connector data changed.
-    /// Consumed at the start of a run, so a change that lands mid-run is picked up by the next one.
-    private static var signalsInvalidated = false
+    private static let work = ReminderWorkQueue()
+    private static var revision = 0
     private static var cachedSignals: [ContextSignal] = []
     private static var signalsFetchedAt: Date?
+    private static var cachedHubRevision = -1
 
-    /// Re-plans and returns only once a run that started after this call has finished, so callers that
-    /// must hand control back to iOS (notification actions, HealthKit, background tasks) know the
-    /// pending requests are up to date. Bursts of calls share one run.
+    static var isResetting: Bool { work.isPaused }
+
+    /// Each caller waits for a fresh pass. Cancelling a background caller releases it promptly;
+    /// unrelated foreground callers retain their work.
     static func run(refreshSignals: Bool = false) async {
-        if refreshSignals { signalsInvalidated = true }
-        requested += 1
-        let target = requested
-        if worker == nil {
-            worker = Task { @MainActor in
-                while completed < requested {
-                    let generation = requested
-                    await runOnce(now: .now, calendar: .current)
-                    completed = generation
-                }
-                worker = nil
-            }
-        }
-        while completed < target, let current = worker {
-            await current.value
-        }
+        guard !isResetting, !Task.isCancelled else { return }
+        if refreshSignals { invalidateSignals() }
+        await work.run { await runOnce(now: .now, calendar: .current) }
+    }
+
+    static func connectionsChanged() {
+        invalidateSignals()
+        Reminders.reschedule()
+    }
+
+    private static func invalidateSignals() {
+        revision += 1
+        cachedSignals = []
+        signalsFetchedAt = nil
+    }
+
+    /// Drain any in-flight notification add before the caller deletes data and clears requests.
+    static func beginReset() async {
+        invalidateSignals()
+        await work.pauseAndDrain()
+    }
+
+    static func endReset() { work.resume() }
+
+    private static func isCurrent(_ value: Int) -> Bool {
+        value == revision && !work.isPaused && !Task.isCancelled
     }
 
     private static func runOnce(now: Date, calendar: Calendar) async {
+        let pass = revision
+        // Entitlements come from StoreKit on every run; a lapsed subscription falls back to usual times here.
+        await Store.shared.refresh()
+        guard isCurrent(pass) else { return }
+        let isPro = Store.shared.isPro
+        let hub = ConnectorHub.shared
+        let signals = isPro ? await signals(from: hub, now: now, calendar: calendar) : []
+        guard isCurrent(pass) else { return }
         let context = sharedContainer.mainContext
         Supplement.backfillIDs(in: context)
         let supplements = (try? context.fetch(FetchDescriptor<Supplement>())) ?? []
         let doseLogs = (try? context.fetch(FetchDescriptor<DoseLog>())) ?? []
         let decisionLogs = (try? context.fetch(FetchDescriptor<DecisionLog>())) ?? []
-
-        // Entitlements come from StoreKit on every run; a lapsed subscription falls back to usual times here.
-        await Store.shared.refresh()
-        let isPro = Store.shared.isPro
-        let hub = ConnectorHub.shared
-        let signals = isPro ? await signals(from: hub, now: now, calendar: calendar) : []
         let prefs = Preferences.current(isPro: isPro, connectedSources: hub.connectedSources)
 
         let plans = supplements.map(\.dosePlan)
@@ -61,27 +70,33 @@ enum NotificationScheduler {
             history: EngineInputs.history(from: decisionLogs, now: now),
             prefs: prefs, now: now, calendar: calendar)
 
-        await apply(decisions, plans: plans, prefs: prefs, logs: decisionLogs, context: context, now: now, calendar: calendar)
+        await apply(decisions, plans: plans, prefs: prefs, logs: decisionLogs, context: context, now: now, calendar: calendar, pass: pass)
+        guard isCurrent(pass) else { return }
         prune(decisionLogs, context: context, now: now)
         try? context.save()
     }
 
     /// Connector data is cached for a few minutes so routine edits don't hit WHOOP's rate limits.
     private static func signals(from hub: ConnectorHub, now: Date, calendar: Calendar) async -> [ContextSignal] {
-        let invalidated = signalsInvalidated
-        signalsInvalidated = false
-        if !invalidated, let fetched = signalsFetchedAt, now.timeIntervalSince(fetched) < 5 * 60 {
-            return cachedSignals
+        let hubRevision = hub.revision
+        if cachedHubRevision == hubRevision, let fetched = signalsFetchedAt,
+           now.timeIntervalSince(fetched) < 5 * 60 {
+            return cachedSignals.filter { hub.connectedSources.contains($0.source) }
         }
-        cachedSignals = await hub.signals(since: calendar.startOfDay(for: now))
+        let pass = revision
+        let fresh = await hub.signals(since: calendar.startOfDay(for: now))
+        guard isCurrent(pass), hub.revision == hubRevision else { return [] }
+        cachedSignals = fresh.filter { hub.connectedSources.contains($0.source) }
         signalsFetchedAt = now
+        cachedHubRevision = hubRevision
         return cachedSignals
     }
 
     private static func apply(_ decisions: [ReminderDecision], plans: [DosePlan], prefs: Preferences,
-                              logs: [DecisionLog], context: ModelContext, now: Date, calendar: Calendar) async {
+                              logs: [DecisionLog], context: ModelContext, now: Date, calendar: Calendar, pass: Int) async {
         let center = UNUserNotificationCenter.current()
         let pending = await center.pendingNotificationRequests()
+        guard isCurrent(pass) else { return }
         let pendingByID = Dictionary(pending.map { ($0.identifier, $0) }, uniquingKeysWith: { a, _ in a })
         let wanted = Set(decisions.map(\.id))
 
@@ -118,7 +133,12 @@ enum NotificationScheduler {
             }
             do {
                 try await center.add(request)
+                guard isCurrent(pass) else {
+                    center.removePendingNotificationRequests(withIdentifiers: [request.identifier])
+                    return
+                }
             } catch {
+                guard isCurrent(pass) else { return }
                 // Not scheduled (e.g. notifications not allowed yet), so it must not count as delivered later.
                 if let log = logsByID[decision.id] { context.delete(log) }
                 continue
@@ -171,6 +191,64 @@ enum NotificationScheduler {
         let cutoff = now.addingTimeInterval(-14 * 24 * 3600)
         for log in decisionLogs where log.fireDate < cutoff && !log.isDeleted {
             context.delete(log)
+        }
+    }
+}
+
+/// One serial scheduler worker, with individually cancellable callers and a deletion barrier.
+/// The operation checks cancellation after each suspension before touching persistent state.
+@MainActor
+final class ReminderWorkQueue {
+    private(set) var isPaused = false
+    private var requested = 0
+    private var worker: Task<Void, Never>?
+    private var waiters: [UUID: (generation: Int, continuation: CheckedContinuation<Void, Never>)] = [:]
+    private var operation: (@MainActor () async -> Void)?
+
+    func run(_ operation: @escaping @MainActor () async -> Void) async {
+        guard !isPaused, !Task.isCancelled else { return }
+        let id = UUID()
+        await withTaskCancellationHandler {
+            await withCheckedContinuation { continuation in
+                guard !isPaused, !Task.isCancelled else { continuation.resume(); return }
+                requested += 1
+                self.operation = operation
+                waiters[id] = (requested, continuation)
+                startIfNeeded()
+            }
+        } onCancel: {
+            Task { @MainActor in self.cancel(id) }
+        }
+    }
+
+    func pauseAndDrain() async {
+        isPaused = true
+        worker?.cancel()
+        let pending = waiters.values.map(\.continuation)
+        waiters.removeAll()
+        for continuation in pending { continuation.resume() }
+        await worker?.value
+    }
+
+    func resume() { isPaused = false }
+
+    private func cancel(_ id: UUID) {
+        waiters.removeValue(forKey: id)?.continuation.resume()
+        if waiters.isEmpty { worker?.cancel() }
+    }
+
+    private func startIfNeeded() {
+        guard worker == nil, !isPaused, !waiters.isEmpty else { return }
+        worker = Task { @MainActor in
+            while !isPaused, !waiters.isEmpty, !Task.isCancelled {
+                let generation = requested
+                await operation?()
+                guard !Task.isCancelled else { break }
+                let done = waiters.filter { $0.value.generation <= generation }.map(\.key)
+                for id in done { waiters.removeValue(forKey: id)?.continuation.resume() }
+            }
+            worker = nil
+            startIfNeeded()
         }
     }
 }

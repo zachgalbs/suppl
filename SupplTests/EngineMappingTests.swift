@@ -187,4 +187,168 @@ final class EngineMappingTests: XCTestCase {
         XCTAssertEqual(log.supplementNames, "New name")
     }
 
+    func testEqualExplicitQuietHoursRemainDisabledRatherThanAutomatic() {
+        let d = defaults()
+        d.set(22 * 60, forKey: PrefKey.quietStart)
+        d.set(22 * 60, forKey: PrefKey.quietEnd)
+        XCTAssertEqual(Preferences.current(isPro: false, connectedSources: [], defaults: d).quietHours,
+                       QuietHours(start: 22 * 60, end: 22 * 60))
+    }
+
+    func testCancelledSchedulerCallerReturnsBeforeSuspendedOperationFinishes() async {
+        let queue = ReminderWorkQueue()
+        let entered = expectation(description: "operation started")
+        let returned = expectation(description: "cancelled caller returned")
+        var release: CheckedContinuation<Void, Never>?
+        var wrote = false
+        let caller = Task { @MainActor in
+            await queue.run {
+                await withCheckedContinuation { release = $0; entered.fulfill() }
+                if !Task.isCancelled { wrote = true }
+            }
+            returned.fulfill()
+        }
+        await fulfillment(of: [entered], timeout: 2)
+        caller.cancel()
+        await fulfillment(of: [returned], timeout: 2)
+        XCTAssertFalse(wrote)
+        release?.resume()
+        await queue.pauseAndDrain()
+        XCTAssertFalse(wrote, "expired background work cannot resume writes")
+    }
+
+    func testResetDrainsOutstandingWorkAndRejectsNewRunsUntilResumed() async {
+        let queue = ReminderWorkQueue()
+        let entered = expectation(description: "operation started")
+        let pausing = expectation(description: "reset started")
+        var release: CheckedContinuation<Void, Never>?
+        var drained = false
+        var writes = 0
+        let caller = Task { @MainActor in
+            await queue.run {
+                await withCheckedContinuation { release = $0; entered.fulfill() }
+                if !Task.isCancelled { writes += 1 }
+            }
+        }
+        await fulfillment(of: [entered], timeout: 2)
+        let reset = Task { @MainActor in
+            pausing.fulfill()
+            await queue.pauseAndDrain()
+            drained = true
+        }
+        await fulfillment(of: [pausing], timeout: 2)
+        XCTAssertTrue(queue.isPaused)
+        XCTAssertFalse(drained, "reset must wait for an outstanding notification add to return")
+        await queue.run { writes += 1 }
+        XCTAssertEqual(writes, 0)
+        release?.resume()
+        await reset.value
+        await caller.value
+        XCTAssertTrue(drained)
+        XCTAssertEqual(writes, 0)
+        queue.resume()
+        await queue.run { writes += 1 }
+        XCTAssertEqual(writes, 1)
+    }
+
+    func testCancellingBackgroundCallerKeepsForegroundRequestAlive() async {
+        let queue = ReminderWorkQueue()
+        let entered = expectation(description: "first pass started")
+        let joined = expectation(description: "foreground joined")
+        let expired = expectation(description: "background returned")
+        var release: CheckedContinuation<Void, Never>?
+        var passes = 0
+        let operation: @MainActor () async -> Void = {
+            passes += 1
+            if passes == 1 {
+                await withCheckedContinuation { release = $0; entered.fulfill() }
+            }
+        }
+        let background = Task { @MainActor in
+            await queue.run(operation)
+            expired.fulfill()
+        }
+        await fulfillment(of: [entered], timeout: 2)
+        let foreground = Task { @MainActor in
+            joined.fulfill()
+            await queue.run(operation)
+        }
+        await fulfillment(of: [joined], timeout: 2)
+        background.cancel()
+        await fulfillment(of: [expired], timeout: 2)
+        release?.resume()
+        await foreground.value
+        XCTAssertEqual(passes, 2, "the foreground caller requires a pass started after its request")
+    }
+
+    private func hub(_ connector: any Connector, onChange: @escaping @MainActor () -> Void = {}) -> ConnectorHub {
+        let d = defaults()
+        d.set(true, forKey: WhoopConnector.installedKey)
+        return ConnectorHub(health: AppleHealthConnector(defaults: d), calendar: CalendarConnector(defaults: d),
+                            whoop: WhoopConnector(info: [:], defaults: d), connectors: [connector], onChange: onChange)
+    }
+
+    func testDisconnectDropsLateSignalsAndDoesNotRestoreErrors() async {
+        let fake = SuspendedConnector()
+        let hub = hub(fake)
+        let entered = expectation(description: "fetch started")
+        fake.onFetch = { entered.fulfill() }
+        let fetch = Task { @MainActor in await hub.signals(since: now) }
+        await fulfillment(of: [entered], timeout: 2)
+        await hub.disconnect(.calendar)
+        fake.release?.resume(returning: [ContextSignal(kind: .busy([]), source: .calendar, observedAt: now)])
+        let signals = await fetch.value
+        XCTAssertTrue(signals.isEmpty)
+        XCTAssertTrue(hub.connectedSources.isEmpty)
+        XCTAssertNil(hub.lastError[.calendar])
+    }
+
+    func testDisconnectExcludesSourceBeforeProviderTeardownFinishes() async {
+        let fake = SuspendedConnector()
+        let entered = expectation(description: "disconnect started")
+        var release: CheckedContinuation<Void, Never>?
+        fake.onDisconnect = { await withCheckedContinuation { release = $0; entered.fulfill() } }
+        var changes = 0
+        let hub = hub(fake) { changes += 1 }
+        let disconnect = Task { @MainActor in await hub.disconnect(.calendar) }
+        await fulfillment(of: [entered], timeout: 2)
+        XCTAssertTrue(hub.connectedSources.isEmpty, "exclude even a provider still claiming connected")
+        XCTAssertEqual(changes, 1, "invalidate the cache immediately")
+        release?.resume()
+        await disconnect.value
+        XCTAssertEqual(changes, 2, "replan after teardown")
+    }
+
+    func testConnectInvalidatesTheScheduleImmediately() async {
+        let fake = SuspendedConnector()
+        fake.authorization = .notConnected
+        var changes = 0
+        let hub = hub(fake) { changes += 1 }
+        await hub.connect(.calendar)
+        XCTAssertEqual(changes, 1)
+        XCTAssertEqual(hub.connectedSources, [.calendar])
+    }
+
+}
+
+@MainActor
+private final class SuspendedConnector: Connector {
+    let id = ConnectorID.calendar
+    let displayName = "Calendar"
+    let summary = "Test source"
+    let availability = ConnectorAvailability.available
+    var authorization = ConnectorAuthorization.connected
+    var lastSync: Date?
+    var release: CheckedContinuation<[ContextSignal], Never>?
+    var onFetch: () -> Void = {}
+    var onDisconnect: (() async -> Void)?
+
+    func connect() async throws { authorization = .connected }
+    func disconnect() async {
+        await onDisconnect?()
+        authorization = .notConnected
+    }
+    func fetchSignals(since: Date) async throws -> [ContextSignal] {
+        await withCheckedContinuation { release = $0; onFetch() }
+    }
 }

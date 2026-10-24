@@ -12,6 +12,10 @@ final class ConnectorHub {
     let health: AppleHealthConnector
     let calendar: CalendarConnector
     let whoop: WhoopConnector
+    private(set) var revision = 0
+    @ObservationIgnored private var changing: Set<ConnectorID> = []
+    @ObservationIgnored private let suppliedConnectors: [any Connector]?
+    @ObservationIgnored private let onChange: @MainActor () -> Void
     private(set) var lastError: [ConnectorID: String] = [:]
 
     /// Without a sync in this long, a connected source "hasn't updated recently".
@@ -20,14 +24,18 @@ final class ConnectorHub {
     @ObservationIgnored private let log = Logger(subsystem: "com.zgalbs.suppl", category: "connectors")
 
     /// Optionals rather than default arguments, because default arguments can't call main-actor inits in Swift 5 mode.
-    init(health: AppleHealthConnector? = nil, calendar: CalendarConnector? = nil, whoop: WhoopConnector? = nil) {
+    init(health: AppleHealthConnector? = nil, calendar: CalendarConnector? = nil, whoop: WhoopConnector? = nil,
+         connectors: [any Connector]? = nil,
+         onChange: @escaping @MainActor () -> Void = { NotificationScheduler.connectionsChanged() }) {
+        suppliedConnectors = connectors
+        self.onChange = onChange
         self.health = health ?? AppleHealthConnector()
         self.calendar = calendar ?? CalendarConnector()
         self.whoop = whoop ?? WhoopConnector()
     }
 
     /// Display order: Apple Health, Calendar, WHOOP.
-    var connectors: [any Connector] { [health, calendar, whoop] }
+    var connectors: [any Connector] { suppliedConnectors ?? [health, calendar, whoop] }
 
     func connector(_ id: ConnectorID) -> (any Connector)? {
         connectors.first { $0.id == id }
@@ -44,23 +52,30 @@ final class ConnectorHub {
     }
 
     /// Calls connect(), records a user-readable error in lastError[id] instead of throwing.
-    /// On success it does one fetch, so the card shows a real sync time (or an error) straight away.
+    /// On success a fresh replan fetches permitted context for Pro timing.
     func connect(_ id: ConnectorID) async {
-        guard let connector = connector(id) else { return }
+        guard let connector = connector(id), !changing.contains(id) else { return }
+        let version = revision
         lastError[id] = nil
         do {
             try await connector.connect()
         } catch {
+            guard version == revision else { return }
             lastError[id] = message(for: error, connector: connector)
             return
         }
-        await fetch(from: connector, since: Date().addingTimeInterval(-Self.staleAfter))
+        guard isUsable(connector), !Task.isCancelled else { return }
+        changed()
     }
 
     func disconnect(_ id: ConnectorID) async {
         guard let connector = connector(id) else { return }
+        changing.insert(id)
+        changed()
         await connector.disconnect()
+        changing.remove(id)
         lastError[id] = nil
+        changed()
     }
 
     /// Sources of connected connectors (for engine copy).
@@ -77,35 +92,48 @@ final class ConnectorHub {
 
     /// Fetches from every connected, available connector since `since`, swallowing per-connector errors (logged to lastError). Never throws.
     func signals(since: Date) async -> [ContextSignal] {
+        let version = revision
         var all: [ContextSignal] = []
         for connector in connectors where isUsable(connector) {
             all += await fetch(from: connector, since: since)
         }
-        return all
+        guard version == revision, !Task.isCancelled else { return [] }
+        return all.filter { connectedSources.contains($0.source) }
     }
 
     /// For "Delete all data": disconnects everything and deletes WHOOP tokens.
     func disconnectAll() async {
-        for connector in connectors {
-            await connector.disconnect()
-        }
+        changing = Set(connectors.map(\.id))
+        changed()
+        // Clear WHOOP locally immediately, even if another provider's teardown suspends.
         whoop.deleteAllData()
+        for connector in connectors { await connector.disconnect() }
+        changing = []
         lastError = [:]
+        changed()
+    }
+
+    private func changed() {
+        revision += 1
+        onChange()
     }
 
     // MARK: - Private
 
     private func isUsable(_ connector: any Connector) -> Bool {
-        connector.availability == .available && connector.authorization == .connected
+        !changing.contains(connector.id) && connector.availability == .available && connector.authorization == .connected
     }
 
     @discardableResult
     private func fetch(from connector: any Connector, since: Date) async -> [ContextSignal] {
+        let version = revision
         do {
             let signals = try await connector.fetchSignals(since: since)
+            guard version == revision, isUsable(connector), !Task.isCancelled else { return [] }
             lastError[connector.id] = nil
             return signals
         } catch {
+            guard version == revision, isUsable(connector), !Task.isCancelled else { return [] }
             log.error("\(connector.id.rawValue, privacy: .public) fetch failed")
             lastError[connector.id] = message(for: error, connector: connector)
             return []

@@ -21,7 +21,7 @@ extension Preferences {
 
         let start = (defaults.object(forKey: PrefKey.quietStart) as? Int) ?? -1
         let end = (defaults.object(forKey: PrefKey.quietEnd) as? Int) ?? -1
-        let quiet = start >= 0 && end >= 0 && start != end ? QuietHours(start: start, end: end) : nil
+        let quiet = (0..<1440).contains(start) && (0..<1440).contains(end) ? QuietHours(start: start, end: end) : nil
 
         return Preferences(
             usualTimes: usual,

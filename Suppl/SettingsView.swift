@@ -21,6 +21,7 @@ struct SettingsView: View {
     @AppStorage(PrefKey.quietStart) private var quietStart = -1
     @AppStorage(PrefKey.quietEnd) private var quietEnd = -1
 
+    @State private var resetting = false
     @State private var confirmingReset = false
     #if DEBUG
     @State private var testSent = false
@@ -71,6 +72,8 @@ struct SettingsView: View {
                     Text("suppl. reminds you to take what you already use. It doesn't give medical advice. Talk to a pharmacist or doctor about doses and interactions.\n\nVersion \(Bundle.main.appVersion)")
                 }
             }
+            .disabled(resetting)
+            .interactiveDismissDisabled(resetting)
             .scrollContentBackground(.hidden)
             .background(Color.cream)
             .navigationTitle("Profile")
@@ -182,23 +185,28 @@ struct SettingsView: View {
 
     /// Everything the app stores on this phone. Subscriptions belong to the Apple ID and aren't touched.
     private func reset() {
-        try? context.delete(model: Supplement.self)
-        try? context.delete(model: DoseLog.self)
-        try? context.delete(model: DecisionLog.self)
-        try? context.save()
-        let center = UNUserNotificationCenter.current()
-        center.removeAllPendingNotificationRequests()
-        center.removeAllDeliveredNotifications()
-        let keys = [PrefKey.intensity, PrefKey.quietStart, PrefKey.quietEnd, PrefKey.privacyMode,
-                    PrefKey.birthYear, PrefKey.isAdult, PrefKey.takesSupplements] + Slot.allCases.map(\.storageKey)
-        for key in keys {
-            UserDefaults.standard.removeObject(forKey: key)
-        }
-        AppRouter.shared.whyNowGroupID = nil
+        guard !resetting else { return }
+        resetting = true
         Task {
+            await NotificationScheduler.beginReset()
             await ConnectorHub.shared.disconnectAll()
+            try? context.delete(model: Supplement.self)
+            try? context.delete(model: DoseLog.self)
+            try? context.delete(model: DecisionLog.self)
+            try? context.save()
+            let center = UNUserNotificationCenter.current()
+            center.removeAllPendingNotificationRequests()
+            center.removeAllDeliveredNotifications()
+            let keys = [PrefKey.intensity, PrefKey.quietStart, PrefKey.quietEnd, PrefKey.privacyMode,
+                        PrefKey.birthYear, PrefKey.isAdult, PrefKey.takesSupplements] + Slot.allCases.map(\.storageKey)
+            for key in keys {
+                UserDefaults.standard.removeObject(forKey: key)
+            }
+            AppRouter.shared.whyNowGroupID = nil
             name = ""
             onboarded = false
+            NotificationScheduler.endReset()
+            resetting = false
         }
     }
 }

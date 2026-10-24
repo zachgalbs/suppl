@@ -62,8 +62,8 @@ Statuses: **Implemented** · **Partial** · **Not started** · **Blocked (extern
 | Monthly and yearly subscriptions | Implemented in code; Blocked (external) | App Store Connect products |
 | Working purchase restoration | Implemented in code | `AppStore.sync()`; needs a sandbox test on device |
 | Secure authentication | Not started | No accounts in v1 (nothing leaves the device) |
-| Privacy controls | Partial | Lock-screen privacy works with immediate Profile replanning; connector disconnect/cache and reset races remain under independent review |
-| Account deletion | Partial | No accounts; local deletion and WHOOP token clearing exist, but in-flight scheduler/connector work still needs a deletion barrier |
+| Privacy controls | Partial | Lock-screen privacy works with immediate Profile replanning; connector disconnect/cache and reset barriers added; awaiting their macOS CI and device acceptance |
+| Account deletion | Partial | No accounts; local deletion and WHOOP token clearing exist, but in-flight scheduler work now drains before deletion and stale connector results are rejected; device acceptance pending |
 | Accessibility support | Partial | Dynamic Type, VoiceOver labels, 44 pt targets in code; not audited on device |
 | Automated testing | Implemented | 173 core tests, 12 app tests (incl. on-disk upgrade), 18 broker tests, all in CI |
 | Clinical safety review of actionable rules | Needs clinical review | Every catalog entry, tip, and rule is `unreviewed` |
@@ -73,3 +73,5 @@ Statuses: **Implemented** · **Partial** · **Not started** · **Blocked (extern
 ## Independent verification follow-up (2026-10-24)
 
 The rows above describe the implementation, not final independent acceptance. Codex fixed clinician-directed workout timing and midnight carry-over in `944fb2a` (CI `40042993312` green); creation-date eligibility in `b64e731` passed CI `40044223008`. Notification payload identity and immediate Profile preference replanning in `575af42` passed CI `40045457513`. Original test counts above refer to the handoff snapshot. Reset concurrency, connector session/cache races and background expiration remain under review. A follow-up UI repair improves contrast/tap targets, limits test helpers to Debug, and labels history as scheduled rather than delivered; its own CI is required. Device accessibility remains unverified. The finite reminder queue is still an open fallback blocker; the earlier BUILD_LOG statement that a longer horizon fixed it is superseded by this limitation.
+
+2026-10-24 lifecycle follow-up: `f080003` WHOOP repair passed CI `40046639685`. Scheduler reset/cancellation, connection cache invalidation and Health/Calendar session guards now have a follow-up repair plus seven app regression cases (macOS CI required). An offline extraction of the actual queue and its three cancellation/reset tests passed on Linux; this is not device validation. The finite-queue fallback blocker remains open.

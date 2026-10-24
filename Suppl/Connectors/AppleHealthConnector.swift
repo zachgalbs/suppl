@@ -18,6 +18,7 @@ final class AppleHealthConnector: Connector {
     private(set) var lastSync: Date?
 
     @ObservationIgnored var now: () -> Date = Date.init
+    @ObservationIgnored private var sessionID = UUID()
     @ObservationIgnored private let store = HKHealthStore()
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private var observer: HKObserverQuery?
@@ -41,11 +42,13 @@ final class AppleHealthConnector: Connector {
 
     func connect() async throws {
         guard availability == .available else { throw ConnectorError.unsupported }
+        let session = sessionID
         do {
             try await store.requestAuthorization(toShare: [], read: [workoutType, sleepType])
         } catch {
             throw ConnectorError.failed("Couldn't open the Apple Health prompt. Try again.")
         }
+        guard session == sessionID, !Task.isCancelled else { throw ConnectorError.cancelled }
         defaults.set(true, forKey: Self.connectedKey)
         authorization = .connected
         startQueryIfReady()
@@ -53,19 +56,21 @@ final class AppleHealthConnector: Connector {
 
     /// Stops reading. Only the user can revoke the OS permission, in the Health app (see `disconnectNote`).
     func disconnect() async {
+        sessionID = UUID()
+        defaults.removeObject(forKey: Self.connectedKey)
+        defaults.removeObject(forKey: Self.lastSyncKey)
+        authorization = .notConnected
+        lastSync = nil
         if let observer { store.stop(observer) }
         observer = nil
         if availability == .available {
             try? await store.disableBackgroundDelivery(for: workoutType)
         }
-        defaults.removeObject(forKey: Self.connectedKey)
-        defaults.removeObject(forKey: Self.lastSyncKey)
-        authorization = .notConnected
-        lastSync = nil
     }
 
     func fetchSignals(since: Date) async throws -> [ContextSignal] {
         guard availability == .available, authorization == .connected else { return [] }
+        let session = sessionID
         let at = now()
         var signals: [ContextSignal] = []
 
@@ -74,6 +79,7 @@ final class AppleHealthConnector: Connector {
             sortDescriptors: [SortDescriptor(\.endDate, order: .reverse)],
             limit: 20
         ).result(for: store)
+        guard session == sessionID, !Task.isCancelled else { return [] }
         for w in workouts where w.endDate >= since && w.endDate <= at {
             signals.append(ContextSignal(kind: .workoutEnded(start: w.startDate, end: w.endDate),
                                          source: .appleHealth, observedAt: at))
@@ -88,6 +94,7 @@ final class AppleHealthConnector: Connector {
             sortDescriptors: [SortDescriptor(\.startDate)],
             limit: nil
         ).result(for: store)
+        guard session == sessionID, !Task.isCancelled else { return [] }
         let asleep = sleep
             .filter { SleepSessions.asleepValues.contains($0.value) && $0.endDate > $0.startDate }
             .map { DateInterval(start: $0.startDate, end: $0.endDate) }

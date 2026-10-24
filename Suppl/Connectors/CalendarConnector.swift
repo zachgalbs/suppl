@@ -17,6 +17,7 @@ final class CalendarConnector: Connector {
     private var enabled: Bool
 
     @ObservationIgnored var now: () -> Date = Date.init
+    @ObservationIgnored private var sessionID = UUID()
     @ObservationIgnored private let store = EKEventStore()
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private var changeObserver: NSObjectProtocol?
@@ -43,12 +44,14 @@ final class CalendarConnector: Connector {
     }
 
     func connect() async throws {
+        let session = sessionID
         let granted: Bool
         do {
             granted = try await store.requestFullAccessToEvents()
         } catch {
             throw ConnectorError.failed("Couldn't ask for calendar access. Try again.")
         }
+        guard session == sessionID, !Task.isCancelled else { throw ConnectorError.cancelled }
         guard granted else {
             enabled = false
             throw ConnectorError.denied("Calendar access is off. You can turn it on in Settings, then Privacy & Security > Calendars.")
@@ -58,6 +61,7 @@ final class CalendarConnector: Connector {
     }
 
     func disconnect() async {
+        sessionID = UUID()
         enabled = false
         lastSync = nil
         defaults.removeObject(forKey: Self.connectedKey)

@@ -13,7 +13,7 @@ enum BackgroundRefresh {
                 await NotificationScheduler.run(refreshSignals: true)
                 task.setTaskCompleted(success: !Task.isCancelled)
             }
-            // Cancelling ends the run's wait early; the task above still reports completion exactly once.
+            // The queue releases this caller promptly and cancels the worker if no other caller needs it.
             task.expirationHandler = { work.cancel() }
         }
     }
