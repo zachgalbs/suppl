@@ -8,8 +8,12 @@ struct ConnectStep: View {
 
     private var hub: ConnectorHub { .shared }
 
-    private var whoopNote: String {
-        hub.connector(.whoop)?.availability == .available ? " Using WHOOP for timing is part of suppl. Pro." : ""
+    private var footer: String {
+        guard Features.current.smartTimingFree else {
+            return "Smart timing with these apps is part of suppl. Pro. Without it, reminders come at your usual times. You can connect or disconnect anytime in Profile."
+        }
+        let whoop = hub.connector(.whoop)?.availability == .available ? " Using WHOOP for timing is part of suppl. Pro." : ""
+        return "Timing around your workouts, sleep, and calendar is free while suppl. is in testing.\(whoop) You can connect or disconnect anytime in Profile."
     }
 
     private var anyConnected: Bool {
@@ -25,9 +29,7 @@ struct ConnectStep: View {
                         .card()
                 }
             }
-            Text(Features.current.smartTimingFree
-                 ? "Timing around your workouts, sleep, and calendar is free while suppl. is in testing.\(whoopNote) You can connect or disconnect anytime in Profile."
-                 : "Smart timing with these apps is part of suppl. Pro. Without it, reminders come at your usual times. You can connect or disconnect anytime in Profile.")
+            Text(footer)
                 .font(.footnote)
                 .foregroundStyle(Color.forest.opacity(0.8))
         }
