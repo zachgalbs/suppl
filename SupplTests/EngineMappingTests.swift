@@ -1,5 +1,6 @@
 import XCTest
 import SwiftData
+import UserNotifications
 import SupplCore
 @testable import suppl
 
@@ -134,6 +135,56 @@ final class EngineMappingTests: XCTestCase {
         XCTAssertEqual(snoozed.first { $0.day == yesterday }?.state, .snoozed(until: until))
         let done = EngineInputs.statuses(for: [s], logs: [snooze, skipped], now: now, calendar: calendar)
         XCTAssertEqual(done.first { $0.day == yesterday }?.state, .skipped(at: skipped.at))
+    }
+
+    private func privateRequest(planIDs: [String] = ["a"], dayOffset: Int = 0,
+                                minuteOffset: Int = 0) -> UNNotificationRequest {
+        let day = Day(now, calendar: calendar).adding(days: dayOffset, calendar: calendar)
+        let decision = ReminderDecision(id: ReminderID.make(day: day, moment: .breakfast, stage: .initial),
+            groupID: ReminderID.group(day: day, moment: .breakfast), day: day, moment: .breakfast,
+            planIDs: planIDs, fireDate: now.addingTimeInterval(Double(minuteOffset * 60)), stage: .initial,
+            reason: Reason(trigger: .usualTime, ruleID: "timing.usual.v1"))
+        let text = ReminderCopy.notification(for: decision, plans: [], privacyMode: true,
+                                             calendar: calendar, locale: Locale(identifier: "en_US"))
+        return NotificationScheduler.makeRequest(for: decision, text: text, calendar: calendar)
+    }
+
+    func testPrivateReminderReplacesChangedDoseTargets() {
+        let original = privateRequest()
+        XCTAssertTrue(NotificationScheduler.isSame(original, as: privateRequest()))
+        for ids in [["a", "b"], ["b"], []] {
+            let changed = privateRequest(planIDs: ids)
+            XCTAssertEqual(original.content.body, changed.content.body)
+            XCTAssertFalse(NotificationScheduler.isSame(original, as: changed), "actions must use the current plan set")
+        }
+    }
+
+    func testReminderIdentityChecksDayTimeCategoryAndGroup() {
+        let original = privateRequest()
+        XCTAssertFalse(NotificationScheduler.isSame(original, as: privateRequest(dayOffset: 1)))
+        XCTAssertFalse(NotificationScheduler.isSame(original, as: privateRequest(minuteOffset: 1)))
+        let content = original.content.mutableCopy() as! UNMutableNotificationContent
+        content.categoryIdentifier = Reminders.followUpCategory
+        let followUp = UNNotificationRequest(identifier: original.identifier, content: content, trigger: original.trigger)
+        XCTAssertFalse(NotificationScheduler.isSame(original, as: followUp))
+        content.categoryIdentifier = original.content.categoryIdentifier
+        content.threadIdentifier = "another-group"
+        let regrouped = UNNotificationRequest(identifier: original.identifier, content: content, trigger: original.trigger)
+        XCTAssertFalse(NotificationScheduler.isSame(original, as: regrouped))
+    }
+
+    func testReusedPrivateRequestKeepsAnUpdatedExplanation() {
+        let day = Day(now, calendar: calendar)
+        var decision = ReminderDecision(id: ReminderID.make(day: day, moment: .breakfast, stage: .initial),
+            groupID: ReminderID.group(day: day, moment: .breakfast), day: day, moment: .breakfast,
+            planIDs: ["a"], fireDate: now, stage: .initial,
+            reason: Reason(trigger: .usualTime, ruleID: "timing.usual.v1"))
+        let log = DecisionLog(decision: decision, title: "Private", reasonText: "Before", supplementNames: ["Old name"])
+        decision.planIDs = ["b"]
+        log.update(decision: decision, title: "Private", reasonText: "After", supplementNames: ["New name"])
+        XCTAssertEqual(log.decision?.planIDs, ["b"])
+        XCTAssertEqual(log.reasonText, "After")
+        XCTAssertEqual(log.supplementNames, "New name")
     }
 
 }

@@ -126,3 +126,9 @@ Accepted, not changed:
 - First repair `944fb2a` passed CI `40042993312` (simulator build and app tests), with 176 core tests locally; no completion claimed for the remaining independent-review queue.
 - Added the existing supplement creation timestamp to the core plan. Yesterday’s carry-over is now eligible only for routines already present that day; adding a supplement after midnight must not invent yesterday’s dose. No persistence schema or stored field changed. Two further core regression cases cover new versus existing routines.
 - Local core suite and follow-up CI are required; if CI outlasts this watcher run, its exact run ID and SHA are checkpointed in watcher STATE. Remaining open review areas: durable reminders after prolonged inactivity, notification payload identity, immediate preference replanning, connector/token races, reset/expiration lifecycle and accessibility.
+
+### 2026-10-24 — Codex notification identity and preference repair
+- Prior creation-date repair `b64e731` passed CI `40044223008`; 178 core tests and 14 app tests passed, plus 18 broker tests.
+- Notification equality now includes action payload (plan ids, day, moment, group), category, thread and exact wall-clock trigger. Private text no longer hides changed dose targets. Reused requests refresh their stored explanation.
+- Profile changes to privacy, intensity, usual times and quiet hours request an immediate coalesced replan while Profile remains open.
+- Three app regression tests cover generic-text plan replacement, schedule/category/group identity and explanation updates. macOS CI is required; no local iOS or device pass is claimed. Independent review and other recorded findings remain incomplete.

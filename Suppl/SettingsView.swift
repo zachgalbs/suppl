@@ -18,6 +18,8 @@ struct SettingsView: View {
     @AppStorage(Slot.postWorkout.storageKey) private var postWorkout = Slot.postWorkout.defaultMinutes
     @AppStorage(PrefKey.intensity) private var intensityRaw = Intensity.balanced.rawValue
     @AppStorage(PrefKey.privacyMode) private var privacyMode = false
+    @AppStorage(PrefKey.quietStart) private var quietStart = -1
+    @AppStorage(PrefKey.quietEnd) private var quietEnd = -1
 
     @State private var confirmingReset = false
     @State private var testSent = false
@@ -69,6 +71,11 @@ struct SettingsView: View {
                 Text("This removes your supplements, reminder history, and settings, and disconnects your apps. It doesn't cancel a subscription.")
             }
             .sheet(isPresented: $showingPaywall) { PaywallView() }
+            .onChange(of: [wake, breakfast, lunch, dinner, bedtime, postWorkout, quietStart, quietEnd]) {
+                Reminders.reschedule()
+            }
+            .onChange(of: intensityRaw) { Reminders.reschedule() }
+            .onChange(of: privacyMode) { Reminders.reschedule() }
             .onDisappear { Reminders.reschedule() }
         }
     }

@@ -106,30 +106,16 @@ enum NotificationScheduler {
             let reasonText = ReminderCopy.whyNow(decision.reason, moment: decision.moment, calendar: calendar, locale: locale)
             let names = decision.planIDs.compactMap { plansByID[$0]?.name }
 
-            if let existing = pendingByID[decision.id], isSame(existing, text: text, fireDate: decision.fireDate) {
-                if logsByID[decision.id] == nil {
+            let request = makeRequest(for: decision, text: text, calendar: calendar)
+            if let existing = pendingByID[decision.id], isSame(existing, as: request) {
+                // Generic privacy text can stay unchanged while the explanation or saved plan changes.
+                if let log = logsByID[decision.id] {
+                    log.update(decision: decision, title: text.title, reasonText: reasonText, supplementNames: names)
+                } else {
                     context.insert(DecisionLog(decision: decision, title: text.title, reasonText: reasonText, supplementNames: names))
                 }
                 continue
             }
-            let content = UNMutableNotificationContent()
-            content.title = text.title
-            content.body = text.body
-            content.sound = .default
-            content.threadIdentifier = decision.groupID
-            content.categoryIdentifier = decision.stage == .initial ? Reminders.category : Reminders.followUpCategory
-            content.userInfo = [
-                "slot": decision.moment.rawValue,
-                "group": decision.groupID,
-                "day": decision.day.key,
-                "plans": decision.planIDs,
-            ]
-            // Wall-clock components with no time zone, like the old repeating triggers: if the user flies
-            // and doesn't open the app, breakfast still comes at breakfast time where they are.
-            let when = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: decision.fireDate)
-            let request = UNNotificationRequest(
-                identifier: decision.id, content: content,
-                trigger: UNCalendarNotificationTrigger(dateMatching: when, repeats: false))
             do {
                 try await center.add(request)
             } catch {
@@ -146,12 +132,38 @@ enum NotificationScheduler {
         }
     }
 
-    /// Same text and a fire date within a minute: leave it alone instead of churning the request.
-    private static func isSame(_ request: UNNotificationRequest, text: NotificationText, fireDate: Date) -> Bool {
-        guard request.content.title == text.title, request.content.body == text.body,
-              let next = (request.trigger as? UNCalendarNotificationTrigger)?.nextTriggerDate()
+    static func makeRequest(for decision: ReminderDecision, text: NotificationText,
+                            calendar: Calendar) -> UNNotificationRequest {
+        let content = UNMutableNotificationContent()
+        content.title = text.title
+        content.body = text.body
+        content.sound = .default
+        content.threadIdentifier = decision.groupID
+        content.categoryIdentifier = decision.stage == .initial ? Reminders.category : Reminders.followUpCategory
+        content.userInfo = [
+            "slot": decision.moment.rawValue,
+            "group": decision.groupID,
+            "day": decision.day.key,
+            "plans": decision.planIDs,
+        ]
+        // Local wall-clock components preserve usual times when travelling without opening the app.
+        let when = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: decision.fireDate)
+        return UNNotificationRequest(identifier: decision.id, content: content,
+            trigger: UNCalendarNotificationTrigger(dateMatching: when, repeats: false))
+    }
+
+    /// Matching text alone is insufficient: private reminders still carry distinct action targets.
+    static func isSame(_ existing: UNNotificationRequest, as wanted: UNNotificationRequest) -> Bool {
+        guard existing.identifier == wanted.identifier,
+              existing.content.title == wanted.content.title,
+              existing.content.body == wanted.content.body,
+              existing.content.categoryIdentifier == wanted.content.categoryIdentifier,
+              existing.content.threadIdentifier == wanted.content.threadIdentifier,
+              NSDictionary(dictionary: existing.content.userInfo).isEqual(to: wanted.content.userInfo),
+              let oldTrigger = existing.trigger as? UNCalendarNotificationTrigger,
+              let newTrigger = wanted.trigger as? UNCalendarNotificationTrigger
         else { return false }
-        return abs(next.timeIntervalSince(fireDate)) < 60
+        return oldTrigger.repeats == newTrigger.repeats && oldTrigger.dateComponents == newTrigger.dateComponents
     }
 
     /// The Why-now sheet and Recent reminders only look back 14 days. Dose history is kept.
