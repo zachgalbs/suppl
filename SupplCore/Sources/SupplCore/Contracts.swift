@@ -240,6 +240,10 @@ public struct Preferences: Codable, Sendable, Hashable {
     /// how long reminders keep coming if the app never runs again; the heads-up warns before they stop.
     /// Follow-ups cover two days.
     public var planningDays: Int
+    /// Initials past `planningDays`, up to this many days, only fill slots nothing else needs. Sparse
+    /// routines (weekly plans, one daily supplement) then reach weeks ahead, so the heads-up isn't
+    /// anchored to their very next reminder.
+    public var maxPlanningDays: Int
 
     public init(usualTimes: [Moment: Int] = Preferences.defaultUsualTimes,
                 windows: [Moment: MomentWindow] = [:],
@@ -251,7 +255,8 @@ public struct Preferences: Codable, Sendable, Hashable {
                 connectedSources: Set<SignalSource> = [],
                 freshness: FreshnessPolicy = FreshnessPolicy(),
                 minimumGapMinutes: Int = 10,
-                planningDays: Int = 14) {
+                planningDays: Int = 14,
+                maxPlanningDays: Int = 28) {
         self.usualTimes = usualTimes
         self.windows = windows
         self.intensity = intensity
@@ -263,6 +268,7 @@ public struct Preferences: Codable, Sendable, Hashable {
         self.freshness = freshness
         self.minimumGapMinutes = minimumGapMinutes
         self.planningDays = planningDays
+        self.maxPlanningDays = maxPlanningDays
     }
 
     /// Same defaults as the app's `Slot.defaultMinutes`.

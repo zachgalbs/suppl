@@ -42,7 +42,7 @@ enum EngineFixtures {
         var p = Preferences(intensity: intensity, quietHours: quiet, contextAware: contextAware,
                             connectedSources: sources,
                             // Most tests reason about today and tomorrow; EngineHorizonTests covers the full week.
-                            planningDays: 2)
+                            planningDays: 2, maxPlanningDays: 2)
         edit(&p)
         return p
     }

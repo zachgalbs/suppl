@@ -48,7 +48,7 @@ public enum ReminderEngine {
         let today = Day(now, calendar: calendar)
         var decisions: [ReminderDecision] = []
         // Yesterday may still have a future quiet-hours reminder, snooze, or follow-up.
-        for offset in -1..<max(2, prefs.planningDays) {
+        for offset in -1..<max(2, prefs.planningDays, prefs.maxPlanningDays) {
             let day = today.adding(days: offset, calendar: calendar)
             for moment in Moment.allCases {
                 let open = unique.filter { plan in
@@ -68,21 +68,23 @@ public enum ReminderEngine {
                 decisions += offset < 2 ? planned : planned.filter { $0.stage == .initial }
             }
         }
-        return capped(decisions, delivered: Set(history.map(\.id)), now: now, budget: budget)
+        return capped(decisions, delivered: Set(history.map(\.id)), now: now, budget: budget,
+                      fillFrom: today.adding(days: max(2, prefs.planningDays), calendar: calendar))
     }
 
     /// Initials are what must keep coming if the app doesn't run again, so they outrank later follow-ups.
-    /// Snoozes (asked for) and follow-ups due within a day come first. Soonest first within each tier,
-    /// so it's the farthest-off reminders that give way. Returned soonest first, ties by id.
+    /// Snoozes (asked for) come first, then anything due within a day; initials from `fillFrom` on only
+    /// fill what's left. Soonest first within each tier, so it's the farthest-off reminders that give way.
+    /// Returned soonest first, ties by id.
     static func capped(_ decisions: [ReminderDecision], delivered: Set<String> = [], now: Date,
-                       budget: Int = maxDecisions) -> [ReminderDecision] {
+                       budget: Int = maxDecisions, fillFrom: Day? = nil) -> [ReminderDecision] {
         let soon = now.addingTimeInterval(nearTerm)
         func tier(_ d: ReminderDecision) -> Int {
-            switch d.stage {
-            case .snoozed: 0
-            case .followUp: d.fireDate <= soon ? 0 : 2
-            case .initial: 1
-            }
+            if d.stage == .snoozed { return 0 }
+            if d.fireDate <= soon { return 1 }
+            if d.stage != .initial { return 3 }
+            if let fillFrom, d.day >= fillFrom { return 4 }
+            return 2
         }
         let kept = decisions.sorted { (tier($0), $0.fireDate, $0.id) < (tier($1), $1.fireDate, $1.id) }
             .prefix(max(0, budget))

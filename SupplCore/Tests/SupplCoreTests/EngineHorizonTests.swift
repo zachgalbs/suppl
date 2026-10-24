@@ -45,8 +45,9 @@ final class EngineHorizonTests: XCTestCase {
         XCTAssertTrue(Set(nearFollowUps.reminderIDs).isSubset(of: Set(out.reminderIDs)))
     }
 
-    func testDefaultHorizonIsTwoWeeks() {
+    func testDefaultHorizonIsTwoWeeksFilledToFour() {
         XCTAssertEqual(Preferences().planningDays, 14)
+        XCTAssertEqual(Preferences().maxPlanningDays, 28)
     }
     func testClinicianDirectedWorkoutKeepsUsualTime() throws {
         let plans = [F.plan("fixed", .postWorkout, clinician: true), F.plan("flexible", .postWorkout)]

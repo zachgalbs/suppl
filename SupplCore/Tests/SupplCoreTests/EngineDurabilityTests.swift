@@ -133,4 +133,30 @@ final class EngineDurabilityTests: XCTestCase {
             if case .followUp = d.stage { XCTAssertTrue(initials.contains(F.id(d.day, d.moment)), d.id) }
         }
     }
+
+    /// Sparse routines reach past two weeks with leftover slots, so the heads-up isn't on their next reminder.
+    private func sparse(_ edit: (inout Preferences) -> Void = { _ in }) -> Preferences {
+        F.prefs { $0.planningDays = 14; $0.maxPlanningDays = 28; edit(&$0) }
+    }
+
+    func testWeeklyPlanHeadsUpIsWeeksAwayNotOnTheNextReminder() throws {
+        let prefs = sparse { $0.intensity = .gentle }
+        let out = F.run([F.plan("m", .lunch, frequency: .weekdays([2]))], prefs: prefs, now: F.at(6, 0))
+        XCTAssertEqual(out.map(\.day.key), ["2026-10-26", "2026-11-02", "2026-11-09", "2026-11-16"])
+        let headsUp = try XCTUnwrap(ReminderEngine.headsUpDate(for: out, prefs: prefs, calendar: F.ny))
+        XCTAssertEqual(headsUp, F.date(2026, 11, 9, 12, 30))
+    }
+
+    func testFillDaysTakeOnlyWhatFollowUpsLeave() {
+        let plans = [F.plan("b", .breakfast), F.plan("d", .dinner)]
+        let all = F.run(plans, prefs: sparse(), now: F.at(6, 0))
+        XCTAssertLessThanOrEqual(all.count, ReminderEngine.maxDecisions)
+        XCTAssertNotNil(all.decision(F.id(F.tomorrow, .breakfast, .followUp(1))))
+        XCTAssertNotNil(all.decision(F.id(Day(year: 2026, month: 11, day: 19), .dinner)), "four weeks ahead")
+        // With room for everything but the fill days, tomorrow's follow-ups still win.
+        let tight = F.run(plans, prefs: sparse(), now: F.at(6, 0), budget: 32)
+        XCTAssertNotNil(tight.decision(F.id(F.tomorrow, .breakfast, .followUp(1))))
+        XCTAssertNotNil(tight.decision(F.id(F.tomorrow, .dinner, .followUp(1))))
+        XCTAssertFalse(tight.contains { $0.day >= Day(year: 2026, month: 11, day: 6) })
+    }
 }
