@@ -96,9 +96,10 @@ struct SupplementDetailView: View {
         let time = timeText(supplement.slot.minutes)
         if supplement.clinicianDirected { return "At your saved time, \(time). Context won't move this reminder." }
         if supplement.slot == .postWorkout {
-            return Features.current.smartTiming
-                ? "Usually around \(time). When workout data is available, this can move after a workout."
-                : "Usually around \(time). With Pro and workout data available, this can move after a workout."
+            let features = Features.current
+            if features.isPro { return "Usually around \(time). When workout data is available, this can move after a workout." }
+            if features.smartTiming { return "Usually around \(time). When Apple Health has workout data, this can move after a workout." }
+            return "Usually around \(time). With Pro and workout data available, this can move after a workout."
         }
         return "\(supplement.timingNote), usually \(time)"
     }

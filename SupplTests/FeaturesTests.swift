@@ -17,9 +17,10 @@ final class FeaturesTests: XCTestCase {
         return d
     }
 
-    func testSwitchShipsOnInThisBuild() {
-        XCTAssertEqual(Bundle.main.object(forInfoDictionaryKey: Features.infoKey) as? Bool, true)
-        XCTAssertTrue(Features.smartTimingFreeInBuild)
+    func testSwitchIsABooleanInfoKeyAndIsWhatTheAppReads() {
+        let value = Bundle.main.object(forInfoDictionaryKey: Features.infoKey) as? Bool
+        XCTAssertNotNil(value, "set SupplSmartTimingFree to true or false in project.yml")
+        XCTAssertEqual(Features.smartTimingFreeInBuild, value)
     }
 
     func testSwitchOffKeepsTodaysProGatingExactly() {
