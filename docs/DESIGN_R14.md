@@ -38,16 +38,17 @@ So no background path is guaranteed to run. A fix has to stay safe if the app ne
 ### A. Budget the request cap (shipped)
 
 - **Limit.** 64 total. Two slots are always reserved: one for the heads-up and one for the Debug test reminder. The engine gets the rest (62), minus any pending request it doesn't manage. On the first launch after upgrading, the old build's repeating `suppl.<slot>` and `suppl.followup.<slot>` requests (up to 10) are counted as still pending, even though they're being removed, because removal is asynchronous. The engine gets 52 on that pass and 62 afterwards.
-- **Priority.** (1) snoozes the user asked for and follow-ups due within 24 hours, (2) initial reminders, soonest first, (3) later follow-ups, only if room is left. Within each tier soonest wins, so the farthest reminders give way. A follow-up whose initial was cut is dropped, so there's no "Still open" about something never sent.
-- **Horizon.** Initials are planned up to 14 days ahead, budget permitting (it was 7). A light routine now lasts two weeks with zero launches. The busiest routine lasts about eight and a half days (eight full days of every moment), up from about four. A longer horizon *alone* would not help: the cap, not the horizon, was the binding limit, and with no warning the queue would still end silently.
-- **Runtime guard.** Before adding a new identifier, the scheduler re-reads what iOS reports as pending, counting the two reserved slots as taken. If 64 is reached, it skips the farthest additions. Because removal is asynchronous, this re-read can only over-count, which errs safe. The heads-up is computed from what iOS actually accepted, not from what was planned.
+- **Priority.** (1) snoozes the user asked for, (2) anything due within 24 hours (initials and follow-ups), (3) initial reminders up to 14 days ahead, (4) later follow-ups, (5) initials from 14 up to 28 days ahead, which only fill leftover slots. Within each tier soonest wins, so the farthest reminders give way. A follow-up whose initial was cut is dropped, so there's no "Still open" about something never sent.
+- **Horizon.** Initials are planned 14 days ahead, then filled up to 28 days with whatever room is left (it was 7 days). A light routine now lasts four weeks with zero launches, and a weekly plan gets four occurrences, so its heads-up is weeks away instead of riding on its next reminder. The busiest routine lasts about eight and a half days (eight full days of every moment), up from about four. A longer horizon *alone* would not help: the cap, not the horizon, was the binding limit, and with no warning the queue would still end silently.
+- **Runtime guard.** Before adding a new identifier, the scheduler re-reads what iOS reports as pending, counting the two reserved slots as taken. If 64 is reached, it turns away the farthest additions. Because removal is asynchronous, this re-read can only over-count. Anything turned away gets one more try after a fresh count, so a near-term reminder isn't lost just because a removal hadn't landed yet. The heads-up is computed from what iOS actually accepted, not from what was planned.
+- **Superseded or cancelled passes.** A request that was already added stays put unless a reset (Delete all data) is draining the scheduler. Pulling it back could race the next pass's snapshot and leave nothing pending. A pass that is cut short still moves the heads-up, based on the reminders it did handle, which are the soonest part of the queue.
 - **Rules.** Ids are still one per dose day, moment and stage, so nothing duplicates. Taken and Skip still remove the group's pending requests and re-plan. Budgeting only decides *which* already-valid reminders go in, so quiet hours, weekdays and clinician-directed timing are untouched.
 
 ### B. Final heads-up notification (shipped)
 
 - One request, `suppl.headsup`. Title "suppl.", body "Open suppl. to keep your reminders coming." No category, so there's no Taken, Snooze or Skip. It names no supplement, so it reads the same with lock-screen privacy on.
 - **When.** It reuses the fire time of a planned initial reminder outside quiet hours: the latest one at least 24 hours before the last planned initial, or the earliest if the queue is shorter than that. Reusing a time that already passed quiet-hours and window rules means it never adds a new time of day. Coverage only ever ends after the last planned initial, so the warning always comes before silence. In the busiest routine it comes a full day early.
-- **Replaced on every re-plan.** It uses the same identifier, so adding it replaces the old one, and it's skipped when unchanged. If nothing is planned, it's removed. Anyone whose app runs at least every few days (including through notification actions) never sees it.
+- **Replaced on every re-plan.** It uses the same identifier, so adding it replaces the old one, and it's skipped when unchanged. If nothing is planned, it's removed. Only a reset takes it back after it's added. Anyone whose app runs every few days (including through notification actions) never sees it. A weekly plan's heads-up sits about two weeks out, behind its next reminder, so acting on one weekly reminder moves the warning too.
 - **Tap.** Opens the app. `ReminderActions` re-plans for it, and launching re-plans anyway.
 - **Rules.** It isn't a dose reminder, so it can't duplicate one or fire "after Taken" for a dose. It fits because its slot is reserved.
 
@@ -81,14 +82,17 @@ A server that knows each user's schedule can send alert pushes indefinitely. It 
 
 ## Trade-offs accepted
 
-- With zero launches, reminders still stop. The difference is that they stop after 8 to 14 days instead of about 4, and only after a clear warning.
+- With zero launches, reminders still stop. The difference is that they stop after 8 to 28 days instead of about 4, and only after a clear warning.
 - In the busiest routines, follow-ups more than 24 hours out give way to initials until the next re-plan.
 - The heads-up rides on a reminder's time, so on that one occasion the user sees two notifications at once.
 - If every planned initial is inside quiet hours (only possible for bedtime reminders exempted from them), the heads-up shares that bedtime reminder's time.
+- The Debug test slot is also reserved in Release builds, where it is never used. That costs one slot.
+- The app tests check the requests the scheduler builds, not the live `UNUserNotificationCenter` diff (it isn't injectable). Device steps in the PR cover that.
 - iOS's 64 limit is documented on a legacy page. If Apple ever lowered it, the runtime guard would still not exceed what iOS reports, but the reserved-slot arithmetic would need updating.
 
 ## Tests
 
 - `SupplCore/Tests/SupplCoreTests/EngineDurabilityTests.swift`: budget arithmetic and foreign counts; the six-moment Extra Help worst case at 0 and 10 foreign requests; a zero-launch simulation (every moment covered for eight days, heads-up at least a day before the first missing reminder); the heads-up shares a planned time and stays outside quiet hours; Taken and Skip leave nothing pending; no duplicate initials; weekday and clinician timing under the budget; follow-ups never outlive their initial; snoozes are kept.
 - `SupplTests/DurableRemindersTests.swift`: the same worst case through the app's real request builders, including the upgrade pass with the old build's requests still pending, the 64 limit with the test slot, quiet hours, Taken and Skip, and the heads-up's identity (no category, no plan ids, replaced in place).
-- `EngineHorizonTests`: a week of initials and near-term follow-ups survive the cap; the default horizon is two weeks.
+- Also in `EngineDurabilityTests`: a weekly plan reaches four occurrences and its heads-up is two weeks out; fill days never displace tomorrow's follow-ups.
+- `EngineHorizonTests`: a week of initials and near-term follow-ups survive the cap; the default horizon is two weeks, filled up to four.

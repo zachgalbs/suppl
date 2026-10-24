@@ -49,7 +49,7 @@ Statuses: **Implemented** · **Partial** · **Not started** · **Blocked (extern
 | Structured evidence-backed knowledge engine | Partial; Needs clinical review | Catalog + rule model with ids, versions, sources, `reviewStatus: "unreviewed"` |
 | Medication and supplement safety screening | Not started; Needs clinical review | No medication entry. Three supplement spacing rules exist but ship `enabled: false` |
 | Context-aware reminder architecture | Implemented | Pure engine in `SupplCore` with timing/status tests; app scheduler diffs pending requests |
-| Functional push notifications | Partial | Local notifications, budgeted within iOS's 64 (up to two weeks ahead), with a heads-up before the queue runs out. APNs is future work |
+| Functional push notifications | Partial | Local notifications, budgeted within iOS's 64 (up to four weeks ahead), with a heads-up before the queue runs out. APNs is future work |
 | Taken, Snooze, and Skip actions | Implemented | |
 | Gentle accountability | Implemented | No shame copy; no response stays unconfirmed; confirmed-days streak on Home (`SupplCore/.../Accountability/Streak.swift`) |
 | Optional mascot | Not started | Stretch; skipped this session |
@@ -58,7 +58,7 @@ Statuses: **Implemented** · **Partial** · **Not started** · **Blocked (extern
 | Full contextual AI chat | Not started | Out of scope |
 | Explainable notification decisions | Implemented | `DecisionLog` + Why-now sheet (`Suppl/Home/WhyNowView.swift`), Recent reminders (Pro) |
 | Optional data integrations with honest availability states | Implemented | Apple Health, Calendar. WHOOP shows "Not available yet" until configured |
-| Graceful fallback without connected apps | Implemented | Usual-time reminders continue for 8 to 14 days with zero app launches, then a heads-up asks the user to open the app before the last one. Every launch re-plans. `docs/DESIGN_R14.md` |
+| Graceful fallback without connected apps | Implemented | Usual-time reminders continue for 8 to 28 days with zero app launches, then a heads-up asks the user to open the app before the last one. Every launch re-plans. `docs/DESIGN_R14.md` |
 | Monthly and yearly subscriptions | Implemented in code; Blocked (external) | App Store Connect products |
 | Working purchase restoration | Implemented in code | `AppStore.sync()`; needs a sandbox test on device |
 | Secure authentication | Not started | No accounts in v1; WHOOP OAuth uses WHOOP and the token broker |

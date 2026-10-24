@@ -127,18 +127,25 @@ Accepted, not changed:
 
 ### How R14 was resolved
 The full comparison, with Apple documentation for every platform claim, is in `docs/DESIGN_R14.md`. Summary:
-- **Budget.** iOS keeps 64 pending notifications. Two slots are reserved (the heads-up and the Debug test reminder), and the rest go to reminders: snoozes and follow-ups due within a day, then initial reminders up to two weeks out, then later follow-ups. Requests left over from the old build count against the budget until they're gone. Before adding anything new, the scheduler re-reads what iOS actually holds, so the limit holds even while removals are still finishing.
+- **Budget.** iOS keeps 64 pending notifications. Two slots are reserved (the heads-up and the Debug test reminder), and the rest go to reminders: snoozes, then anything due within a day, then initial reminders up to two weeks out, then later follow-ups, then initials up to four weeks out if room is left. Requests left over from the old build count against the budget until they're gone. Before adding anything new, the scheduler re-reads what iOS actually holds, so the limit holds even while removals are still finishing.
 - **Heads-up.** One "Open suppl. to keep your reminders coming." notification, moved on every re-plan. It reuses the time of a planned reminder outside quiet hours, at least a day before the last one when possible. It names no supplement and has no actions, so it can't duplicate a reminder or fire for a dose already Taken or Skipped.
 - **Re-plan everywhere.** Every launch (foreground, background, HealthKit, background refresh, notification action) now re-plans and re-submits the refresh task, and tapping the heads-up re-plans.
-- **Result with zero launches.** A light routine keeps coming for two weeks. The busiest routine keeps every moment for eight full days (it used to be about four), and the heads-up arrives a day before the queue ends.
+- **Result with zero launches.** A light routine keeps coming for four weeks. The busiest routine keeps every moment for eight full days (it used to be about four), and the heads-up arrives a day before the queue ends.
 - **Rejected.** Repeating triggers in any form, because iOS can't give them a start date or skip one occurrence, so they either duplicate smart reminders or fire after Taken or Skip. APNs is the long-term fix once a backend exists.
 
 ### Also on this pass
 - **Smart timing is free during testing.** One switch, `SupplSmartTimingFree` in `project.yml` (on), makes workout, late-wake and calendar timing available to everyone. WHOOP, Extra Help and Recent reminders stay Pro. With the switch off, the previous Pro gating applies exactly. Paywall, onboarding and Profile copy follow the switch.
 - **CI.** Actions moved to `actions/checkout@v7` and `actions/upload-artifact@v7` (Node 24), clearing the Node 20 deprecation warning.
-- **Fresh review.** A new reviewer that hadn't written the code is checking the R14 changes; outcomes are added here when it finishes.
+- **Fresh review.** A new reviewer that hadn't written the code checked the R14 changes against the rules above. It found no duplicates, no reminder after Taken or Skip, no way past 64, and no migration risk. It did find these, all fixed:
+  - The heads-up could be pulled back by a superseded or cancelled pass, leaving the queue to end silently. It is now removed only during a reset, and a pass that's cut short still moves it.
+  - A full queue could turn away a near-term reminder (such as a new snooze) while removals were still landing. Turned-away requests now get a second try after a fresh count.
+  - A weekly plan had only two occurrences in two weeks, so its heads-up arrived with every reminder. Initials now fill leftover slots up to four weeks ahead.
+  - WHOOP was still fetched for free users and then thrown away. Only sources whose data may time reminders are read now.
+  - Two smaller fixes: reminders due within a day now share a tier with their follow-ups, and the detail screen no longer promises workout timing to a free user whose only workout source is WHOOP.
+  - Accepted, not changed: the switch applies to every build, including App Store ones, so its "while suppl. is in testing" copy ships until Zach turns it off (it's on his checklist). The test slot is reserved in Release too (it costs one slot). The app tests check the requests the scheduler builds, not the live notification-center diff.
 
 ### Current status
 - All review findings, R1 to R22, are resolved.
 - What's still open is outside this repo: running it on a device, TestFlight, App Store Connect products, the WHOOP developer app and broker, and clinical and legal review. These are listed in the PR under Zach's checklist.
 - Local `swift test` couldn't run on this pass (the sandbox blocks download.swift.org), so SupplCore tests were verified by CI's SupplCore step.
+- The committed `Suppl.xcodeproj` wasn't re-synced from CI on this pass, because the sandbox can't reach GitHub's artifact storage. It doesn't list the three new app and test files. Nothing breaks: CI and `scripts/testflight.sh` both run `xcodegen generate` first, and so should anyone opening the project on a Mac. The next session with artifact access should commit the regenerated project.
