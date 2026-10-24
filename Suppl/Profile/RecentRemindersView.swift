@@ -1,7 +1,7 @@
 import SwiftUI
 import SwiftData
 
-/// Reminders that went out in the last 14 days, newest first, with why each was sent. Pro.
+/// Elapsed reminder schedules from the last 14 days, newest first. Delivery is not verified. Pro.
 @MainActor
 struct RecentRemindersView: View {
     @Query private var logs: [DecisionLog]
@@ -10,7 +10,7 @@ struct RecentRemindersView: View {
     init() {
         let now = Date.now
         let cutoff = now.addingTimeInterval(-14 * 24 * 60 * 60)
-        // Only reminders already delivered; pending ones live in DecisionLog too.
+        // Show elapsed schedules; iOS may have silenced or delayed their delivery.
         _logs = Query(filter: #Predicate<DecisionLog> { $0.fireDate <= now && $0.fireDate >= cutoff },
                       sort: [SortDescriptor(\DecisionLog.fireDate, order: .reverse)])
     }
@@ -24,7 +24,7 @@ struct RecentRemindersView: View {
                 }
             } else if logs.isEmpty {
                 Section {
-                    Text("No reminders in the last 14 days.")
+                    Text("No scheduled reminders in the last 14 days.")
                 }
             } else {
                 Section {
@@ -32,7 +32,7 @@ struct RecentRemindersView: View {
                         row(log)
                     }
                 } footer: {
-                    Text("Kept for 14 days, only on this phone.")
+                    Text("These are scheduled times, not delivery confirmations. iOS may silence or delay notifications. Kept for 14 days, only on this phone.")
                 }
             }
         }

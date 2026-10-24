@@ -123,7 +123,7 @@ struct SupplementForm: View {
 
     private var weekdayChips: some View {
         let calendar = Calendar.current
-        return HStack(spacing: 6) {
+        return LazyVGrid(columns: [GridItem(.adaptive(minimum: 44), spacing: 6)], spacing: 6) {
             ForEach(Weekdays.ordered(calendar), id: \.self) { day in
                 weekdayChip(day, short: calendar.veryShortWeekdaySymbols[day - 1],
                             full: calendar.weekdaySymbols[day - 1])
@@ -138,8 +138,8 @@ struct SupplementForm: View {
         } label: {
             Text(short)
                 .font(.subheadline.weight(.semibold))
-                .frame(maxWidth: .infinity, minHeight: 44)
-                .background(on ? Color.sage : Color.sage.opacity(0.15))
+                .frame(minWidth: 44, maxWidth: .infinity, minHeight: 44)
+                .background(on ? Color.forest : Color.softSage)
                 .foregroundStyle(on ? Color.cream : Color.forest)
                 .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
@@ -157,6 +157,7 @@ struct SupplementForm: View {
                         .font(.footnote)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 6)
+                        .frame(minWidth: 44, minHeight: 44)
                         .background(Color.sage.opacity(0.15))
                         .clipShape(Capsule())
                 }

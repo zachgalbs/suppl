@@ -132,3 +132,11 @@ Accepted, not changed:
 - Notification equality now includes action payload (plan ids, day, moment, group), category, thread and exact wall-clock trigger. Private text no longer hides changed dose targets. Reused requests refresh their stored explanation.
 - Profile changes to privacy, intensity, usual times and quiet hours request an immediate coalesced replan while Profile remains open.
 - Three app regression tests cover generic-text plan replacement, schedule/category/group identity and explanation updates. macOS CI is required; no local iOS or device pass is claimed. Independent review and other recorded findings remain incomplete.
+
+### 2026-10-24 — Codex truthful reminder UI and accessibility repair
+- Notification identity/preference repair `575af42` passed macOS CI `40045457513`; independent review continues.
+- Recent reminders and Why now now describe scheduled times, not unverified delivery. Elapsed accepted schedules still suppress duplicates conservatively; no delivery proof or dose confirmation is inferred.
+- Test reminders and their Profile controls are Debug-only, clearly marked as tests and never invent a supplement. The Debug button reports scheduling errors rather than claiming a failed request was sent.
+- Primary button/text tint uses forest for contrast; weekday controls wrap in an adaptive grid with 44-point minimum targets. Brand sage/lavender tokens remain for decoration. Device Dynamic Type/VoiceOver auditing still belongs to Zach.
+- Detail/summary copy distinguishes fixed clinician-directed groups and conditional workout timing. Daily tips carry the same general-information/label caveat as catalog details.
+- Local core/broker tests and macOS CI are required for this batch. Durable reminder fallback, WHOOP session/persistence races, connector cache invalidation and reset/background lifecycle findings remain unresolved; no final independent-review acceptance or comment yet.

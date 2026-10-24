@@ -92,7 +92,7 @@ struct ConnectorRow: View {
             case .notConnected:
                 Button("Connect", action: connect)
                     .buttonStyle(.bordered)
-                    .tint(Color.sage)
+                    .tint(Color.forest)
                     .frame(minHeight: 44)
                     .accessibilityLabel("Connect \(connector.displayName)")
             case .denied:

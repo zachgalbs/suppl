@@ -68,7 +68,8 @@ struct SummaryStep: View {
         case .bedtime: return "before bed"
         case .postWorkout:
             let canSeeWorkouts = !hub.connectedSources.isDisjoint(with: [.appleHealth, .whoop])
-            if canSeeWorkouts && Store.shared.isPro { return "after workouts" }
+            let fixedGroup = supplements.contains { $0.slot == .postWorkout && $0.clinicianDirected }
+            if canSeeWorkouts && Store.shared.isPro && !fixedGroup { return "after recorded workouts when data is available" }
             return "at \(timeText(Slot.postWorkout.minutes)) for after-workout supplements"
         }
     }

@@ -22,7 +22,10 @@ struct SettingsView: View {
     @AppStorage(PrefKey.quietEnd) private var quietEnd = -1
 
     @State private var confirmingReset = false
+    #if DEBUG
     @State private var testSent = false
+    @State private var testError: String?
+    #endif
     @State private var showingPaywall = false
 
     private var isPro: Bool { Store.shared.isPro }
@@ -41,14 +44,24 @@ struct SettingsView: View {
                 connections
                 MembershipSection(showingPaywall: $showingPaywall)
 
+                #if DEBUG
                 Section {
-                    Button(testSent ? "Sent. Lock your phone." : "Send a test reminder in 5 seconds") {
-                        Reminders.sendTest()
-                        testSent = true
+                    Button(testSent ? "Test scheduled. Lock your phone." : "Send a test reminder in 5 seconds") {
+                        Task {
+                            do {
+                                try await Reminders.sendTest()
+                                testSent = true
+                                testError = nil
+                            } catch {
+                                testError = "Couldn't schedule the test reminder. Try again."
+                            }
+                        }
                     }
+                    if let testError { Text(testError) }
                 } footer: {
-                    Text("Long-press the notification to see Taken, Snooze, and Skip.")
+                    Text("Long-press to try the actions. Test actions don't change your routine.")
                 }
+                #endif
 
                 Section {
                     Button("Delete all data", role: .destructive) { confirmingReset = true }
@@ -154,7 +167,7 @@ struct SettingsView: View {
                         Spacer()
                         Text("Pro")
                             .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(Color.lavender)
+                            .foregroundStyle(Color.forest)
                     }
                 }
             }

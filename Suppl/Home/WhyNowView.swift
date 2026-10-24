@@ -1,7 +1,7 @@
 import SwiftUI
 import SwiftData
 
-/// Opened from a notification tap: what we sent, and the data we based it on.
+/// The scheduled reminder and the data its timing was based on.
 struct WhyNowView: View {
     @Environment(\.dismiss) private var dismiss
     @Query private var logs: [DecisionLog]
@@ -12,7 +12,7 @@ struct WhyNowView: View {
                       sort: [SortDescriptor(\DecisionLog.fireDate, order: .reverse)])
     }
 
-    /// The most recent reminder in the group that has actually gone out.
+    /// Prefer the latest elapsed schedule; a passed fire date alone does not prove delivery.
     private var latest: DecisionLog? {
         logs.first { $0.fireDate <= .now } ?? logs.first
     }
@@ -53,7 +53,7 @@ struct WhyNowView: View {
             }
             VStack(alignment: .leading, spacing: 10) {
                 Text(log.reasonText)
-                Label("Sent \(stamp(log.fireDate))", systemImage: "bell")
+                Label("Scheduled for \(stamp(log.fireDate))", systemImage: "bell")
                     .font(.subheadline)
                 if let data = log.dataTimestamp {
                     Label("Data from \(stamp(data))", systemImage: "clock")

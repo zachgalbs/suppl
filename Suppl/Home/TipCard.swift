@@ -13,6 +13,9 @@ struct TipCard: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text(tip.text)
                     .font(.callout)
+                Text("General information. Check it against your label.")
+                    .font(.footnote)
+                    .foregroundStyle(Color.forest.opacity(0.8))
                 if let url = URL(string: tip.sourceURL) {
                     Link("Learn more", destination: url)
                         .font(.subheadline.weight(.semibold))

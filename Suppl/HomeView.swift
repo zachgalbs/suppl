@@ -28,7 +28,7 @@ struct HomeView: View {
                     if streak >= 2 {
                         Label("\(streak) days in a row, every dose confirmed", systemImage: "leaf.fill")
                             .font(.subheadline)
-                            .foregroundStyle(Color.sage)
+                            .foregroundStyle(Color.forest)
                     }
 
                     if let notificationStatus, !supplements.isEmpty {
@@ -121,7 +121,7 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 8) {
             Label(slot.title, systemImage: slot.symbol)
                 .font(.headline)
-                .foregroundStyle(Color.sage)
+                .foregroundStyle(Color.forest)
             VStack(spacing: 0) {
                 ForEach(items) { item in
                     row(item)

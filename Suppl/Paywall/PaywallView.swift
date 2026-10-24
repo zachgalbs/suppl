@@ -68,7 +68,7 @@ struct PaywallView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("suppl. Pro")
                 .font(.headline)
-                .foregroundStyle(Color.lavender)
+                .foregroundStyle(Color.forest)
             Text("Let suppl. take care of the remembering.")
                 .font(.largeTitle.bold())
                 .fixedSize(horizontal: false, vertical: true)
@@ -88,7 +88,7 @@ struct PaywallView: View {
                 feature("waveform.path.ecg", "WHOOP", "Use your WHOOP workouts and sleep for timing.")
             }
             feature("bell.badge", "Extra Help", "Up to two gentle follow-ups if you don't respond.")
-            feature("clock.arrow.circlepath", "Recent reminders", "See what we sent and why.")
+            feature("clock.arrow.circlepath", "Recent reminders", "See scheduled reminders and why.")
         }
         .card()
     }

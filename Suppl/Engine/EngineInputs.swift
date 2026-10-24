@@ -73,7 +73,8 @@ enum EngineInputs {
         return result
     }
 
-    /// Decisions whose fire date has passed, so the engine never sends them again.
+    /// Accepted schedules whose fire date has passed. Used conservatively to prevent duplicate nudges,
+    /// not as proof that iOS displayed them or that the user took a dose.
     static func history(from logs: [DecisionLog], now: Date) -> [ReminderDecision] {
         logs.filter { $0.fireDate <= now }.compactMap(\.decision)
     }

@@ -17,7 +17,7 @@ struct SupplApp: App {
                     OnboardingView()
                 }
             }
-            .tint(.sage)
+            .tint(.forest)
             .preferredColorScheme(.light)
             .onChange(of: onboarded) { _, done in
                 if done { Reminders.reschedule() }

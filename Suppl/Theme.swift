@@ -24,7 +24,7 @@ struct PrimaryButtonStyle: ButtonStyle {
             .font(.headline)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
-            .background(Color.sage.opacity(configuration.isPressed ? 0.8 : 1))
+            .background(Color.forest.opacity(configuration.isPressed ? 0.8 : 1))
             .foregroundStyle(Color.cream)
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }

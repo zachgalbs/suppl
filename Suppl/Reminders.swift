@@ -1,5 +1,4 @@
 import Foundation
-import SwiftData
 import SupplCore
 import UserNotifications
 
@@ -35,33 +34,24 @@ enum Reminders {
         Task { await NotificationScheduler.run() }
     }
 
-    /// Fires a sample reminder a few seconds from now so testers can try the actions.
-    /// It respects lock-screen privacy, and its actions record nothing.
+    #if DEBUG
+    /// A clearly labelled sample. Test actions never record a real dose.
     @MainActor
-    static func sendTest() {
-        let supplements = (try? sharedContainer.mainContext.fetch(FetchDescriptor<Supplement>())) ?? []
-        let slot = supplements.first?.slot ?? .breakfast
-        let names = supplements.filter { $0.slot == slot }.map(\.name)
-        let request = UNNotificationRequest(
-            identifier: "suppl.test",
-            content: content(for: slot, names: names.isEmpty ? ["Vitamin D"] : names, category: category),
-            trigger: UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
-        )
-        UNUserNotificationCenter.current().add(request)
-    }
-
-    private static func content(for slot: Slot, names: [String], category: String) -> UNMutableNotificationContent {
+    static func sendTest() async throws {
         let content = UNMutableNotificationContent()
         if UserDefaults.standard.bool(forKey: PrefKey.privacyMode) {
             content.title = ReminderCopy.privateTitle
             content.body = ReminderCopy.privateBody
         } else {
-            content.title = slot.isMeal ? "\(slot.title) time" : slot.title
-            content.body = ListFormatter.localizedString(byJoining: names)
+            content.title = "suppl. test reminder"
+            content.body = "This is a test. Its actions don't change your routine."
         }
         content.sound = .default
         content.categoryIdentifier = category
-        content.userInfo = ["slot": slot.rawValue, "test": true]
-        return content
+        content.userInfo = ["test": true]
+        let request = UNNotificationRequest(identifier: "suppl.test", content: content,
+            trigger: UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false))
+        try await UNUserNotificationCenter.current().add(request)
     }
+    #endif
 }

@@ -94,8 +94,10 @@ struct SupplementDetailView: View {
 
     private var whenText: String {
         let time = timeText(supplement.slot.minutes)
+        let fixedGroup = all.contains { $0.slot == supplement.slot && $0.clinicianDirected }
+        if fixedGroup { return "At your saved time, \(time). Context won't move this reminder." }
         if supplement.slot == .postWorkout {
-            return "After a workout. If none is recorded, around \(time)."
+            return "Usually around \(time). With Pro and workout data available, this can move after a workout."
         }
         return "\(supplement.timingNote), usually \(time)"
     }
