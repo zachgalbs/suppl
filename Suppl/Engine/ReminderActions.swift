@@ -12,6 +12,8 @@ struct ReminderResponse: Sendable {
     var planIDs: [String]?
     /// The Profile test reminder. Its actions record nothing, so testing never marks a real dose.
     var isTest: Bool
+    /// "Open suppl. to keep your reminders coming." Opening it re-plans and records nothing.
+    var isHeadsUp: Bool
 
     init(action: String, userInfo: [AnyHashable: Any]) {
         self.action = action
@@ -20,6 +22,7 @@ struct ReminderResponse: Sendable {
         dayKey = userInfo["day"] as? String
         planIDs = userInfo["plans"] as? [String]
         isTest = userInfo["test"] as? Bool ?? false
+        isHeadsUp = userInfo["headsUp"] as? Bool ?? false
     }
 }
 
@@ -29,6 +32,10 @@ struct ReminderResponse: Sendable {
 enum ReminderActions {
     static func handle(_ response: ReminderResponse, now: Date = .now) async {
         guard !response.isTest, !NotificationScheduler.isResetting else { return }
+        if response.isHeadsUp {
+            await NotificationScheduler.run()
+            return
+        }
         let calendar = Calendar.current
         let todayKey = Day(now, calendar: calendar).key
         let dayKey = response.dayKey ?? todayKey

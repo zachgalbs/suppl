@@ -49,7 +49,7 @@ enum Reminders {
         content.sound = .default
         content.categoryIdentifier = category
         content.userInfo = ["test": true]
-        let request = UNNotificationRequest(identifier: "suppl.test", content: content,
+        let request = UNNotificationRequest(identifier: NotificationBudget.testID, content: content,
             trigger: UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false))
         try await UNUserNotificationCenter.current().add(request)
     }

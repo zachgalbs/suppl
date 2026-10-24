@@ -56,6 +56,9 @@ enum NotificationScheduler {
         let fetched = features.smartTiming ? await signals(from: hub, now: now, calendar: calendar) : []
         guard isCurrent(pass) else { return }
         let usable = features.timingSignals(fetched, connected: hub.connectedSources)
+        let center = UNUserNotificationCenter.current()
+        let pending = await center.pendingNotificationRequests()
+        guard isCurrent(pass) else { return }
         let context = sharedContainer.mainContext
         Supplement.backfillIDs(in: context)
         let supplements = (try? context.fetch(FetchDescriptor<Supplement>())) ?? []
@@ -69,9 +72,13 @@ enum NotificationScheduler {
             statuses: EngineInputs.statuses(for: supplements, logs: doseLogs, now: now, calendar: calendar),
             signals: usable,
             history: EngineInputs.history(from: decisionLogs, now: now),
-            prefs: prefs, now: now, calendar: calendar)
+            prefs: prefs, now: now, calendar: calendar,
+            budget: NotificationBudget.engineSlots(foreign: NotificationBudget.foreignCount(pending.map(\.identifier))))
 
-        await apply(decisions, plans: plans, prefs: prefs, logs: decisionLogs, context: context, now: now, calendar: calendar, pass: pass)
+        let scheduled = await apply(decisions, pending: pending, plans: plans, prefs: prefs, logs: decisionLogs,
+                                    context: context, now: now, calendar: calendar, pass: pass)
+        guard isCurrent(pass) else { return }
+        await scheduleHeadsUp(after: scheduled, pending: pending, prefs: prefs, calendar: calendar, pass: pass)
         guard isCurrent(pass) else { return }
         prune(decisionLogs, context: context, now: now)
         try? context.save()
@@ -93,11 +100,11 @@ enum NotificationScheduler {
         return cachedSignals
     }
 
-    private static func apply(_ decisions: [ReminderDecision], plans: [DosePlan], prefs: Preferences,
-                              logs: [DecisionLog], context: ModelContext, now: Date, calendar: Calendar, pass: Int) async {
+    /// Returns the decisions iOS now holds, unchanged or newly added.
+    private static func apply(_ decisions: [ReminderDecision], pending: [UNNotificationRequest], plans: [DosePlan],
+                              prefs: Preferences, logs: [DecisionLog], context: ModelContext, now: Date,
+                              calendar: Calendar, pass: Int) async -> [ReminderDecision] {
         let center = UNUserNotificationCenter.current()
-        let pending = await center.pendingNotificationRequests()
-        guard isCurrent(pass) else { return }
         let pendingByID = Dictionary(pending.map { ($0.identifier, $0) }, uniquingKeysWith: { a, _ in a })
         let wanted = Set(decisions.map(\.id))
 
@@ -116,6 +123,14 @@ enum NotificationScheduler {
         let plansByID = Dictionary(plans.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
         let locale = Locale.current
 
+        // Removal finishes asynchronously, so count what iOS still reports before adding new ids.
+        // The heads-up and test slots always count as taken, so engine reminders can't crowd them out.
+        let current = await center.pendingNotificationRequests()
+        guard isCurrent(pass) else { return [] }
+        var occupied = Set(current.map(\.identifier))
+        occupied.formUnion([NotificationBudget.headsUpID, NotificationBudget.testID])
+        var scheduled: [ReminderDecision] = []
+
         for decision in decisions {
             let text = ReminderCopy.notification(for: decision, plans: plans, privacyMode: prefs.privacyMode,
                                                  calendar: calendar, locale: locale)
@@ -130,20 +145,28 @@ enum NotificationScheduler {
                 } else {
                     context.insert(DecisionLog(decision: decision, title: text.title, reasonText: reasonText, supplementNames: names))
                 }
+                scheduled.append(decision)
+                continue
+            }
+            // Soonest first, so a full queue turns away the farthest reminders; the next run retries them.
+            guard occupied.contains(decision.id) || occupied.count < NotificationBudget.pendingLimit else {
+                if let log = logsByID[decision.id] { context.delete(log) }
                 continue
             }
             do {
                 try await center.add(request)
                 guard isCurrent(pass) else {
                     center.removePendingNotificationRequests(withIdentifiers: [request.identifier])
-                    return
+                    return []
                 }
             } catch {
-                guard isCurrent(pass) else { return }
+                guard isCurrent(pass) else { return [] }
                 // Not scheduled (e.g. notifications not allowed yet), so it must not count as delivered later.
                 if let log = logsByID[decision.id] { context.delete(log) }
                 continue
             }
+            occupied.insert(decision.id)
+            scheduled.append(decision)
 
             if let log = logsByID[decision.id] {
                 log.update(decision: decision, title: text.title, reasonText: reasonText, supplementNames: names)
@@ -151,6 +174,37 @@ enum NotificationScheduler {
                 context.insert(DecisionLog(decision: decision, title: text.title, reasonText: reasonText, supplementNames: names))
             }
         }
+        return scheduled
+    }
+
+    /// One "Open suppl." notification before the queue runs out, moved on every run. It names no dose,
+    /// so it can't duplicate a reminder or nag about one already Taken or Skipped.
+    private static func scheduleHeadsUp(after scheduled: [ReminderDecision], pending: [UNNotificationRequest],
+                                        prefs: Preferences, calendar: Calendar, pass: Int) async {
+        let center = UNUserNotificationCenter.current()
+        guard let date = ReminderEngine.headsUpDate(for: scheduled, prefs: prefs, calendar: calendar) else {
+            center.removePendingNotificationRequests(withIdentifiers: [NotificationBudget.headsUpID])
+            return
+        }
+        let request = makeHeadsUpRequest(at: date, calendar: calendar)
+        if let existing = pending.first(where: { $0.identifier == request.identifier }), isSame(existing, as: request) {
+            return
+        }
+        // Same identifier, so this replaces the previous heads-up.
+        try? await center.add(request)
+        if !isCurrent(pass) { center.removePendingNotificationRequests(withIdentifiers: [request.identifier]) }
+    }
+
+    static func makeHeadsUpRequest(at date: Date, calendar: Calendar) -> UNNotificationRequest {
+        let content = UNMutableNotificationContent()
+        content.title = ReminderCopy.headsUp.title
+        content.body = ReminderCopy.headsUp.body
+        content.sound = .default
+        // No category: there is nothing to mark. Tapping it opens the app, which re-plans.
+        content.userInfo = ["headsUp": true]
+        let when = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
+        return UNNotificationRequest(identifier: NotificationBudget.headsUpID, content: content,
+            trigger: UNCalendarNotificationTrigger(dateMatching: when, repeats: false))
     }
 
     static func makeRequest(for decision: ReminderDecision, text: NotificationText,

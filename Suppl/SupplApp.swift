@@ -38,6 +38,9 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
         Supplement.backfillIDs(in: sharedContainer.mainContext)
         Store.shared.start()
         BackgroundRefresh.register()
+        // Every launch, foreground or background, extends the one-shot queue and moves the heads-up.
+        BackgroundRefresh.schedule()
+        Reminders.reschedule()
 
         // Context changes re-plan with fresh connector data. Both are no-ops until the user connects.
         let hub = ConnectorHub.shared
