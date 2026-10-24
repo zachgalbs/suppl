@@ -236,8 +236,9 @@ public struct Preferences: Codable, Sendable, Hashable {
     public var freshness: FreshnessPolicy
     /// Shortest calendar gap worth moving a reminder into.
     public var minimumGapMinutes: Int
-    /// Days of initial reminders kept pending. Every trigger is one-shot, so this is how long reminders
-    /// keep coming if the app is never opened and background refresh never runs. Follow-ups cover two days.
+    /// Days of initial reminders kept pending, budget permitting. Every trigger is one-shot, so this bounds
+    /// how long reminders keep coming if the app never runs again; the heads-up warns before they stop.
+    /// Follow-ups cover two days.
     public var planningDays: Int
 
     public init(usualTimes: [Moment: Int] = Preferences.defaultUsualTimes,
@@ -250,7 +251,7 @@ public struct Preferences: Codable, Sendable, Hashable {
                 connectedSources: Set<SignalSource> = [],
                 freshness: FreshnessPolicy = FreshnessPolicy(),
                 minimumGapMinutes: Int = 10,
-                planningDays: Int = 7) {
+                planningDays: Int = 14) {
         self.usualTimes = usualTimes
         self.windows = windows
         self.intensity = intensity
@@ -387,11 +388,14 @@ public struct NotificationText: Codable, Sendable, Hashable {
 // Implemented in Engine/ReminderEngine.swift and Copy/ReminderCopy.swift:
 //
 //   public enum ReminderEngine {
-//       /// Reminders that should be pending right now, for today and tomorrow, soonest first, at most 48.
+//       /// Reminders that should be pending right now, soonest first, within `budget` (see `NotificationBudget`).
 //       /// `history` holds decisions already delivered (fire date in the past), so nothing fires twice.
 //       public static func plan(plans: [DosePlan], statuses: [DoseStatus], signals: [ContextSignal],
 //                               history: [ReminderDecision], prefs: Preferences,
-//                               now: Date, calendar: Calendar) -> [ReminderDecision]
+//                               now: Date, calendar: Calendar, budget: Int) -> [ReminderDecision]
+//       /// When to warn that the one-shot queue is running out.
+//       public static func headsUpDate(for scheduled: [ReminderDecision], prefs: Preferences,
+//                                      calendar: Calendar) -> Date?
 //   }
 //
 //   public enum ReminderCopy {

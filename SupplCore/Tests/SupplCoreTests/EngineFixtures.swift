@@ -69,9 +69,9 @@ enum EngineFixtures {
 
     static func run(_ plans: [DosePlan], statuses: [DoseStatus] = [], signals: [ContextSignal] = [],
                     history: [ReminderDecision] = [], prefs: Preferences = prefs(), now: Date,
-                    calendar: Calendar = ny) -> [ReminderDecision] {
+                    calendar: Calendar = ny, budget: Int = ReminderEngine.maxDecisions) -> [ReminderDecision] {
         ReminderEngine.plan(plans: plans, statuses: statuses, signals: signals, history: history,
-                            prefs: prefs, now: now, calendar: calendar)
+                            prefs: prefs, now: now, calendar: calendar, budget: budget)
     }
 
     static func id(_ day: Day, _ moment: Moment, _ stage: ReminderStage = .initial) -> String {

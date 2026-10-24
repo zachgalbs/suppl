@@ -5,6 +5,8 @@ import Foundation
 public enum ReminderCopy {
     public static let privateTitle = "suppl."
     public static let privateBody = "suppl. has a reminder for you."
+    /// Sent before the pending queue runs out. Names no supplement, so it's the same with lock-screen privacy on.
+    public static let headsUp = NotificationText(title: "suppl.", body: "Open suppl. to keep your reminders coming.")
 
     public static func momentTitle(_ moment: Moment) -> String {
         switch moment {

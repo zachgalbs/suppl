@@ -91,23 +91,23 @@ final class EngineBasicsTests: XCTestCase {
         XCTAssertTrue(out.allSatisfy { $0.fireDate > F.at(9, 0) })
     }
 
-    func testCapKeepsTheSoonest48() {
+    func testCapKeepsTheSoonestInitials() {
         let base = F.at(0, 0)
-        let many = (0..<60).reversed().map { i in
+        let many = (0..<80).reversed().map { i in
             ReminderDecision(id: String(format: "x%02d", i), groupID: "g", day: F.today, moment: .lunch, planIDs: ["a"],
                              fireDate: base.addingTimeInterval(TimeInterval(i * 60)), stage: .initial,
                              reason: Reason(trigger: .usualTime, ruleID: "timing.usual.v1"))
         }
-        let capped = ReminderEngine.capped(many)
+        let capped = ReminderEngine.capped(many, now: base)
         XCTAssertEqual(capped.count, ReminderEngine.maxDecisions)
         XCTAssertEqual(capped.first?.id, "x00")
-        XCTAssertEqual(capped.last?.id, "x47")
+        XCTAssertEqual(capped.last?.id, String(format: "x%02d", ReminderEngine.maxDecisions - 1))
     }
 
     func testBusiestRealInputStaysUnderTheCap() {
         let plans = Moment.allCases.flatMap { m in (0..<5).map { F.plan("\(m.rawValue)\($0)", m) } }
         let out = F.run(plans, prefs: F.prefs(intensity: .extraHelp) { $0.followUpDelayMinutes = 10 }, now: F.at(0, 1))
-        XCTAssertLessThanOrEqual(out.count, 48)
+        XCTAssertLessThanOrEqual(out.count, ReminderEngine.maxDecisions)
         XCTAssertEqual(Set(out.reminderIDs).count, out.count, "ids must be unique")
     }
 

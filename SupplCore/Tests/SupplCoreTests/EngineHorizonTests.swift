@@ -1,8 +1,8 @@
 import XCTest
 @testable import SupplCore
 
-/// Every trigger is one-shot, so the planning horizon is how long reminders keep coming if the app
-/// is never opened again. The old build used repeating triggers; a two-day horizon would be a regression.
+/// Every trigger is one-shot, so the planning horizon bounds how long reminders keep coming if the app
+/// never runs again. EngineDurabilityTests covers the budget and the heads-up that warns before they stop.
 final class EngineHorizonTests: XCTestCase {
     private typealias F = EngineFixtures
 
@@ -29,20 +29,24 @@ final class EngineHorizonTests: XCTestCase {
         XCTAssertEqual(out.map(\.day.key), ["2026-10-26"])
     }
 
-    func testCapDropsTheFarthestInitialsFirst() {
+    func testCapKeepsTheWeeksInitialsBeforeLaterFollowUps() {
         let plans = Moment.allCases.map { F.plan($0.rawValue, $0) }
         let out = F.run(plans, prefs: week(.extraHelp), now: F.at(0, 1))
-        XCTAssertEqual(out.count, ReminderEngine.maxDecisions)
+        XCTAssertLessThanOrEqual(out.count, ReminderEngine.maxDecisions)
         XCTAssertEqual(out.map(\.fireDate), out.map(\.fireDate).sorted())
-        // Today's and tomorrow's follow-ups all survive the cap.
-        let keptFollowUps = out.filter { $0.stage != .initial }.count
-        let allFollowUps = F.run(plans, prefs: F.prefs(intensity: .extraHelp), now: F.at(0, 1))
-            .filter { $0.stage != .initial }.count
-        XCTAssertEqual(keptFollowUps, allFollowUps)
+        // Every initial of the week survives the cap.
+        let allInitials = F.run(plans, prefs: week(.gentle), now: F.at(0, 1))
+        XCTAssertEqual(Set(out.filter { $0.stage == .initial }.reminderIDs), Set(allInitials.reminderIDs))
+        // So do the follow-ups due within a day.
+        let soon = F.at(0, 1).addingTimeInterval(24 * 3600)
+        let nearFollowUps = F.run(plans, prefs: F.prefs(intensity: .extraHelp), now: F.at(0, 1))
+            .filter { $0.stage != .initial && $0.fireDate <= soon }
+        XCTAssertFalse(nearFollowUps.isEmpty)
+        XCTAssertTrue(Set(nearFollowUps.reminderIDs).isSubset(of: Set(out.reminderIDs)))
     }
 
-    func testDefaultHorizonIsAWeek() {
-        XCTAssertEqual(Preferences().planningDays, 7)
+    func testDefaultHorizonIsTwoWeeks() {
+        XCTAssertEqual(Preferences().planningDays, 14)
     }
     func testClinicianDirectedWorkoutKeepsUsualTime() throws {
         let plans = [F.plan("fixed", .postWorkout, clinician: true), F.plan("flexible", .postWorkout)]

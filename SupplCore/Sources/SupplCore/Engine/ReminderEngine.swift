@@ -3,8 +3,12 @@ import Foundation
 /// Decides which reminders should be pending. Pure: the same inputs always give the same output,
 /// so the scheduler can re-run it whenever anything changes and diff pending requests by id.
 public enum ReminderEngine {
-    /// iOS keeps 64 pending requests per app. Staying at 48 leaves room for the test reminder and old builds' ids.
-    public static let maxDecisions = 48
+    /// iOS keeps 64 pending requests per app; the heads-up and the test reminder keep one each.
+    public static let maxDecisions = NotificationBudget.engineSlots(foreign: 0)
+    /// Follow-ups this close compete with initials for the budget; later ones only fill what's left.
+    static let nearTerm: TimeInterval = 24 * 3600
+    /// The heads-up comes at least this long before the last planned reminder when the queue allows.
+    static let headsUpLead: TimeInterval = 24 * 3600
     /// Reminders computed "for right now" fire at least this far out, so they're never already in the past.
     static let minimumLead: TimeInterval = 60
     /// Health data often lands a moment after the workout ends; wait a little before nudging.
@@ -22,12 +26,12 @@ public enum ReminderEngine {
         public static let quietHours = "timing.quietHours.v1"
     }
 
-    /// Reminders that should be pending right now, soonest first, at most 48. Initial reminders cover
+    /// Reminders that should be pending right now, soonest first, at most `budget`. Initial reminders cover
     /// `prefs.planningDays` days from today (in `calendar`); eligible carry-over from yesterday is retained across midnight.
     /// `history` holds decisions already delivered, so nothing fires twice.
     public static func plan(plans: [DosePlan], statuses: [DoseStatus], signals: [ContextSignal],
                             history: [ReminderDecision], prefs: Preferences,
-                            now: Date, calendar: Calendar) -> [ReminderDecision] {
+                            now: Date, calendar: Calendar, budget: Int = maxDecisions) -> [ReminderDecision] {
         // Context-aware timing is Pro. Without it, signals are ignored entirely and every reminder is a usual-time one.
         let context = SignalContext(signals: prefs.contextAware ? signals : [], freshness: prefs.freshness,
                                     now: now, calendar: calendar)
@@ -64,12 +68,43 @@ public enum ReminderEngine {
                 decisions += offset < 2 ? planned : planned.filter { $0.stage == .initial }
             }
         }
-        return capped(decisions)
+        return capped(decisions, delivered: Set(history.map(\.id)), now: now, budget: budget)
     }
 
-    /// Soonest first, ties by id, then the cap, so it's the farthest-off initials that give way.
-    static func capped(_ decisions: [ReminderDecision]) -> [ReminderDecision] {
-        Array(decisions.sorted { ($0.fireDate, $0.id) < ($1.fireDate, $1.id) }.prefix(maxDecisions))
+    /// Initials are what must keep coming if the app doesn't run again, so they outrank later follow-ups.
+    /// Snoozes (asked for) and follow-ups due within a day come first. Soonest first within each tier,
+    /// so it's the farthest-off reminders that give way. Returned soonest first, ties by id.
+    static func capped(_ decisions: [ReminderDecision], delivered: Set<String> = [], now: Date,
+                       budget: Int = maxDecisions) -> [ReminderDecision] {
+        let soon = now.addingTimeInterval(nearTerm)
+        func tier(_ d: ReminderDecision) -> Int {
+            switch d.stage {
+            case .snoozed: 0
+            case .followUp: d.fireDate <= soon ? 0 : 2
+            case .initial: 1
+            }
+        }
+        let kept = decisions.sorted { (tier($0), $0.fireDate, $0.id) < (tier($1), $1.fireDate, $1.id) }
+            .prefix(max(0, budget))
+        // A "Still open" for an initial that was cut would follow up on nothing.
+        let initials = Set(kept.filter { $0.stage == .initial }.map(\.id)).union(delivered)
+        return kept.filter { d in
+            guard case .followUp = d.stage else { return true }
+            return initials.contains(ReminderID.make(day: d.day, moment: d.moment, stage: .initial))
+        }.sorted { ($0.fireDate, $0.id) < ($1.fireDate, $1.id) }
+    }
+
+    /// When to schedule the heads-up for what iOS actually accepted, or `nil` when nothing is planned.
+    /// It shares the fire time of a planned initial outside quiet hours, so it never adds a new time
+    /// of day, and it comes a day before the last initial when the queue is long enough.
+    public static func headsUpDate(for scheduled: [ReminderDecision], prefs: Preferences,
+                                   calendar: Calendar) -> Date? {
+        let quiet = prefs.effectiveQuietHours
+        let initials = scheduled.filter { $0.stage == .initial }.map(\.fireDate).sorted()
+        guard let last = initials.last else { return nil }
+        let calm = initials.filter { !quiet.contains($0, calendar: calendar) }
+        let candidates = calm.isEmpty ? initials : calm
+        return candidates.last { $0 <= last.addingTimeInterval(-headsUpLead) } ?? candidates.first
     }
 
     static func isDue(_ plan: DosePlan, on day: Day, calendar: Calendar) -> Bool {

@@ -164,7 +164,7 @@ final class CopyTests: XCTestCase {
         for trigger in [Reason.Trigger.usualTime, .workoutEnded, .workoutFallback, .lateWake, .calendarGap, .snoozed, .followUp, .quietHours] {
             strings.append(why(Reason(trigger: trigger, ruleID: "x")))
         }
-        strings += [ReminderCopy.privateTitle, ReminderCopy.privateBody]
+        strings += [ReminderCopy.privateTitle, ReminderCopy.privateBody, ReminderCopy.headsUp.title, ReminderCopy.headsUp.body]
         XCTAssertGreaterThan(out.count, 5)
         for s in strings {
             let lower = s.lowercased()
