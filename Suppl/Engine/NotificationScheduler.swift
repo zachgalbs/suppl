@@ -12,6 +12,7 @@ enum NotificationScheduler {
     private static var cachedSignals: [ContextSignal] = []
     private static var signalsFetchedAt: Date?
     private static var cachedHubRevision = -1
+    private static var cachedSources: Set<SignalSource> = []
 
     static var isResetting: Bool { work.isPaused }
 
@@ -53,7 +54,9 @@ enum NotificationScheduler {
         guard isCurrent(pass) else { return }
         let features = Features.current
         let hub = ConnectorHub.shared
-        let fetched = features.smartTiming ? await signals(from: hub, now: now, calendar: calendar) : []
+        // Only sources whose data may time reminders are read at all (WHOOP stays Pro).
+        let sources = features.timingSources(hub.connectedSources)
+        let fetched = sources.isEmpty ? [] : await signals(from: hub, sources: sources, now: now, calendar: calendar)
         guard isCurrent(pass) else { return }
         let usable = features.timingSignals(fetched, connected: hub.connectedSources)
         let center = UNUserNotificationCenter.current()
@@ -77,33 +80,39 @@ enum NotificationScheduler {
 
         let scheduled = await apply(decisions, pending: pending, plans: plans, prefs: prefs, logs: decisionLogs,
                                     context: context, now: now, calendar: calendar, pass: pass)
-        guard isCurrent(pass) else { return }
-        await scheduleHeadsUp(after: scheduled, pending: pending, prefs: prefs, calendar: calendar, pass: pass)
+        // Even a pass cut short moves the heads-up: what it handled is the soonest part of the queue,
+        // so a warning anchored there still comes before the last reminder.
+        if let scheduled, !work.isPaused {
+            await scheduleHeadsUp(after: scheduled, pending: pending, prefs: prefs, calendar: calendar)
+        }
         guard isCurrent(pass) else { return }
         prune(decisionLogs, context: context, now: now)
         try? context.save()
     }
 
     /// Connector data is cached for a few minutes so routine edits don't hit WHOOP's rate limits.
-    private static func signals(from hub: ConnectorHub, now: Date, calendar: Calendar) async -> [ContextSignal] {
+    private static func signals(from hub: ConnectorHub, sources: Set<SignalSource>, now: Date,
+                                calendar: Calendar) async -> [ContextSignal] {
         let hubRevision = hub.revision
-        if cachedHubRevision == hubRevision, let fetched = signalsFetchedAt,
+        if cachedHubRevision == hubRevision, cachedSources == sources, let fetched = signalsFetchedAt,
            now.timeIntervalSince(fetched) < 5 * 60 {
             return cachedSignals.filter { hub.connectedSources.contains($0.source) }
         }
         let pass = revision
-        let fresh = await hub.signals(since: calendar.startOfDay(for: now))
+        let fresh = await hub.signals(since: calendar.startOfDay(for: now), sources: sources)
         guard isCurrent(pass), hub.revision == hubRevision else { return [] }
         cachedSignals = fresh.filter { hub.connectedSources.contains($0.source) }
         signalsFetchedAt = now
         cachedHubRevision = hubRevision
+        cachedSources = sources
         return cachedSignals
     }
 
-    /// Returns the decisions iOS now holds, unchanged or newly added.
+    /// Returns the decisions iOS now holds, unchanged or newly added, soonest first. A pass cut short
+    /// returns the ones handled so far, or nil if it stopped before handling any.
     private static func apply(_ decisions: [ReminderDecision], pending: [UNNotificationRequest], plans: [DosePlan],
                               prefs: Preferences, logs: [DecisionLog], context: ModelContext, now: Date,
-                              calendar: Calendar, pass: Int) async -> [ReminderDecision] {
+                              calendar: Calendar, pass: Int) async -> [ReminderDecision]? {
         let center = UNUserNotificationCenter.current()
         let pendingByID = Dictionary(pending.map { ($0.identifier, $0) }, uniquingKeysWith: { a, _ in a })
         let wanted = Set(decisions.map(\.id))
@@ -125,54 +134,66 @@ enum NotificationScheduler {
 
         // Removal finishes asynchronously, so count what iOS still reports before adding new ids.
         // The heads-up and test slots always count as taken, so engine reminders can't crowd them out.
-        let current = await center.pendingNotificationRequests()
-        guard isCurrent(pass) else { return [] }
-        var occupied = Set(current.map(\.identifier))
-        occupied.formUnion([NotificationBudget.headsUpID, NotificationBudget.testID])
+        // Anything turned away while removals were still landing gets one more try after a fresh count.
         var scheduled: [ReminderDecision] = []
+        var remaining = decisions
+        // Nothing handled yet tells the caller nothing, so it must not move or drop the heads-up.
+        func cutShort() -> [ReminderDecision]? { scheduled.isEmpty ? nil : scheduled }
+        for attempt in 0..<2 where !remaining.isEmpty {
+            let current = await center.pendingNotificationRequests()
+            guard isCurrent(pass) else { return cutShort() }
+            var occupied = Set(current.map(\.identifier))
+            occupied.formUnion([NotificationBudget.headsUpID, NotificationBudget.testID])
+            var turnedAway: [ReminderDecision] = []
 
-        for decision in decisions {
-            let text = ReminderCopy.notification(for: decision, plans: plans, privacyMode: prefs.privacyMode,
-                                                 calendar: calendar, locale: locale)
-            let reasonText = ReminderCopy.whyNow(decision.reason, moment: decision.moment, calendar: calendar, locale: locale)
-            let names = decision.planIDs.compactMap { plansByID[$0]?.name }
+            for decision in remaining {
+                let text = ReminderCopy.notification(for: decision, plans: plans, privacyMode: prefs.privacyMode,
+                                                     calendar: calendar, locale: locale)
+                let reasonText = ReminderCopy.whyNow(decision.reason, moment: decision.moment, calendar: calendar, locale: locale)
+                let names = decision.planIDs.compactMap { plansByID[$0]?.name }
+                func record() {
+                    scheduled.append(decision)
+                    if let log = logsByID[decision.id] {
+                        log.update(decision: decision, title: text.title, reasonText: reasonText, supplementNames: names)
+                    } else {
+                        context.insert(DecisionLog(decision: decision, title: text.title, reasonText: reasonText, supplementNames: names))
+                    }
+                }
 
-            let request = makeRequest(for: decision, text: text, calendar: calendar)
-            if let existing = pendingByID[decision.id], isSame(existing, as: request) {
+                let request = makeRequest(for: decision, text: text, calendar: calendar)
                 // Generic privacy text can stay unchanged while the explanation or saved plan changes.
-                if let log = logsByID[decision.id] {
-                    log.update(decision: decision, title: text.title, reasonText: reasonText, supplementNames: names)
-                } else {
-                    context.insert(DecisionLog(decision: decision, title: text.title, reasonText: reasonText, supplementNames: names))
+                if attempt == 0, let existing = pendingByID[decision.id], isSame(existing, as: request) {
+                    record()
+                    continue
                 }
-                scheduled.append(decision)
-                continue
-            }
-            // Soonest first, so a full queue turns away the farthest reminders; the next run retries them.
-            guard occupied.contains(decision.id) || occupied.count < NotificationBudget.pendingLimit else {
-                if let log = logsByID[decision.id] { context.delete(log) }
-                continue
-            }
-            do {
-                try await center.add(request)
-                guard isCurrent(pass) else {
+                // Soonest first, so a full queue turns away the farthest reminders.
+                guard occupied.contains(decision.id) || occupied.count < NotificationBudget.pendingLimit else {
+                    turnedAway.append(decision)
+                    continue
+                }
+                do {
+                    try await center.add(request)
+                } catch {
+                    guard isCurrent(pass) else { return cutShort() }
+                    // Not scheduled (e.g. notifications not allowed yet), so it must not count as delivered later.
+                    if let log = logsByID[decision.id] { context.delete(log) }
+                    continue
+                }
+                // A reset clears everything, so nothing may be left behind. A newer pass just re-diffs:
+                // pulling this request could race that pass's snapshot and leave nothing pending.
+                if work.isPaused {
                     center.removePendingNotificationRequests(withIdentifiers: [request.identifier])
-                    return []
+                    return scheduled
                 }
-            } catch {
-                guard isCurrent(pass) else { return [] }
-                // Not scheduled (e.g. notifications not allowed yet), so it must not count as delivered later.
-                if let log = logsByID[decision.id] { context.delete(log) }
-                continue
+                occupied.insert(decision.id)
+                record()
+                guard isCurrent(pass) else { return cutShort() }
             }
-            occupied.insert(decision.id)
-            scheduled.append(decision)
-
-            if let log = logsByID[decision.id] {
-                log.update(decision: decision, title: text.title, reasonText: reasonText, supplementNames: names)
-            } else {
-                context.insert(DecisionLog(decision: decision, title: text.title, reasonText: reasonText, supplementNames: names))
-            }
+            remaining = turnedAway
+        }
+        // Still no room: not scheduled, so not history. The next run tries again.
+        for decision in remaining {
+            if let log = logsByID[decision.id] { context.delete(log) }
         }
         return scheduled
     }
@@ -180,7 +201,7 @@ enum NotificationScheduler {
     /// One "Open suppl." notification before the queue runs out, moved on every run. It names no dose,
     /// so it can't duplicate a reminder or nag about one already Taken or Skipped.
     private static func scheduleHeadsUp(after scheduled: [ReminderDecision], pending: [UNNotificationRequest],
-                                        prefs: Preferences, calendar: Calendar, pass: Int) async {
+                                        prefs: Preferences, calendar: Calendar) async {
         let center = UNUserNotificationCenter.current()
         guard let date = ReminderEngine.headsUpDate(for: scheduled, prefs: prefs, calendar: calendar) else {
             center.removePendingNotificationRequests(withIdentifiers: [NotificationBudget.headsUpID])
@@ -190,9 +211,9 @@ enum NotificationScheduler {
         if let existing = pending.first(where: { $0.identifier == request.identifier }), isSame(existing, as: request) {
             return
         }
-        // Same identifier, so this replaces the previous heads-up.
+        // Same identifier, so this replaces the previous heads-up. Only a reset may take it back.
         try? await center.add(request)
-        if !isCurrent(pass) { center.removePendingNotificationRequests(withIdentifiers: [request.identifier]) }
+        if work.isPaused { center.removePendingNotificationRequests(withIdentifiers: [request.identifier]) }
     }
 
     static func makeHeadsUpRequest(at date: Date, calendar: Calendar) -> UNNotificationRequest {

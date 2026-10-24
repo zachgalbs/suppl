@@ -91,10 +91,14 @@ final class ConnectorHub {
     }
 
     /// Fetches from every connected, available connector since `since`, swallowing per-connector errors (logged to lastError). Never throws.
-    func signals(since: Date) async -> [ContextSignal] {
+    /// `sources` limits which connectors are read at all; nil reads every connected one.
+    func signals(since: Date, sources: Set<SignalSource>? = nil) async -> [ContextSignal] {
         let version = revision
         var all: [ContextSignal] = []
         for connector in connectors where isUsable(connector) {
+            if let sources {
+                guard let source = SignalSource(rawValue: connector.id.rawValue), sources.contains(source) else { continue }
+            }
             all += await fetch(from: connector, since: since)
         }
         guard version == revision, !Task.isCancelled else { return [] }
