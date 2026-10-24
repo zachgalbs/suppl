@@ -114,3 +114,10 @@ Accepted, not changed:
 ## Needs a human
 - `PRIVACY.md` link in the paywall points at `main`, so it 404s until this PR merges. Replace with a hosted policy URL after legal review.
 - Run the branch on a device that has the current TestFlight build installed, to confirm the SwiftData upgrade on real data (also covered by `UpgradeTests` in CI).
+
+### 2026-10-24 — Codex Mode C verification, first repair
+- Claude’s Phase 6 handoff and idle final screen were verified; remote `d1f492f` was stable and CI `40041981496` passed. Work is in the separate watcher clone only.
+- Corrected clinician-directed post-workout timing: BUILD_PROMPT explicitly says these plans are never moved. The earlier accepted exception above is superseded; a group containing a clinician-directed plan keeps its usual time.
+- Retained eligible previous-day reminders across midnight, including snoozes and dose-day confirmation/skip state. Regression tests first reproduced the failures against the handoff snapshot.
+- Verification in progress: local core tests and macOS CI must pass before this repair is considered complete.
+- Independent verification remains incomplete. In particular, the seven-day queue still eventually expires without app execution; extending the horizon did not resolve the durable-fallback blocker. No final independent-review comment has been posted.

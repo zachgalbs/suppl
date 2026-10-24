@@ -23,7 +23,7 @@ public enum ReminderEngine {
     }
 
     /// Reminders that should be pending right now, soonest first, at most 48. Initial reminders cover
-    /// `prefs.planningDays` days from today (in `calendar`); follow-ups and snoozes cover today and tomorrow.
+    /// `prefs.planningDays` days from today (in `calendar`); eligible carry-over from yesterday is retained across midnight.
     /// `history` holds decisions already delivered, so nothing fires twice.
     public static func plan(plans: [DosePlan], statuses: [DoseStatus], signals: [ContextSignal],
                             history: [ReminderDecision], prefs: Preferences,
@@ -43,7 +43,8 @@ public enum ReminderEngine {
 
         let today = Day(now, calendar: calendar)
         var decisions: [ReminderDecision] = []
-        for offset in 0..<max(2, prefs.planningDays) {
+        // Yesterday may still have a future quiet-hours reminder, snooze, or follow-up.
+        for offset in -1..<max(2, prefs.planningDays) {
             let day = today.adding(days: offset, calendar: calendar)
             for moment in Moment.allCases {
                 let open = unique.filter { plan in
@@ -160,7 +161,7 @@ private struct Planner {
         // Clinician-directed timing stays put, so the whole group stays put: one notification per moment.
         let movable = !plans.contains(where: \.clinicianDirected)
 
-        if moment == .postWorkout {
+        if moment == .postWorkout, movable {
             // A workout only re-times plans the user already marked post-workout. It never adds any.
             let after = TimeInterval(prefs.window(for: .postWorkout).after * 60)
             if let workout = context.freshWorkout(on: day),
@@ -177,7 +178,7 @@ private struct Planner {
                 // A stale workout falls back with plain usual-time wording.
                 reason = Reason(trigger: .workoutFallback, usualDate: usual, ruleID: RuleID.workoutFallback)
             }
-        } else if movable {
+        } else if moment != .postWorkout, movable {
             var searchWindow = window
             if moment == .wake || moment == .breakfast, let wake = context.wake(on: day) {
                 let usualWake = WallClock.date(day, minutes: prefs.usualMinutes(for: .wake), calendar: calendar)

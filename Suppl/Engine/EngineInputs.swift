@@ -36,16 +36,25 @@ extension Preferences {
 }
 
 enum EngineInputs {
-    /// Per-plan state for today and tomorrow. "Taken" follows `lastTakenAt` (which Home and the
+    /// Per-plan state including yesterday’s reminders that can cross midnight. "Taken" follows `lastTakenAt` (which Home and the
     /// notification both set), so un-marking in the app always wins. Skip and snooze come from `DoseLog`.
     /// No log means no response: pending, never "missed".
     static func statuses(for supplements: [Supplement], logs: [DoseLog], now: Date, calendar: Calendar) -> [DoseStatus] {
         let today = Day(now, calendar: calendar)
         var result: [DoseStatus] = []
         for s in supplements {
-            for day in [today, today.adding(days: 1, calendar: calendar)] {
+            for offset in -1...1 {
+                let day = today.adding(days: offset, calendar: calendar)
                 if let taken = s.lastTakenAt, Day(taken, calendar: calendar) == day {
                     result.append(DoseStatus(planID: s.planID, day: day, state: .confirmed(at: taken)))
+                    continue
+                }
+                // A notification acted on after midnight still confirms its original dose day.
+                // Today's lastTakenAt remains authoritative so Home's undo keeps working.
+                if day < today, let taken = logs.filter({
+                    $0.supplementID == s.planID && $0.dayKey == day.key && $0.action == .taken
+                }).max(by: { $0.at < $1.at }) {
+                    result.append(DoseStatus(planID: s.planID, day: day, state: .confirmed(at: taken.at)))
                     continue
                 }
                 let latest = logs

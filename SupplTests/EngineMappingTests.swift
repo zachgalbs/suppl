@@ -110,4 +110,29 @@ final class EngineMappingTests: XCTestCase {
         let history = EngineInputs.history(from: [log(.breakfast, -600), log(.lunch, 3600)], now: now)
         XCTAssertEqual(history.map(\.moment), [.breakfast])
     }
+    func testPreviousDayActionsDoNotConfirmToday() {
+        let s = Supplement(name: "Magnesium")
+        let today = Day(now, calendar: calendar)
+        let yesterday = today.adding(days: -1, calendar: calendar)
+        let taken = DoseLog(supplementID: s.planID, dayKey: yesterday.key,
+                            action: .taken, at: now, source: .notification)
+        let statuses = EngineInputs.statuses(for: [s], logs: [taken], now: now, calendar: calendar)
+        XCTAssertEqual(statuses.first { $0.day == yesterday }?.state, .confirmed(at: now))
+        XCTAssertNil(statuses.first { $0.day == today })
+    }
+
+    func testPreviousDaySkipAndSnoozeAreAvailableToReplanning() {
+        let s = Supplement(name: "Magnesium")
+        let yesterday = Day(now, calendar: calendar).adding(days: -1, calendar: calendar)
+        let until = now.addingTimeInterval(1800)
+        let snooze = DoseLog(supplementID: s.planID, dayKey: yesterday.key, action: .snoozed,
+                             at: now, snoozedUntil: until, source: .notification)
+        let skipped = DoseLog(supplementID: s.planID, dayKey: yesterday.key, action: .skipped,
+                              at: now.addingTimeInterval(1), source: .notification)
+        let snoozed = EngineInputs.statuses(for: [s], logs: [snooze], now: now, calendar: calendar)
+        XCTAssertEqual(snoozed.first { $0.day == yesterday }?.state, .snoozed(until: until))
+        let done = EngineInputs.statuses(for: [s], logs: [snooze, skipped], now: now, calendar: calendar)
+        XCTAssertEqual(done.first { $0.day == yesterday }?.state, .skipped(at: skipped.at))
+    }
+
 }
