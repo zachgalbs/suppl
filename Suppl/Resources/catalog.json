@@ -1,0 +1,1979 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "id": "vitamin-a",
+      "name": "Vitamin A",
+      "synonyms": [
+        "retinol",
+        "retinyl palmitate",
+        "retinyl acetate",
+        "beta carotene",
+        "vit a",
+        "vitamine a",
+        "vitamina a"
+      ],
+      "category": "vitamin",
+      "typicalUnits": [
+        "softgel",
+        "capsule",
+        "mcg",
+        "IU"
+      ],
+      "withFoodHint": "food",
+      "suggestedMoment": "breakfast",
+      "note": "Vitamin A is a fat-soluble vitamin found in foods like dairy, fish, and orange and leafy green vegetables. Too much preformed vitamin A can be harmful, especially during pregnancy, so talk with your clinician before taking more than your label says.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/VitaminA-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/VitaminA-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "vitamin-c",
+      "name": "Vitamin C",
+      "synonyms": [
+        "ascorbic acid",
+        "ascorbate",
+        "sodium ascorbate",
+        "calcium ascorbate",
+        "ester c",
+        "vit c",
+        "vitamine c",
+        "vitamina c",
+        "vitamin c gummies"
+      ],
+      "category": "vitamin",
+      "typicalUnits": [
+        "tablet",
+        "capsule",
+        "gummy",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Vitamin C, also called ascorbic acid, is a water-soluble vitamin found in many fruits and vegetables. Supplements come in a few forms, and your label says which one you have.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/VitaminC-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/VitaminC-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "vitamin-d",
+      "name": "Vitamin D",
+      "synonyms": [
+        "vitamin d3",
+        "d3",
+        "cholecalciferol",
+        "vitamin d2",
+        "d2",
+        "ergocalciferol",
+        "vit d",
+        "vit d3",
+        "vitamine d",
+        "vitamina d",
+        "vitamin d 3",
+        "vitamin d gummies"
+      ],
+      "category": "vitamin",
+      "typicalUnits": [
+        "softgel",
+        "capsule",
+        "gummy",
+        "drops",
+        "IU",
+        "mcg"
+      ],
+      "withFoodHint": "food",
+      "suggestedMoment": "breakfast",
+      "note": "Vitamin D is a fat-soluble vitamin, and some fat in the same meal helps the body absorb it. Your label has the amount and directions for your product.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/VitaminD-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/VitaminD-Consumer/",
+        "https://ods.od.nih.gov/factsheets/VitaminD-HealthProfessional/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "vitamin-e",
+      "name": "Vitamin E",
+      "synonyms": [
+        "alpha tocopherol",
+        "d alpha tocopherol",
+        "tocopherol",
+        "mixed tocopherols",
+        "tocotrienols",
+        "vit e",
+        "vitamine e",
+        "vitamina e"
+      ],
+      "category": "vitamin",
+      "typicalUnits": [
+        "softgel",
+        "capsule",
+        "IU",
+        "mg"
+      ],
+      "withFoodHint": "food",
+      "suggestedMoment": "breakfast",
+      "note": "Vitamin E is a fat-soluble vitamin found in nuts, seeds, and vegetable oils. In supplement form it can raise bleeding risk for people on blood thinners such as warfarin, so check with your clinician if you take one.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/VitaminE-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/VitaminE-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "vitamin-k",
+      "name": "Vitamin K",
+      "synonyms": [
+        "vitamin k1",
+        "k1",
+        "phylloquinone",
+        "phytonadione",
+        "vitamin k2",
+        "k2",
+        "menaquinone",
+        "mk 7",
+        "mk7",
+        "mk 4",
+        "vit k",
+        "vitamine k"
+      ],
+      "category": "vitamin",
+      "typicalUnits": [
+        "softgel",
+        "capsule",
+        "drops",
+        "mcg"
+      ],
+      "withFoodHint": "food",
+      "suggestedMoment": "breakfast",
+      "note": "Vitamin K is a fat-soluble vitamin found in leafy greens and some fermented foods. It can interact seriously with the blood thinner warfarin, so talk with your clinician before starting or stopping it if you take one.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/VitaminK-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/VitaminK-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "vitamin-b1",
+      "name": "Thiamin (Vitamin B1)",
+      "synonyms": [
+        "thiamine",
+        "thiamin",
+        "vitamin b1",
+        "b1",
+        "benfotiamine",
+        "vit b1",
+        "thiamine hcl"
+      ],
+      "category": "vitamin",
+      "typicalUnits": [
+        "tablet",
+        "capsule",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Thiamin is a B vitamin found in whole grains, pork, fish, beans, and fortified foods. It's often part of B-complex and multivitamin products.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/Thiamin-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/Thiamin-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "vitamin-b2",
+      "name": "Riboflavin (Vitamin B2)",
+      "synonyms": [
+        "riboflavin",
+        "vitamin b2",
+        "b2",
+        "vit b2",
+        "riboflavine"
+      ],
+      "category": "vitamin",
+      "typicalUnits": [
+        "tablet",
+        "capsule",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Riboflavin is a B vitamin found in eggs, dairy, meat, mushrooms, and fortified grains. It's often part of B-complex and multivitamin products.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/Riboflavin-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/Riboflavin-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "vitamin-b3",
+      "name": "Niacin (Vitamin B3)",
+      "synonyms": [
+        "niacin",
+        "nicotinic acid",
+        "niacinamide",
+        "nicotinamide",
+        "vitamin b3",
+        "b3",
+        "vit b3",
+        "inositol hexanicotinate"
+      ],
+      "category": "vitamin",
+      "typicalUnits": [
+        "tablet",
+        "capsule",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Niacin is a B vitamin found in poultry, fish, grains, and many other foods. Supplements come in different forms, such as nicotinic acid and niacinamide, so check your label for which one you have.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/Niacin-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/Niacin-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "vitamin-b5",
+      "name": "Pantothenic Acid (Vitamin B5)",
+      "synonyms": [
+        "pantothenic acid",
+        "pantothenate",
+        "calcium pantothenate",
+        "vitamin b5",
+        "b5",
+        "vit b5",
+        "pantethine"
+      ],
+      "category": "vitamin",
+      "typicalUnits": [
+        "tablet",
+        "capsule",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Pantothenic acid is a B vitamin found in almost all foods. It's often part of B-complex and multivitamin products.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/PantothenicAcid-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/PantothenicAcid-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "vitamin-b6",
+      "name": "Vitamin B6",
+      "synonyms": [
+        "pyridoxine",
+        "pyridoxine hcl",
+        "pyridoxal 5 phosphate",
+        "p5p",
+        "plp",
+        "b6",
+        "vit b6",
+        "vitamine b6"
+      ],
+      "category": "vitamin",
+      "typicalUnits": [
+        "tablet",
+        "capsule",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Vitamin B6 is a water-soluble vitamin found in many foods. Taking high amounts from supplements for a long time can cause nerve damage, so talk with your clinician before taking more than your label says.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/VitaminB6-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/VitaminB6-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "biotin",
+      "name": "Biotin (Vitamin B7)",
+      "synonyms": [
+        "vitamin b7",
+        "b7",
+        "vitamin h",
+        "biotine",
+        "d biotin",
+        "biotin gummies"
+      ],
+      "category": "vitamin",
+      "typicalUnits": [
+        "tablet",
+        "capsule",
+        "gummy",
+        "mcg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Biotin is a B vitamin found in foods like eggs, fish, meat, seeds, and nuts. Biotin supplements can cause false results on some lab tests, so tell your clinician you take it before blood work.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/Biotin-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/Biotin-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "folate",
+      "name": "Folate (Folic Acid)",
+      "synonyms": [
+        "folic acid",
+        "vitamin b9",
+        "b9",
+        "methylfolate",
+        "l methylfolate",
+        "5 mthf",
+        "folinic acid",
+        "folacin"
+      ],
+      "category": "vitamin",
+      "typicalUnits": [
+        "tablet",
+        "capsule",
+        "mcg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Folate is a B vitamin found naturally in leafy greens, beans, and fruit. Folic acid is the form used in most supplements and fortified foods.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/Folate-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/Folate-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "vitamin-b12",
+      "name": "Vitamin B12",
+      "synonyms": [
+        "b12",
+        "b 12",
+        "cobalamin",
+        "cyanocobalamin",
+        "methylcobalamin",
+        "hydroxocobalamin",
+        "adenosylcobalamin",
+        "vit b12",
+        "vitamine b12",
+        "vitamin b 12"
+      ],
+      "category": "vitamin",
+      "typicalUnits": [
+        "tablet",
+        "capsule",
+        "gummy",
+        "drops",
+        "mcg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Vitamin B12 is found naturally in animal foods such as meat, fish, eggs, and dairy. Plant foods only have it when fortified, as some cereals and nutritional yeasts are.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/VitaminB12-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/VitaminB12-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "vitamin-b-complex",
+      "name": "B-Complex",
+      "synonyms": [
+        "b complex",
+        "vitamin b complex",
+        "b vitamins",
+        "b vitamin complex",
+        "b50",
+        "b 50",
+        "b100",
+        "b 100",
+        "super b complex"
+      ],
+      "category": "vitamin",
+      "typicalUnits": [
+        "tablet",
+        "capsule"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "B-complex products combine several B vitamins in one pill. Amounts vary a lot between products, so your label is the best guide for yours.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/Thiamin-Consumer/",
+        "https://ods.od.nih.gov/factsheets/VitaminB6-Consumer/",
+        "https://ods.od.nih.gov/factsheets/VitaminB12-Consumer/",
+        "https://ods.od.nih.gov/factsheets/Biotin-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "multivitamin",
+      "name": "Multivitamin",
+      "synonyms": [
+        "multi",
+        "multivitamin mineral",
+        "multivitamin and mineral",
+        "multivitamins",
+        "mvm",
+        "daily multivitamin",
+        "multivitamine",
+        "mulitvitamin",
+        "multivitamin gummies",
+        "multi vitamin"
+      ],
+      "category": "multivitamin",
+      "typicalUnits": [
+        "tablet",
+        "capsule",
+        "gummy",
+        "softgel"
+      ],
+      "withFoodHint": "food",
+      "suggestedMoment": "breakfast",
+      "note": "Multivitamins combine several vitamins and minerals, and the mix varies widely between products. They can't take the place of a varied diet, and your label has the directions for your product.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/MVMS-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/MVMS-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "prenatal-vitamin",
+      "name": "Prenatal Vitamin",
+      "synonyms": [
+        "prenatal",
+        "prenatals",
+        "prenatal vitamins",
+        "prenatal multivitamin",
+        "pre natal",
+        "prenatal vitamin with dha"
+      ],
+      "category": "multivitamin",
+      "typicalUnits": [
+        "tablet",
+        "capsule",
+        "softgel",
+        "gummy"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Prenatal vitamins are multivitamins designed for pregnancy. Your clinician or pharmacist can help you choose one and check it against anything else you take.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/Pregnancy-HealthProfessional/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/Pregnancy-HealthProfessional/",
+        "https://ods.od.nih.gov/factsheets/Folate-Consumer/",
+        "https://ods.od.nih.gov/factsheets/WYNTK-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "vitamin-d3-k2",
+      "name": "Vitamin D3 + K2",
+      "synonyms": [
+        "d3 k2",
+        "d3 and k2",
+        "d3 with k2",
+        "k2 d3",
+        "vitamin d3 k2",
+        "vitamin d3 and k2",
+        "vitamin d and k2",
+        "vitamin d k2",
+        "d3 k2 drops"
+      ],
+      "category": "vitamin",
+      "typicalUnits": [
+        "softgel",
+        "capsule",
+        "drops"
+      ],
+      "withFoodHint": "food",
+      "suggestedMoment": "breakfast",
+      "note": "These products pair vitamin D3 with vitamin K2, both fat-soluble vitamins. Vitamin K can interact with the blood thinner warfarin, so check with your clinician first if you take one.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/VitaminD-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/VitaminD-Consumer/",
+        "https://ods.od.nih.gov/factsheets/VitaminK-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "calcium",
+      "name": "Calcium",
+      "synonyms": [
+        "calcium carbonate",
+        "calcium citrate",
+        "calcium citrate malate",
+        "calcium phosphate",
+        "coral calcium",
+        "calcuim",
+        "calicum",
+        "calcium chews"
+      ],
+      "category": "mineral",
+      "typicalUnits": [
+        "tablet",
+        "capsule",
+        "gummy",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Calcium carbonate is absorbed best with food, while calcium citrate is absorbed well with or without food. Your label says which form you have and how to take it.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/Calcium-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/Calcium-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "magnesium",
+      "name": "Magnesium",
+      "synonyms": [
+        "magnesium glycinate",
+        "magnesium bisglycinate",
+        "magnesium citrate",
+        "magnesium oxide",
+        "magnesium threonate",
+        "magnesium l threonate",
+        "magnesium malate",
+        "magnesium chloride",
+        "magnesium taurate",
+        "mag glycinate",
+        "magnesuim",
+        "magnisium",
+        "magnessium",
+        "magensium",
+        "magnesium gummies"
+      ],
+      "category": "mineral",
+      "typicalUnits": [
+        "capsule",
+        "tablet",
+        "gummy",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Magnesium supplements come in many forms, such as glycinate, citrate, and oxide. High amounts from supplements can cause diarrhea or cramping, so follow your label.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/Magnesium-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/Magnesium-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "iron",
+      "name": "Iron",
+      "synonyms": [
+        "ferrous sulfate",
+        "ferrous gluconate",
+        "ferrous fumarate",
+        "ferrous bisglycinate",
+        "iron bisglycinate",
+        "carbonyl iron",
+        "heme iron",
+        "polysaccharide iron",
+        "iron supplement",
+        "irom"
+      ],
+      "category": "mineral",
+      "typicalUnits": [
+        "tablet",
+        "capsule",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Iron supplements can upset the stomach for some people, and vitamin C helps the body absorb iron from plant foods. Keep iron products out of children's reach, because an accidental overdose is dangerous for kids.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/Iron-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/Iron-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "zinc",
+      "name": "Zinc",
+      "synonyms": [
+        "zinc gluconate",
+        "zinc picolinate",
+        "zinc citrate",
+        "zinc acetate",
+        "zinc sulfate",
+        "zinc oxide",
+        "zinc bisglycinate",
+        "zinc lozenges",
+        "zink"
+      ],
+      "category": "mineral",
+      "typicalUnits": [
+        "tablet",
+        "capsule",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Zinc is a mineral found in meat, seafood, beans, and nuts. Taking a lot of zinc for a long time can lower copper levels, so follow your label.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/Zinc-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/Zinc-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "potassium",
+      "name": "Potassium",
+      "synonyms": [
+        "potassium citrate",
+        "potassium chloride",
+        "potassium gluconate",
+        "potasium",
+        "potassuim"
+      ],
+      "category": "mineral",
+      "typicalUnits": [
+        "tablet",
+        "capsule",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Potassium is a mineral found in many fruits, vegetables, beans, and dairy foods. Some medicines affect potassium, so check with your clinician or pharmacist before adding a supplement.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/Potassium-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/Potassium-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "selenium",
+      "name": "Selenium",
+      "synonyms": [
+        "selenomethionine",
+        "sodium selenite",
+        "selenium yeast",
+        "selenuim",
+        "selinium"
+      ],
+      "category": "mineral",
+      "typicalUnits": [
+        "capsule",
+        "tablet",
+        "mcg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Selenium is a mineral found in seafood, meat, grains, and especially Brazil nuts. Getting too much can cause problems like garlic breath and brittle nails, so follow your label.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/Selenium-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/Selenium-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "iodine",
+      "name": "Iodine",
+      "synonyms": [
+        "potassium iodide",
+        "iodide",
+        "kelp",
+        "iodine drops",
+        "iodene"
+      ],
+      "category": "mineral",
+      "typicalUnits": [
+        "tablet",
+        "capsule",
+        "drops",
+        "mcg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Iodine is a mineral the body uses to make thyroid hormones. It's found in seafood, dairy, and iodized salt.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/Iodine-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/Iodine-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "chromium",
+      "name": "Chromium",
+      "synonyms": [
+        "chromium picolinate",
+        "chromium polynicotinate",
+        "chromium chloride",
+        "chromium chelate",
+        "cromium"
+      ],
+      "category": "mineral",
+      "typicalUnits": [
+        "tablet",
+        "capsule",
+        "mcg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Chromium is a mineral found in small amounts in many foods, including meat, whole grains, and some fruits and vegetables. It's included in many multivitamins as well as on its own.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/Chromium-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/Chromium-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "copper",
+      "name": "Copper",
+      "synonyms": [
+        "copper gluconate",
+        "copper bisglycinate",
+        "cupric oxide",
+        "copper sulfate",
+        "copper citrate"
+      ],
+      "category": "mineral",
+      "typicalUnits": [
+        "tablet",
+        "capsule",
+        "mg",
+        "mcg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Copper is a mineral found in shellfish, nuts, seeds, and whole grains. High amounts of zinc from supplements can make it harder for the body to absorb copper.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/Copper-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/Copper-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "manganese",
+      "name": "Manganese",
+      "synonyms": [
+        "manganese gluconate",
+        "manganese sulfate",
+        "manganese citrate",
+        "manganese bisglycinate",
+        "manganeese"
+      ],
+      "category": "mineral",
+      "typicalUnits": [
+        "tablet",
+        "capsule",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Manganese is a mineral found in whole grains, nuts, leafy vegetables, and tea. It's most often found in multivitamins rather than on its own.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/Manganese-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/Manganese-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "choline",
+      "name": "Choline",
+      "synonyms": [
+        "choline bitartrate",
+        "choline chloride",
+        "citicoline",
+        "cdp choline",
+        "alpha gpc",
+        "phosphatidylcholine"
+      ],
+      "category": "vitamin",
+      "typicalUnits": [
+        "capsule",
+        "tablet",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Choline is a nutrient found in many foods, including eggs, meat, fish, and beans. Supplements come in several forms, so check your label for which one you have.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/Choline-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/Choline-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "electrolytes",
+      "name": "Electrolytes",
+      "synonyms": [
+        "electrolyte",
+        "electrolyte powder",
+        "electrolyte drink mix",
+        "electrolyte tablets",
+        "electrolyte capsules",
+        "hydration powder",
+        "hydration mix",
+        "hydration multiplier",
+        "salt tablets",
+        "oral rehydration salts",
+        "elecrolytes"
+      ],
+      "category": "mineral",
+      "typicalUnits": [
+        "scoop",
+        "tablet",
+        "capsule",
+        "g"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Electrolyte products usually contain sodium and potassium, and sometimes magnesium or calcium. Amounts vary a lot between products, so check the label, especially if you're watching your salt.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://medlineplus.gov/fluidandelectrolytebalance.html",
+        "https://ods.od.nih.gov/factsheets/Potassium-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "omega-3",
+      "name": "Omega-3 (Fish Oil)",
+      "synonyms": [
+        "fish oil",
+        "omega 3",
+        "omega3",
+        "omega three",
+        "omega 3 fatty acids",
+        "epa",
+        "dha",
+        "epa dha",
+        "epa and dha",
+        "krill oil",
+        "algal oil",
+        "algae oil",
+        "cod liver oil",
+        "fishoil",
+        "fish oil softgels"
+      ],
+      "category": "fatty acid",
+      "typicalUnits": [
+        "softgel",
+        "capsule",
+        "mg",
+        "mL"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Omega-3 supplements include fish oil, krill oil, cod liver oil, and algal oil. Side effects are usually mild, like an unpleasant taste or heartburn, and your label has the directions for your product.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/Omega3FattyAcids-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/Omega3FattyAcids-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "creatine",
+      "name": "Creatine",
+      "synonyms": [
+        "creatine monohydrate",
+        "creatine hcl",
+        "creatine hydrochloride",
+        "creatine powder",
+        "creatine gummies",
+        "creatin",
+        "kreatin",
+        "creatine mono"
+      ],
+      "category": "sports",
+      "typicalUnits": [
+        "scoop",
+        "g",
+        "capsule",
+        "gummy"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": "postWorkout",
+      "note": "Creatine is a compound stored in muscles, and the body makes some on its own. It usually causes a little weight gain because muscles hold more water.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "protein-powder",
+      "name": "Protein Powder",
+      "synonyms": [
+        "protein",
+        "whey",
+        "whey protein",
+        "whey isolate",
+        "whey protein isolate",
+        "casein",
+        "pea protein",
+        "plant protein",
+        "soy protein",
+        "protein shake",
+        "protien",
+        "protein powder vanilla"
+      ],
+      "category": "protein",
+      "typicalUnits": [
+        "scoop",
+        "g"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": "postWorkout",
+      "note": "Most protein powders contain whey, a protein from milk, while others use plant sources like pea or soy. Your label lists the protein per scoop and the other ingredients.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "collagen",
+      "name": "Collagen",
+      "synonyms": [
+        "collagen peptides",
+        "hydrolyzed collagen",
+        "collagen powder",
+        "marine collagen",
+        "bovine collagen",
+        "colagen",
+        "collegen",
+        "collagen capsules"
+      ],
+      "category": "protein",
+      "typicalUnits": [
+        "scoop",
+        "g",
+        "capsule"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Collagen is a protein, and collagen supplements are made from animal sources such as cattle or fish. Your label lists the source and the amount per serving.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/WYNTK-Consumer/",
+        "https://www.nccih.nih.gov/health/using-dietary-supplements-wisely"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "beta-alanine",
+      "name": "Beta-Alanine",
+      "synonyms": [
+        "beta alanine",
+        "b alanine",
+        "betaalanine",
+        "beta alanin",
+        "beta-alanin"
+      ],
+      "category": "amino acid",
+      "typicalUnits": [
+        "scoop",
+        "g",
+        "capsule",
+        "tablet"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Beta-alanine is an amino acid found in meat, poultry, and fish. Larger amounts can cause a tingling or prickling feeling in the skin, so follow your label.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "bcaa",
+      "name": "BCAAs",
+      "synonyms": [
+        "bcaa",
+        "bcaas",
+        "branched chain amino acids",
+        "branch chain amino acids",
+        "leucine",
+        "isoleucine",
+        "valine"
+      ],
+      "category": "amino acid",
+      "typicalUnits": [
+        "scoop",
+        "g",
+        "capsule"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "BCAAs are three amino acids: leucine, isoleucine, and valine. They're found naturally in protein foods like meat, fish, and milk.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "glutamine",
+      "name": "Glutamine",
+      "synonyms": [
+        "l glutamine",
+        "l-glutamine",
+        "glutamin",
+        "glutamine powder"
+      ],
+      "category": "amino acid",
+      "typicalUnits": [
+        "scoop",
+        "g",
+        "capsule"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Glutamine is an amino acid the body makes on its own and also gets from food. Your label has the amount and directions for your product.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "carnitine",
+      "name": "L-Carnitine",
+      "synonyms": [
+        "carnitine",
+        "l carnitine",
+        "acetyl l carnitine",
+        "acetyl carnitine",
+        "alcar",
+        "l carnitine tartrate",
+        "carnitin"
+      ],
+      "category": "amino acid",
+      "typicalUnits": [
+        "capsule",
+        "tablet",
+        "mg",
+        "mL"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Carnitine is a nutrient found in many foods, especially meat, and the body makes enough for most people. Supplements come in a few forms, such as L-carnitine and acetyl-L-carnitine.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/Carnitine-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/Carnitine-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "l-theanine",
+      "name": "L-Theanine",
+      "synonyms": [
+        "theanine",
+        "l theanine",
+        "l-theanin",
+        "theanin",
+        "ltheanine"
+      ],
+      "category": "amino acid",
+      "typicalUnits": [
+        "capsule",
+        "tablet",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "L-theanine is an amino acid found naturally in tea leaves. Your label has the amount and directions for your product.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/WYNTK-Consumer/",
+        "https://www.nccih.nih.gov/health/using-dietary-supplements-wisely"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "caffeine",
+      "name": "Caffeine",
+      "synonyms": [
+        "caffeine pills",
+        "caffeine tablets",
+        "caffeine anhydrous",
+        "caffine",
+        "cafeine",
+        "caffiene"
+      ],
+      "category": "sports",
+      "typicalUnits": [
+        "tablet",
+        "capsule",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Caffeine shows up in coffee, tea, energy drinks, and many workout products. Amounts vary a lot, so check labels to know your total for the day.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.fda.gov/consumers/consumer-updates/spilling-beans-how-much-caffeine-too-much",
+        "https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "probiotic",
+      "name": "Probiotic",
+      "synonyms": [
+        "probiotics",
+        "lactobacillus",
+        "bifidobacterium",
+        "acidophilus",
+        "saccharomyces boulardii",
+        "s boulardii",
+        "probiotec",
+        "probiotik",
+        "pro biotic",
+        "live cultures"
+      ],
+      "category": "probiotic",
+      "typicalUnits": [
+        "capsule",
+        "gummy",
+        "tablet"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Probiotics are live microorganisms, and products differ in which strains they contain. Some need refrigeration while others don't, so check your label for storage and the use-by date.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/Probiotics-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/Probiotics-Consumer/",
+        "https://www.nccih.nih.gov/health/probiotics-usefulness-and-safety"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "fiber",
+      "name": "Fiber (Psyllium)",
+      "synonyms": [
+        "psyllium",
+        "psyllium husk",
+        "fibre",
+        "fiber supplement",
+        "fiber powder",
+        "inulin",
+        "methylcellulose",
+        "wheat dextrin",
+        "ispaghula",
+        "physillium"
+      ],
+      "category": "fiber",
+      "typicalUnits": [
+        "scoop",
+        "g",
+        "capsule",
+        "tablet"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Fiber supplements like psyllium are taken with plenty of liquid. Your label has the amount and directions for your product.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://medlineplus.gov/druginfo/meds/a601104.html",
+        "https://medlineplus.gov/dietaryfiber.html"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "melatonin",
+      "name": "Melatonin",
+      "synonyms": [
+        "melatonine",
+        "melatonim",
+        "melotonin",
+        "melatonin gummies",
+        "melatonin tablets"
+      ],
+      "category": "hormone",
+      "typicalUnits": [
+        "tablet",
+        "gummy",
+        "capsule",
+        "mg",
+        "drops"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": "bedtime",
+      "note": "Melatonin is a hormone the body makes, and supplements are usually taken in the evening. Studies have found that the amount in many products, including gummies, doesn't match the label.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/melatonin-what-you-need-to-know"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "ashwagandha",
+      "name": "Ashwagandha",
+      "synonyms": [
+        "withania somnifera",
+        "ashwaganda",
+        "ashwagandah",
+        "ashwaghanda",
+        "ashawagandha",
+        "aswagandha",
+        "indian ginseng"
+      ],
+      "category": "herbal",
+      "typicalUnits": [
+        "capsule",
+        "tablet",
+        "gummy",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Ashwagandha is an herb from Ayurvedic tradition. Rare cases of liver injury have been reported, and it should be avoided during pregnancy and breastfeeding.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/Ashwagandha-Consumer/",
+      "examineURL": null,
+      "sources": [
+        "https://ods.od.nih.gov/factsheets/Ashwagandha-Consumer/",
+        "https://www.nccih.nih.gov/health/ashwagandha"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "turmeric",
+      "name": "Turmeric (Curcumin)",
+      "synonyms": [
+        "curcumin",
+        "tumeric",
+        "termeric",
+        "turmeric curcumin",
+        "curcuma longa",
+        "turmeric root",
+        "curcumine"
+      ],
+      "category": "herbal",
+      "typicalUnits": [
+        "capsule",
+        "tablet",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Turmeric is a spice, and curcumin is one of its main compounds. Some highly absorbable curcumin products may harm the liver, so check with your clinician if you have liver concerns.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/turmeric"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "coq10",
+      "name": "CoQ10",
+      "synonyms": [
+        "coenzyme q10",
+        "co q10",
+        "coq 10",
+        "co q 10",
+        "ubiquinone",
+        "ubiquinol",
+        "co enzyme q10",
+        "coq"
+      ],
+      "category": "other",
+      "typicalUnits": [
+        "softgel",
+        "capsule",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "CoQ10 is a compound the body makes on its own. It may interact with the blood thinner warfarin and with insulin, so check with your clinician if you take either.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/coenzyme-q10"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "glucosamine",
+      "name": "Glucosamine",
+      "synonyms": [
+        "glucosamine sulfate",
+        "glucosamine hydrochloride",
+        "glucosamine hcl",
+        "glucosamin",
+        "glucosamine chondroitin"
+      ],
+      "category": "other",
+      "typicalUnits": [
+        "capsule",
+        "tablet",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Glucosamine is often sold together with chondroitin. The pair has been linked to a higher risk of bleeding in people taking warfarin, so check with your clinician if you take a blood thinner.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/glucosamine-and-chondroitin-for-osteoarthritis-what-you-need-to-know"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "chondroitin",
+      "name": "Chondroitin",
+      "synonyms": [
+        "chondroitin sulfate",
+        "condroitin",
+        "chondroiton",
+        "chondroitin sulphate"
+      ],
+      "category": "other",
+      "typicalUnits": [
+        "capsule",
+        "tablet",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Chondroitin is often sold together with glucosamine. The pair has been linked to a higher risk of bleeding in people taking warfarin, so check with your clinician if you take a blood thinner.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/glucosamine-and-chondroitin-for-osteoarthritis-what-you-need-to-know"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "elderberry",
+      "name": "Elderberry",
+      "synonyms": [
+        "sambucus",
+        "sambucus nigra",
+        "elderberry syrup",
+        "elderberry gummies",
+        "elder berry",
+        "eldeberry",
+        "elderbery"
+      ],
+      "category": "herbal",
+      "typicalUnits": [
+        "gummy",
+        "mL",
+        "capsule",
+        "tablet"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Elderberry products are made from cooked or processed berries. Raw or unripe elderberries and other parts of the plant contain substances that can make people sick.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/elderberry"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "echinacea",
+      "name": "Echinacea",
+      "synonyms": [
+        "purple coneflower",
+        "coneflower",
+        "echinacea purpurea",
+        "echinacia",
+        "echinecea",
+        "echinaccea"
+      ],
+      "category": "herbal",
+      "typicalUnits": [
+        "capsule",
+        "tablet",
+        "drops",
+        "mL"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Echinacea is a plant related to daisies, sunflowers, and ragweed. Products vary in which species and plant parts they use, so your label is the best guide for yours.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/echinacea"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "ginseng",
+      "name": "Ginseng",
+      "synonyms": [
+        "asian ginseng",
+        "panax ginseng",
+        "korean ginseng",
+        "korean red ginseng",
+        "red ginseng",
+        "american ginseng",
+        "gingseng",
+        "ginsing",
+        "ginseng root"
+      ],
+      "category": "herbal",
+      "typicalUnits": [
+        "capsule",
+        "tablet",
+        "mg",
+        "mL"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Ginseng is a root used in traditional Chinese medicine, and products include Asian (Panax) and American ginseng. Your label says which kind you have.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/asian-ginseng",
+        "https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "green-tea-extract",
+      "name": "Green Tea Extract",
+      "synonyms": [
+        "green tea",
+        "egcg",
+        "camellia sinensis",
+        "green tea capsules",
+        "greentea extract",
+        "green tea extrat"
+      ],
+      "category": "herbal",
+      "typicalUnits": [
+        "capsule",
+        "tablet",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Green tea extracts come as tablets and capsules. Although uncommon, liver injury has been reported with these products, so check with your clinician if you have liver concerns.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/green-tea",
+        "https://ods.od.nih.gov/factsheets/WeightLoss-Consumer/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "st-johns-wort",
+      "name": "St. John's Wort",
+      "synonyms": [
+        "st johns wort",
+        "saint johns wort",
+        "st john wort",
+        "hypericum",
+        "hypericum perforatum",
+        "st johns wart"
+      ],
+      "category": "herbal",
+      "typicalUnits": [
+        "capsule",
+        "tablet",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "St. John's wort interacts with many medicines, sometimes in serious ways. Check with your pharmacist or clinician before taking it alongside any medicine.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/st-johns-wort"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "valerian",
+      "name": "Valerian",
+      "synonyms": [
+        "valerian root",
+        "valeriana officinalis",
+        "valarian",
+        "valerin",
+        "valerian extract"
+      ],
+      "category": "herbal",
+      "typicalUnits": [
+        "capsule",
+        "tablet",
+        "mg",
+        "mL"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Valerian supplements are made from the roots of the valerian plant. Your label has the amount and directions for your product.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/Valerian-HealthProfessional/",
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/valerian",
+        "https://ods.od.nih.gov/factsheets/Valerian-HealthProfessional/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "garlic",
+      "name": "Garlic",
+      "synonyms": [
+        "garlic extract",
+        "aged garlic extract",
+        "allicin",
+        "garlic oil",
+        "allium sativum",
+        "garlick",
+        "garlic pills"
+      ],
+      "category": "herbal",
+      "typicalUnits": [
+        "capsule",
+        "tablet",
+        "softgel",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Garlic supplements may raise the risk of bleeding. Check with your clinician if you take a blood thinner or aspirin, or before surgery.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/garlic"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "ginger",
+      "name": "Ginger",
+      "synonyms": [
+        "ginger root",
+        "ginger extract",
+        "zingiber officinale",
+        "gingerroot",
+        "ginger capsules"
+      ],
+      "category": "herbal",
+      "typicalUnits": [
+        "capsule",
+        "tablet",
+        "gummy",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Ginger is a plant whose root is used as a spice and in supplements. Your label has the amount and directions for your product.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/ginger"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "ginkgo",
+      "name": "Ginkgo",
+      "synonyms": [
+        "ginkgo biloba",
+        "gingko",
+        "gingko biloba",
+        "ginko",
+        "ginko biloba",
+        "ginkgo leaf"
+      ],
+      "category": "herbal",
+      "typicalUnits": [
+        "capsule",
+        "tablet",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Ginkgo supplements come from the leaves of the ginkgo tree. It may raise bleeding risk in people taking blood thinners such as warfarin, so check with your clinician first.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/ginkgo"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "saw-palmetto",
+      "name": "Saw Palmetto",
+      "synonyms": [
+        "serenoa repens",
+        "saw palmeto",
+        "saw palmetto berry",
+        "sawpalmetto"
+      ],
+      "category": "herbal",
+      "typicalUnits": [
+        "softgel",
+        "capsule",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Saw palmetto comes from a small palm tree, also called the American dwarf palm. Your label has the amount and directions for your product.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/saw-palmetto"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "lutein",
+      "name": "Lutein & Zeaxanthin",
+      "synonyms": [
+        "zeaxanthin",
+        "lutein and zeaxanthin",
+        "lutein zeaxanthin",
+        "meso zeaxanthin",
+        "luteine",
+        "lutien"
+      ],
+      "category": "other",
+      "typicalUnits": [
+        "softgel",
+        "capsule",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Lutein and zeaxanthin are carotenoids, a group of plant pigments. They're part of the AREDS2 eye vitamin formula studied by the National Eye Institute.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.nei.nih.gov/eye-health-information/clinical-trials/age-related-eye-disease-studies-aredsareds2",
+        "https://ods.od.nih.gov/factsheets/VitaminA-HealthProfessional/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "rhodiola",
+      "name": "Rhodiola",
+      "synonyms": [
+        "rhodiola rosea",
+        "golden root",
+        "arctic root",
+        "rose root",
+        "rodiola"
+      ],
+      "category": "herbal",
+      "typicalUnits": [
+        "capsule",
+        "tablet",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Rhodiola is a plant that grows in cold regions and at high altitudes. Your label has the amount and directions for your product.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/rhodiola"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "milk-thistle",
+      "name": "Milk Thistle",
+      "synonyms": [
+        "silymarin",
+        "silybum marianum",
+        "milk thistle seed",
+        "milkthistle",
+        "milk thistel"
+      ],
+      "category": "herbal",
+      "typicalUnits": [
+        "capsule",
+        "tablet",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Silymarin is the main group of compounds in milk thistle extract. Some products have been found to contain amounts that differ from the label.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/milk-thistle"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "cranberry",
+      "name": "Cranberry",
+      "synonyms": [
+        "cranberry extract",
+        "cranberry pills",
+        "cranberry capsules",
+        "vaccinium macrocarpon",
+        "cranbery"
+      ],
+      "category": "herbal",
+      "typicalUnits": [
+        "capsule",
+        "tablet",
+        "softgel",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Cranberry supplements are made from the fruit, often as a dried extract. Your label has the amount and directions for your product.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/cranberry"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "flaxseed",
+      "name": "Flaxseed",
+      "synonyms": [
+        "flaxseed oil",
+        "flax oil",
+        "flax seed",
+        "flax seed oil",
+        "linseed",
+        "ground flaxseed",
+        "flax"
+      ],
+      "category": "fatty acid",
+      "typicalUnits": [
+        "softgel",
+        "capsule",
+        "g",
+        "scoop"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Flaxseed and flaxseed oil come from the seeds of the flax plant and contain ALA, a plant omega-3. Your label has the amount and directions for your product.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/flaxseed-and-flaxseed-oil"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "chamomile",
+      "name": "Chamomile",
+      "synonyms": [
+        "chamomile extract",
+        "camomile",
+        "chamomille",
+        "matricaria",
+        "german chamomile"
+      ],
+      "category": "herbal",
+      "typicalUnits": [
+        "capsule",
+        "mL",
+        "drops"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Chamomile is a daisy-like plant often used as a tea. People allergic to related plants, such as ragweed or daisies, are more likely to react to it.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/chamomile"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "black-cohosh",
+      "name": "Black Cohosh",
+      "synonyms": [
+        "cimicifuga racemosa",
+        "actaea racemosa",
+        "black cohash",
+        "black kohosh",
+        "black cohosh root"
+      ],
+      "category": "herbal",
+      "typicalUnits": [
+        "capsule",
+        "tablet",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Black cohosh supplements are made from the roots of a North American plant. Cases of liver damage have been reported, so check with your clinician if you have liver concerns.",
+      "odsURL": "https://ods.od.nih.gov/factsheets/BlackCohosh-HealthProfessional/",
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/black-cohosh",
+        "https://ods.od.nih.gov/factsheets/BlackCohosh-HealthProfessional/"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "evening-primrose-oil",
+      "name": "Evening Primrose Oil",
+      "synonyms": [
+        "evening primrose",
+        "epo",
+        "oenothera biennis",
+        "primrose oil",
+        "evening primrose oil softgels"
+      ],
+      "category": "fatty acid",
+      "typicalUnits": [
+        "softgel",
+        "capsule",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Evening primrose oil comes from the plant's seeds and contains omega-6 fatty acids, including GLA. Your label has the amount and directions for your product.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/evening-primrose-oil"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    },
+    {
+      "id": "cinnamon",
+      "name": "Cinnamon",
+      "synonyms": [
+        "cinnamon extract",
+        "ceylon cinnamon",
+        "cassia cinnamon",
+        "cinnamon bark",
+        "cinammon",
+        "cinnamon capsules"
+      ],
+      "category": "herbal",
+      "typicalUnits": [
+        "capsule",
+        "mg"
+      ],
+      "withFoodHint": "unknown",
+      "suggestedMoment": null,
+      "note": "Cinnamon supplements are made from the dried bark of a few related trees, including Ceylon and cassia cinnamon. Your label has the amount and directions for your product.",
+      "odsURL": null,
+      "examineURL": null,
+      "sources": [
+        "https://www.nccih.nih.gov/health/cinnamon"
+      ],
+      "reviewStatus": "unreviewed",
+      "lastReviewed": null
+    }
+  ]
+}

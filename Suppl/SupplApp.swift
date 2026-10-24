@@ -6,6 +6,7 @@ import UserNotifications
 struct SupplApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @AppStorage("onboarded") private var onboarded = false
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
         WindowGroup {
@@ -16,10 +17,16 @@ struct SupplApp: App {
                     OnboardingView()
                 }
             }
-            .tint(.sage)
+            .tint(.forest)
             .preferredColorScheme(.light)
+            .onChange(of: onboarded) { _, done in
+                if done { Reminders.reschedule() }
+            }
         }
         .modelContainer(sharedContainer)
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background { BackgroundRefresh.schedule() }
+        }
     }
 }
 
@@ -28,6 +35,24 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         UNUserNotificationCenter.current().delegate = self
         Reminders.registerCategories()
+        Supplement.backfillIDs(in: sharedContainer.mainContext)
+        Store.shared.start()
+        BackgroundRefresh.register()
+        // Every launch, foreground or background, extends the one-shot queue and moves the heads-up.
+        BackgroundRefresh.schedule()
+        Reminders.reschedule()
+
+        // Context changes re-plan with fresh connector data. Both are no-ops until the user connects.
+        let hub = ConnectorHub.shared
+        hub.health.startObservingWorkouts { await NotificationScheduler.run(refreshSignals: true) }
+        hub.calendar.observeChanges { await NotificationScheduler.run(refreshSignals: true) }
+
+        // Reminders are planned in local wall-clock time, so travel and clock changes re-plan.
+        for name in [Notification.Name.NSSystemTimeZoneDidChange, UIApplication.significantTimeChangeNotification] {
+            NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { _ in
+                Task { @MainActor in Reminders.reschedule() }
+            }
+        }
         return true
     }
 
@@ -38,17 +63,9 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
 
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse) async {
-        guard let raw = response.notification.request.content.userInfo["slot"] as? String,
-              let slot = Slot(rawValue: raw) else { return }
-
-        switch response.actionIdentifier {
-        case Reminders.takenAction:
-            await MainActor.run { Reminders.markTaken(slot: slot) }
-        case Reminders.snoozeAction:
-            let names = await MainActor.run { Reminders.names(in: slot) }
-            Reminders.scheduleFollowUp(for: slot, names: names)
-        default:
-            break // Skip, dismiss, or tapping the banner: nothing to record.
-        }
+        // Taken / Snooze / Skip are recorded; tapping the notification opens "Why now?"; dismissing records nothing.
+        let reply = ReminderResponse(action: response.actionIdentifier,
+                                     userInfo: response.notification.request.content.userInfo)
+        await ReminderActions.handle(reply)
     }
 }

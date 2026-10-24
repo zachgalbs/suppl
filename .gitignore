@@ -3,3 +3,11 @@ build/
 DerivedData/
 *.xcuserstate
 xcuserdata/
+.build/
+.swiftpm/
+*.xcresult
+.env
+.env.*
+!.env.example
+node_modules/
+Config/Secrets.xcconfig

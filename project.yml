@@ -3,6 +3,9 @@ options:
   bundleIdPrefix: com.zgalbs
   deploymentTarget:
     iOS: "17.0"
+packages:
+  SupplCore:
+    path: SupplCore
 settings:
   base:
     DEVELOPMENT_TEAM: 8DGT7FKTPZ
@@ -14,7 +17,41 @@ targets:
   Suppl:
     type: application
     platform: iOS
-    sources: [Suppl]
+    sources:
+      - path: Suppl
+        excludes:
+          - Info.plist
+          - Suppl.entitlements
+          - Resources/Products.storekit
+      - path: Suppl/Resources/Products.storekit
+        buildPhase: none
+    configFiles:
+      Debug: Config/Suppl.xcconfig
+      Release: Config/Suppl.xcconfig
+    dependencies:
+      - package: SupplCore
+    entitlements:
+      path: Suppl/Suppl.entitlements
+      properties:
+        com.apple.developer.healthkit: true
+        com.apple.developer.healthkit.background-delivery: true
+    info:
+      path: Suppl/Info.plist
+      properties:
+        # XcodeGen writes 1.0 / 1 into the file otherwise, which would override the settings above.
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleURLTypes:
+          - CFBundleURLName: com.zgalbs.suppl
+            CFBundleURLSchemes: [suppl]
+        BGTaskSchedulerPermittedIdentifiers: [com.zgalbs.suppl.refresh]
+        UIBackgroundModes: [fetch]
+        # Smart timing (workouts, late wake, calendar) free while testing; copy says so. Set false before an
+        # App Store release to restore Pro gating. Applies to every configuration, TestFlight included.
+        SupplSmartTimingFree: true
+        WHOOPClientID: $(WHOOP_CLIENT_ID)
+        WHOOPBrokerURL: $(WHOOP_BROKER_URL)
+        WHOOPAppKey: $(WHOOP_APP_KEY)
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.zgalbs.suppl
@@ -27,3 +64,22 @@ targets:
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
+        INFOPLIST_KEY_NSHealthShareUsageDescription: "suppl. reads your workouts and sleep so it can remind you after a workout and shift morning reminders when you wake up late. Nothing leaves your phone."
+        INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription: "suppl. checks when you're busy so it can move a flexible reminder into a free moment. It never reads event titles, notes, or attendees."
+    scheme:
+      testTargets: [SupplTests]
+      storeKitConfiguration: Suppl/Resources/Products.storekit
+  SupplTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [SupplTests]
+    dependencies:
+      # SupplCore is linked into the app; the hosted test bundle resolves it through the app binary.
+      - target: Suppl
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.zgalbs.suppl.tests
+        GENERATE_INFOPLIST_FILE: YES
+        # XcodeGen derives these from the target name (Suppl), but the product is named suppl.
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/suppl.app/suppl
+        BUNDLE_LOADER: $(TEST_HOST)
