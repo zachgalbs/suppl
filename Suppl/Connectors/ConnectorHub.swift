@@ -105,9 +105,9 @@ final class ConnectorHub {
     func disconnectAll() async {
         changing = Set(connectors.map(\.id))
         changed()
-        // Clear WHOOP locally immediately, even if another provider's teardown suspends.
-        whoop.deleteAllData()
-        for connector in connectors { await connector.disconnect() }
+        // WHOOP clears local credentials first, then attempts grant revocation with its saved token.
+        await whoop.disconnect()
+        for connector in connectors where connector.id != .whoop { await connector.disconnect() }
         changing = []
         lastError = [:]
         changed()

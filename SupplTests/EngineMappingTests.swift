@@ -281,6 +281,48 @@ final class EngineMappingTests: XCTestCase {
         XCTAssertEqual(passes, 2, "the foreground caller requires a pass started after its request")
     }
 
+
+    private func savedRoutine() throws -> ModelContainer {
+        let container = try ModelContainer(for: Supplement.self, DoseLog.self, DecisionLog.self,
+                                           configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let context = container.mainContext
+        let supplement = Supplement(name: "Saved routine")
+        context.insert(supplement)
+        let day = Day(now, calendar: calendar)
+        context.insert(DoseLog(supplementID: supplement.planID, dayKey: day.key, action: .taken, source: .app))
+        let decision = ReminderDecision(id: ReminderID.make(day: day, moment: .breakfast, stage: .initial),
+            groupID: ReminderID.group(day: day, moment: .breakfast), day: day, moment: .breakfast,
+            planIDs: [supplement.planID], fireDate: now, stage: .initial,
+            reason: Reason(trigger: .usualTime, ruleID: "timing.usual.v1"))
+        context.insert(DecisionLog(decision: decision, title: "Saved", reasonText: "Usual time", supplementNames: [supplement.name]))
+        try context.save()
+        return container
+    }
+
+    func testDeleteAllRemovesEveryStoredModel() throws {
+        let container = try savedRoutine()
+        try LocalData.deleteAll(in: container.mainContext)
+        let check = ModelContext(container)
+        XCTAssertEqual(try check.fetchCount(FetchDescriptor<Supplement>()), 0)
+        XCTAssertEqual(try check.fetchCount(FetchDescriptor<DoseLog>()), 0)
+        XCTAssertEqual(try check.fetchCount(FetchDescriptor<DecisionLog>()), 0)
+    }
+
+    func testFailedDeleteRollsBackAllModelsAndPropagatesFailure() throws {
+        enum DiskFailure: Error { case failed }
+        let container = try savedRoutine()
+        let context = container.mainContext
+        XCTAssertThrowsError(try LocalData.deleteAll(in: context) { _ in throw DiskFailure.failed })
+        XCTAssertFalse(context.hasChanges)
+        XCTAssertEqual(try context.fetchCount(FetchDescriptor<Supplement>()), 1)
+        XCTAssertEqual(try context.fetchCount(FetchDescriptor<DoseLog>()), 1)
+        XCTAssertEqual(try context.fetchCount(FetchDescriptor<DecisionLog>()), 1)
+        // A later autosave must not finish a deletion that the UI reported as failed.
+        try context.save()
+        let check = ModelContext(container)
+        XCTAssertEqual(try check.fetchCount(FetchDescriptor<Supplement>()), 1)
+    }
+
     private func hub(_ connector: any Connector, onChange: @escaping @MainActor () -> Void = {}) -> ConnectorHub {
         let d = defaults()
         d.set(true, forKey: WhoopConnector.installedKey)

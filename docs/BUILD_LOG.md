@@ -2,7 +2,13 @@
 
 Resume with: read `docs/PLAN.md` and this file, then continue from "Next".
 
-## Status (final)
+## Current independent-review status (2026-10-24)
+
+The build handoff below is historical. Codex's review is still in progress and release acceptance is **blocked by R14**: reminders use a finite, non-repeating queue. A six-moment Extra Help routine with quiet hours off exhausts some groups after about four days because the 48-request cap truncates the seven-day horizon. This regresses pre-v1 indefinite reminders. A longer horizon does not solve it.
+
+Latest verified repair: `c28ac1c`, CI `40048146895` green (178 core, 24 app, 18 broker). This adds connector/session invalidation, cancellation and reset draining, plus equal-quiet-hours and conditional-detail corrections. The following transactional deletion/error-reporting repair still requires its own CI. No final independent-review acceptance yet.
+
+## Original build handoff
 | Phase | State | CI |
 |---|---|---|
 | 0 Plan | Done (`docs/PLAN.md`) | n/a |
@@ -16,7 +22,7 @@ Resume with: read `docs/PLAN.md` and this file, then continue from "Next".
 Tests in CI: 173 SupplCore, 12 SupplTests (incl. on-disk upgrade), 18 broker.
 
 ## Next
-Nothing in progress. Remaining work is on Zach's checklist in the PR and under "Needs a human" below. If a session resumes: re-run CI on the branch head, then pick from the PR's known limitations (sleep observer for late wake, Oura boundary, mascot).
+Finish exact-head verification of the deletion repair, reconcile the draft PR and implementation map, and address the durable-reminder blocker before release. Do not start stretch features while R14 is open. Historical phase completion is not independent acceptance.
 
 ## PR
 Draft PR: https://github.com/zachgalbs/suppl/pull/1
@@ -154,3 +160,11 @@ Accepted, not changed:
 - Scheduler callers are individually cancellable. Expired background callers return promptly; the worker is cancelled when nobody else needs it. Every scheduler suspension checks cancellation/revision before subsequent writes. A reset pauses and drains the worker, disconnects providers, then clears models/notifications/settings before resuming. Notification actions are ignored during deletion.
 - Added deterministic app tests for cancellation while a provider is suspended, concurrent foreground work, reset draining, disconnect during fetch/teardown and connect invalidation. Equal custom quiet endpoints preserve the engine's no-quiet-hours meaning. Flexible supplement detail copy no longer claims permanent fixed timing due to another plan's non-overlapping weekdays.
 - Core/broker suites and exact-head macOS CI required. The finite non-repeating queue remains an unresolved blocker; independent acceptance and the one final review comment are still pending. Device lifecycle/permission acceptance remains Zach's task.
+
+### 2026-10-24 — Codex deletion failure reporting and handoff correction
+- Lifecycle repair `c28ac1c` passed CI `40048146895`, including all 24 app tests and the seven new regression cases.
+- Delete-all now stages every persisted model deletion in one save, rolls back if it fails, shows a retryable error and preserves onboarding/settings on failure. The Done button also stays disabled while deletion drains. Two app tests cover complete deletion and an injected save failure followed by a later save.
+- Reset retains WHOOP's best-effort grant revocation by passing its captured token through disconnect before clearing other providers. Corrected the draft privacy policy's uninstall/Keychain wording; legal review remains external.
+- Actual-source finite-queue probe: at October 24 00:01 UTC, six moments + Extra Help + quiet hours off produce 48 requests; lunch/dinner/bedtime/workout end October 27, wake/breakfast October 28. The original PR's “over a week” limit was too optimistic.
+- Durable fallback remains BLOCKER R14. Apple calendar triggers automatically repeat at every matching date; adding a parallel recurring usual-time alarm can duplicate smart reminders or notify after Taken/Skip. No supported arbitrary future start bound for daily/weekly repeats was identified in Apple's trigger API. A safe durable strategy needs a separate design/contract decision and inactivity/duplicate/action tests; neither naive recurrence nor a longer finite horizon is accepted as a fix. APNs/backend expansion remains out of scope.
+- Local core/broker suites and exact-head macOS CI are required for this repair. Device upgrade, actual notification delivery, StoreKit transitions and accessibility remain Zach's verification checklist.

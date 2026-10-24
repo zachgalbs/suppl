@@ -22,6 +22,7 @@ struct SettingsView: View {
     @AppStorage(PrefKey.quietEnd) private var quietEnd = -1
 
     @State private var resetting = false
+    @State private var resetFailed = false
     @State private var confirmingReset = false
     #if DEBUG
     @State private var testSent = false
@@ -79,12 +80,17 @@ struct SettingsView: View {
             .navigationTitle("Profile")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } }
+                ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() }.disabled(resetting) }
             }
             .confirmationDialog("Delete all data and start over?", isPresented: $confirmingReset, titleVisibility: .visible) {
                 Button("Delete everything", role: .destructive, action: reset)
             } message: {
                 Text("This removes your supplements, reminder history, and settings, and disconnects your apps. It doesn't cancel a subscription.")
+            }
+            .alert("Couldn't delete your data", isPresented: $resetFailed) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Your saved routine couldn't be removed. Connected apps were disconnected. Please try deleting again.")
             }
             .sheet(isPresented: $showingPaywall) { PaywallView() }
             .onChange(of: [wake, breakfast, lunch, dinner, bedtime, postWorkout, quietStart, quietEnd]) {
@@ -187,13 +193,21 @@ struct SettingsView: View {
     private func reset() {
         guard !resetting else { return }
         resetting = true
+        resetFailed = false
         Task {
             await NotificationScheduler.beginReset()
+            defer {
+                NotificationScheduler.endReset()
+                resetting = false
+                if resetFailed { Reminders.reschedule() }
+            }
             await ConnectorHub.shared.disconnectAll()
-            try? context.delete(model: Supplement.self)
-            try? context.delete(model: DoseLog.self)
-            try? context.delete(model: DecisionLog.self)
-            try? context.save()
+            do {
+                try LocalData.deleteAll(in: context)
+            } catch {
+                resetFailed = true
+                return
+            }
             let center = UNUserNotificationCenter.current()
             center.removeAllPendingNotificationRequests()
             center.removeAllDeliveredNotifications()
@@ -205,8 +219,6 @@ struct SettingsView: View {
             AppRouter.shared.whyNowGroupID = nil
             name = ""
             onboarded = false
-            NotificationScheduler.endReset()
-            resetting = false
         }
     }
 }
@@ -225,3 +237,23 @@ extension Bundle {
         .modelContainer(PreviewData.container())
 }
 #endif
+
+/// Stage all model deletions in one save; a failure must not look like a completed reset.
+@MainActor
+enum LocalData {
+    static func deleteAll(in context: ModelContext,
+                          save: (ModelContext) throws -> Void = { try $0.save() }) throws {
+        do {
+            let supplements = try context.fetch(FetchDescriptor<Supplement>())
+            let doses = try context.fetch(FetchDescriptor<DoseLog>())
+            let decisions = try context.fetch(FetchDescriptor<DecisionLog>())
+            for model in supplements { context.delete(model) }
+            for model in doses { context.delete(model) }
+            for model in decisions { context.delete(model) }
+            try save(context)
+        } catch {
+            context.rollback()
+            throw error
+        }
+    }
+}

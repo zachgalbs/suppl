@@ -24,7 +24,9 @@ suppl. contains no analytics or advertising SDKs. Nothing you enter is sold or s
 Purchases are handled by Apple. suppl. sees whether you have an active subscription, not your payment details.
 
 ## Deleting your data
-Profile > Delete all data removes everything suppl. stored on your device and disconnects connected apps. Deleting the app also removes it.
+Profile > Delete all data removes your saved routine, reminder history, settings, and WHOOP sign-in from this device, and disconnects connected apps. If saved routine deletion fails, the app reports the failure so you can retry.
+
+Uninstalling removes the app's local routine and history, but iOS Keychain sign-in credentials can survive uninstall. Use Delete all data before uninstalling to clear the WHOOP sign-in. On a fresh reinstall, suppl. also clears an old WHOOP sign-in once protected device storage is available. Only you can revoke Health or Calendar permission in iOS settings.
 
 ## Medical disclaimer
 suppl. doesn't give medical advice. Talk to a pharmacist or doctor about doses and interactions.

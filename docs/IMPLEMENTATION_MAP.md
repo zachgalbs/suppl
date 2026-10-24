@@ -48,8 +48,8 @@ Statuses: **Implemented** · **Partial** · **Not started** · **Blocked (extern
 | Verified saved supplement doses | Partial | The app stores and shows exactly what the user typed and never changes it. No label verification (needs scanning) |
 | Structured evidence-backed knowledge engine | Partial; Needs clinical review | Catalog + rule model with ids, versions, sources, `reviewStatus: "unreviewed"` |
 | Medication and supplement safety screening | Not started; Needs clinical review | No medication entry. Three supplement spacing rules exist but ship `enabled: false` |
-| Context-aware reminder architecture | Implemented | Pure engine in `SupplCore` with ~110 tests; app scheduler diffs pending requests |
-| Functional push notifications | Partial | Local notifications planned 7 days ahead. APNs out of scope |
+| Context-aware reminder architecture | Implemented | Pure engine in `SupplCore` with timing/status tests; app scheduler diffs pending requests |
+| Functional push notifications | Partial | Local notifications planned up to 7 days ahead, fewer under the 48-request cap. APNs out of scope |
 | Taken, Snooze, and Skip actions | Implemented | |
 | Gentle accountability | Implemented | No shame copy; no response stays unconfirmed; confirmed-days streak on Home (`SupplCore/.../Accountability/Streak.swift`) |
 | Optional mascot | Not started | Stretch; skipped this session |
@@ -61,11 +61,11 @@ Statuses: **Implemented** · **Partial** · **Not started** · **Blocked (extern
 | Graceful fallback without connected apps | Partial | Usual times work within the pending queue, but one-shot reminders eventually stop without app execution. This does not yet equal pre-v1 repeating reminders. `Suppl/Engine/NotificationScheduler.swift` |
 | Monthly and yearly subscriptions | Implemented in code; Blocked (external) | App Store Connect products |
 | Working purchase restoration | Implemented in code | `AppStore.sync()`; needs a sandbox test on device |
-| Secure authentication | Not started | No accounts in v1 (nothing leaves the device) |
-| Privacy controls | Partial | Lock-screen privacy works with immediate Profile replanning; connector disconnect/cache and reset barriers added; awaiting their macOS CI and device acceptance |
-| Account deletion | Partial | No accounts; local deletion and WHOOP token clearing exist, but in-flight scheduler work now drains before deletion and stale connector results are rejected; device acceptance pending |
+| Secure authentication | Not started | No accounts in v1; WHOOP OAuth uses WHOOP and the token broker |
+| Privacy controls | Partial | Lock-screen privacy works with immediate Profile replanning; connector disconnect/cache and reset barriers passed CI `40048146895`; deletion-failure repair and device acceptance pending |
+| Account deletion | Partial | No accounts; local deletion and WHOOP token clearing exist, but scheduler drain and stale-result rejection passed CI; transactional model deletion/error reporting added with two tests, awaiting CI; device acceptance pending |
 | Accessibility support | Partial | Dynamic Type, VoiceOver labels, 44 pt targets in code; not audited on device |
-| Automated testing | Implemented | 173 core tests, 12 app tests (incl. on-disk upgrade), 18 broker tests, all in CI |
+| Automated testing | Implemented | 178 core tests, 24 app tests (incl. on-disk upgrade and lifecycle), 18 broker tests passed at `c28ac1c`; two added deletion tests await their own CI |
 | Clinical safety review of actionable rules | Needs clinical review | Every catalog entry, tip, and rule is `unreviewed` |
 | Legal and privacy review | Needs legal or App Store review | `PRIVACY.md` is a draft; health claims and paywall copy need review |
 | App Store submission readiness | Needs legal or App Store review | Privacy policy URL, App Privacy answers, subscription metadata, review notes |
@@ -75,3 +75,5 @@ Statuses: **Implemented** · **Partial** · **Not started** · **Blocked (extern
 The rows above describe the implementation, not final independent acceptance. Codex fixed clinician-directed workout timing and midnight carry-over in `944fb2a` (CI `40042993312` green); creation-date eligibility in `b64e731` passed CI `40044223008`. Notification payload identity and immediate Profile preference replanning in `575af42` passed CI `40045457513`. Original test counts above refer to the handoff snapshot. Reset concurrency, connector session/cache races and background expiration remain under review. A follow-up UI repair improves contrast/tap targets, limits test helpers to Debug, and labels history as scheduled rather than delivered; its own CI is required. Device accessibility remains unverified. The finite reminder queue is still an open fallback blocker; the earlier BUILD_LOG statement that a longer horizon fixed it is superseded by this limitation.
 
 2026-10-24 lifecycle follow-up: `f080003` WHOOP repair passed CI `40046639685`. Scheduler reset/cancellation, connection cache invalidation and Health/Calendar session guards now have a follow-up repair plus seven app regression cases (macOS CI required). An offline extraction of the actual queue and its three cancellation/reset tests passed on Linux; this is not device validation. The finite-queue fallback blocker remains open.
+
+2026-10-24 handoff correction: R14 is release-blocking. In the six-moment/Extra Help/no-quiet-hours probe, the cap truncates some reminders after roughly four days. No indefinite fallback is implemented. A separate durable strategy must preserve quiet hours, saved dose-day status and no duplicates; expanding the horizon alone is insufficient. Current lifecycle repair `c28ac1c` passed all 24 app tests. Final deletion repair, exact-head CI/artifact check and independent-review disposition remain pending.
