@@ -80,4 +80,25 @@ final class EngineHorizonTests: XCTestCase {
         XCTAssertTrue(done.contains { $0.day == F.tomorrow })
     }
 
+    func testNewRoutineDoesNotInheritYesterdaysOvernightReminder() {
+        var plan = F.plan("new", .lunch)
+        plan.startDate = F.at(0, 2, day: 24)
+        let prefs = F.prefs(intensity: .gentle, quiet: QuietHours(start: 23 * 60, end: 30)) {
+            $0.usualTimes[.lunch] = 23 * 60 + 40
+        }
+        let out = F.run([plan], prefs: prefs, now: F.at(0, 5, day: 24))
+        XCTAssertNil(out.decision(F.id(F.today, .lunch)))
+        XCTAssertEqual(out.decision(F.id(F.tomorrow, .lunch))?.fireDate, F.at(0, 30, day: 25))
+    }
+
+    func testExistingRoutineStillKeepsYesterdaysOvernightReminder() {
+        var plan = F.plan("existing", .lunch)
+        plan.startDate = F.at(12, 0)
+        let prefs = F.prefs(intensity: .gentle, quiet: QuietHours(start: 23 * 60, end: 30)) {
+            $0.usualTimes[.lunch] = 23 * 60 + 40
+        }
+        let out = F.run([plan], prefs: prefs, now: F.at(0, 5, day: 24))
+        XCTAssertEqual(out.decision(F.id(F.today, .lunch))?.fireDate, F.at(0, 30, day: 24))
+    }
+
 }

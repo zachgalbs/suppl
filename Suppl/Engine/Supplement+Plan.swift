@@ -11,6 +11,7 @@ extension Supplement {
                  withFood: withFood,
                  frequency: takesEveryDay ? .daily : .weekdays(weekdays),
                  clinicianDirected: clinicianDirected,
-                 catalogID: catalogID)
+                 catalogID: catalogID,
+                 startDate: createdAt)
     }
 }

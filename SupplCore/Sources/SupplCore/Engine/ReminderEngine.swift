@@ -73,9 +73,10 @@ public enum ReminderEngine {
     }
 
     static func isDue(_ plan: DosePlan, on day: Day, calendar: Calendar) -> Bool {
+        if let start = plan.startDate, day < Day(start, calendar: calendar) { return false }
         switch plan.frequency {
-        case .daily: true
-        case let .weekdays(days): days.contains(day.weekday(in: calendar))
+        case .daily: return true
+        case let .weekdays(days): return days.contains(day.weekday(in: calendar))
         }
     }
 }

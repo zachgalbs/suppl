@@ -33,6 +33,7 @@ final class EngineMappingTests: XCTestCase {
         XCTAssertEqual(plan.frequency, .weekdays([2, 4, 6]))
         XCTAssertTrue(plan.clinicianDirected)
         XCTAssertEqual(plan.catalogID, "creatine")
+        XCTAssertEqual(plan.startDate, s.createdAt)
     }
 
     func testPreferencesUseSavedTimesAndDefaultToTodaysBehaviour() {

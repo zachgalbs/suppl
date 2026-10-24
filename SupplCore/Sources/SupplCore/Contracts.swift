@@ -103,9 +103,12 @@ public struct DosePlan: Codable, Sendable, Hashable, Identifiable {
     /// Clinician-directed plans are never moved by context signals.
     public var clinicianDirected: Bool
     public var catalogID: String?
+    /// Existing app creation timestamp; a routine never owes doses from before it was added.
+    public var startDate: Date?
 
     public init(id: String, name: String, doseText: String, moment: Moment, withFood: Bool,
-                frequency: Frequency = .daily, clinicianDirected: Bool = false, catalogID: String? = nil) {
+                frequency: Frequency = .daily, clinicianDirected: Bool = false, catalogID: String? = nil,
+                startDate: Date? = nil) {
         self.id = id
         self.name = name
         self.doseText = doseText
@@ -114,6 +117,7 @@ public struct DosePlan: Codable, Sendable, Hashable, Identifiable {
         self.frequency = frequency
         self.clinicianDirected = clinicianDirected
         self.catalogID = catalogID
+        self.startDate = startDate
     }
 }
 

@@ -19,7 +19,7 @@ Statuses: **Implemented** · **Partial** · **Not started** · **Blocked (extern
 | Add supplements: manual entry (name, brand, dose, unit, frequency, with food) | Implemented | `Suppl/SupplementForm.swift` (+ post-workout moment, clinician-directed flag, notes) |
 | Home: greeting, list (name, dose, timing note), one daily tip | Implemented | `Suppl/HomeView.swift`, `Suppl/Home/StatusCard.swift`, `Suppl/Home/TipCard.swift`, `Suppl/Resources/tips.json` (44 sourced tips) |
 | Supplement detail: edit / remove | Implemented | `Suppl/Home/SupplementDetailView.swift` |
-| Reminders at usual meal times | Implemented | `SupplCore/.../Engine/ReminderEngine.swift`, `Suppl/Engine/NotificationScheduler.swift` |
+| Reminders at usual meal times | Partial | `SupplCore/.../Engine/ReminderEngine.swift`, `Suppl/Engine/NotificationScheduler.swift` |
 | Taken / Snooze / Skip | Implemented | `Suppl/Engine/ReminderActions.swift`, `Suppl/Engine/Logs.swift` (`DoseLog`) |
 | One follow-up max (Balanced) | Implemented | Engine follow-ups by intensity (Gentle 0, Balanced 1, Extra Help 2) |
 | Apple Health: workouts | Implemented | `Suppl/Connectors/AppleHealthConnector.swift` (observer query + background delivery, best effort) |
@@ -58,7 +58,7 @@ Statuses: **Implemented** · **Partial** · **Not started** · **Blocked (extern
 | Full contextual AI chat | Not started | Out of scope |
 | Explainable notification decisions | Implemented | `DecisionLog` + Why-now sheet (`Suppl/Home/WhyNowView.swift`), Recent reminders (Pro) |
 | Optional data integrations with honest availability states | Implemented | Apple Health, Calendar. WHOOP shows "Not available yet" until configured |
-| Graceful fallback without connected apps | Implemented | Usual times; equals the pre-v1 behaviour; tested |
+| Graceful fallback without connected apps | Partial | Usual times work within the pending queue, but one-shot reminders eventually stop without app execution. This does not yet equal pre-v1 repeating reminders. `Suppl/Engine/NotificationScheduler.swift` |
 | Monthly and yearly subscriptions | Implemented in code; Blocked (external) | App Store Connect products |
 | Working purchase restoration | Implemented in code | `AppStore.sync()`; needs a sandbox test on device |
 | Secure authentication | Not started | No accounts in v1 (nothing leaves the device) |
@@ -69,3 +69,7 @@ Statuses: **Implemented** · **Partial** · **Not started** · **Blocked (extern
 | Clinical safety review of actionable rules | Needs clinical review | Every catalog entry, tip, and rule is `unreviewed` |
 | Legal and privacy review | Needs legal or App Store review | `PRIVACY.md` is a draft; health claims and paywall copy need review |
 | App Store submission readiness | Needs legal or App Store review | Privacy policy URL, App Privacy answers, subscription metadata, review notes |
+
+## Independent verification follow-up (2026-10-24)
+
+The rows above describe the implementation, not final independent acceptance. Codex fixed clinician-directed workout timing and midnight carry-over in `944fb2a` (CI `40042993312` green); creation-date eligibility is a follow-up repair pending its own CI. Original test counts above refer to the handoff snapshot. Privacy/reset concurrency, stale notification action identities, connector session races and accessibility remain under review. The finite reminder queue is still an open fallback blocker; the earlier BUILD_LOG statement that a longer horizon fixed it is superseded by this limitation.

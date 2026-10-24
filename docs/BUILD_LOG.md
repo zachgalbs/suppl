@@ -121,3 +121,8 @@ Accepted, not changed:
 - Retained eligible previous-day reminders across midnight, including snoozes and dose-day confirmation/skip state. Regression tests first reproduced the failures against the handoff snapshot.
 - Verification in progress: local core tests and macOS CI must pass before this repair is considered complete.
 - Independent verification remains incomplete. In particular, the seven-day queue still eventually expires without app execution; extending the horizon did not resolve the durable-fallback blocker. No final independent-review comment has been posted.
+
+### 2026-10-24 — Codex carry-over eligibility follow-up
+- First repair `944fb2a` passed CI `40042993312` (simulator build and app tests), with 176 core tests locally; no completion claimed for the remaining independent-review queue.
+- Added the existing supplement creation timestamp to the core plan. Yesterday’s carry-over is now eligible only for routines already present that day; adding a supplement after midnight must not invent yesterday’s dose. No persistence schema or stored field changed. Two further core regression cases cover new versus existing routines.
+- Local core suite and follow-up CI are required; if CI outlasts this watcher run, its exact run ID and SHA are checkpointed in watcher STATE. Remaining open review areas: durable reminders after prolonged inactivity, notification payload identity, immediate preference replanning, connector/token races, reset/expiration lifecycle and accessibility.
